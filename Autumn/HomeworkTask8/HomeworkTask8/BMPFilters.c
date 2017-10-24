@@ -1,47 +1,5 @@
 #include <stdio.h>
-
-typedef unsigned char UBYTE;
-typedef unsigned short WORD;
-typedef unsigned long DWORD;
-typedef long LONG;
-
-#pragma pack(1)
-typedef struct
-{
-	WORD bfType;
-	DWORD bfSize;
-	WORD bfReserved1;
-	WORD bfReserved2;
-	DWORD bfOffBits;
-} BITMAPFILEHEADER;
-#pragma pack()
-
-#pragma pack(1)
-typedef struct
-{
-	DWORD biSize;
-	LONG biWidth;
-	LONG biHeight;
-	WORD biPlanes;
-	WORD biBitCount;
-	DWORD biCompression;
-	DWORD biSizeImage;
-	LONG biXPelsPerMeter;
-	LONG biYPelsPerMeter;
-	DWORD biClrUsed;
-	DWORD biClrImportant;
-} BITMAPINFOHEADER;
-#pragma pack()
-
-typedef struct
-{
-	UBYTE red;
-	UBYTE green;
-	UBYTE blue;
-} PIXEL;
-
-PIXEL* pixelNew(UBYTE, UBYTE, UBYTE);
-void Clamp(short*);
+#include "BMPFilters.h"
 
 int main()
 {
@@ -161,32 +119,118 @@ int main()
 				}
 			}
 
-			printf("Choose filter:\n0 = Average3x3 (default)\n1 = Gaussian3x3\n2 = Sobel X\n3 = Sobel Y\n4 = GreyScale\n");
+			printf("Choose filter:\n0 = Average3x3 (default)\n1 = Gaussian3x3\n2 = Sobel X\n3 = Sobel Y\n4 = GrayScale\n");
 			scanf("%d", &filter);
 
 			switch (filter)
 			{
 			case 1: // gaussian3x3
+			{
+				int sum;
 
 				break;
+			}
 			case 2: // sobelx
+			{
+				UBYTE maskx[3][3] =
+				{
+					{ -1, 0, 1 },
+					{ -2, 0, 2 },
+					{ -1, 0, 1 }
+				};
+
+				for (int x = 0; x < width; x++)
+				{
+					for (int y = 0; y < height; y++)
+					{
+						short gx = 0;
+
+						for (int i = -1; i <= 1; i++)
+						{
+							for (int j = -1; j <= 1; j++)
+							{
+								if (x + i >= 0 && x + i < width && y + j >= 0 && y + j < height)
+								{
+									UBYTE cur = pixelGrayscaled(newImage[x + i][y + j]);
+									cur *= maskx[i][j];
+
+									gx += cur;
+								}
+							}
+						}
+
+						gx /= 9;
+						clampToByte(&gx);
+						newImage[x][y] = *(pixelNewSame(gx));
+					}
+				}
 
 				break;
+			}
 			case 3: // sobely
+			{
+				UBYTE masky[3][3] =
+				{
+					{ -1, -2, -1 },
+					{ 0, 0, 0 },
+					{ 1, 2, 1 }
+				};
+
+				for (int x = 0; x < width; x++)
+				{
+					for (int y = 0; y < height; y++)
+					{
+						short gy = 0;
+
+						for (int i = -1; i <= 1; i++)
+						{
+							for (int j = -1; j <= 1; j++)
+							{
+								if (x + i >= 0 && x + i < width && y + j >= 0 && y + j < height)
+								{
+									UBYTE cur = pixelGrayscaled(newImage[x + i][y + j]);
+									cur *= masky[i][j];
+
+									gy += cur;
+								}
+							}
+						}
+
+						gy /= 9;
+						clampToByte(&gy);
+						newImage[x][y] = *(pixelNewSame(gy));
+					}
+				}
 
 				break;
-			case 4: // greyscale
+			}
+			case 4: // grayscale
+			{
+				for (int x = 0; x < width; x++)
+				{
+					for (int y = 0; y < height; y++)
+					{
+						/*PIXEL pix = newImage[x][y];
+						WORD grayscale = 0; // WORD used, because 255*9 > 255
+						grayscale = pix.blue + pix.green + pix.red;
+						grayscale /= 3;*/
 
+						UBYTE grayscale = pixelGrayscaled(newImage[x][y]);
+						newImage[x][y] = *(pixelNewSame(grayscale));
+					}
+				}
 				break;
+			}
 			default: // avg3x3
+			{
 				for (int x = 0; x < width; x++)
 				{
 					for (int y = 0; y < height; y++)
 					{
 						WORD r = 0, g = 0, b = 0; // WORD used, because 255*9 > 255
-						for (int i = -1; i < 2; i++)
+						for (int i = -1; i <= 1; i++)
 						{
-							for (int j = -1; j < 2; j++)
+							for (int j = -1; j <= 1; j++)
 							{
 								if (x + i >= 0 && x + i < width && y + j >= 0 && y + j < height)
 								{
@@ -201,16 +245,16 @@ int main()
 				}
 				break;
 			}
-
+			}
 			// write new image to file
 			// fseek(targetFile, bmFileHeader.bfOffBits, SEEK_SET);
 			for (int y = 0; y < height; y++)
 			{
 				for (int x = 0; x < width; x++)
 				{
-					/*Clamp(&r);
-					Clamp(&g);
-					Clamp(&b);*/
+					/*clampToByte(&r);
+					clampToByte(&g);
+					clampToByte(&b);*/
 
 					UBYTE b = newImage[x][y].blue;
 					UBYTE g = newImage[x][y].green;
@@ -249,7 +293,36 @@ PIXEL* pixelNew(UBYTE r, UBYTE g, UBYTE b)
 	return p;
 }
 
-void Clamp(short *value)
+PIXEL* pixelNewSame(UBYTE v)
+{
+	PIXEL* p = malloc(sizeof(PIXEL));
+	p->red = v;
+	p->green = v;
+	p->blue = v;
+	return p;
+}
+
+UBYTE* pixelGrayscaled(PIXEL p)
+{
+	return (p.blue + p.green + p.red) / 3;
+}
+
+/*void pixelMultiply(PIXEL *p, UBYTE v)
+{
+	short value = p->red * v;
+	clampToByte(value);
+	p->red = value;
+
+	value = p->green * v;
+	clampToByte(value);
+	p->green = value;
+
+	value = p->blue * v;
+	clampToByte(value);
+	p->blue = value;
+}*/
+
+void clampToByte(short *value)
 {
 	*value = 
 		*value < 0 ? 0 : 
