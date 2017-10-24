@@ -1,11 +1,13 @@
 #include <stdio.h>
 
+typedef unsigned char UBYTE;
 typedef unsigned short WORD;
 typedef unsigned long DWORD;
 typedef long LONG;
 
 #pragma pack(1)
-typedef struct tagBITMAPFILEHEADER {
+typedef struct
+{
 	WORD bfType;
 	DWORD bfSize;
 	WORD bfReserved1;
@@ -15,7 +17,8 @@ typedef struct tagBITMAPFILEHEADER {
 #pragma pack()
 
 #pragma pack(1)
-typedef struct tagBITMAPINFOHEADER {
+typedef struct
+{
 	DWORD biSize;
 	LONG biWidth;
 	LONG biHeight;
@@ -30,6 +33,27 @@ typedef struct tagBITMAPINFOHEADER {
 } BITMAPINFOHEADER;
 #pragma pack()
 
+typedef struct
+{
+	UBYTE red;
+	UBYTE green;
+	UBYTE blue;
+} PIXEL;
+
+PIXEL* pixelNew(UBYTE r, UBYTE g, UBYTE b)
+{
+	PIXEL* p = malloc(sizeof(PIXEL));
+	p->red = r;
+	p->green = g;
+	p->blue = b;
+	return p;
+}
+
+void pixelDestroy(PIXEL *p)
+{
+	free(p);
+}
+
 void Clamp(short*);
 
 int main()
@@ -40,7 +64,7 @@ int main()
 		FILE *sourceFile;
 		BITMAPFILEHEADER bmFileHeader;
 		BITMAPINFOHEADER bmInfoHeader;
-		unsigned char *image;
+		UBYTE *image;
 
 		int restartFilterChoosing = 1;
 
@@ -71,10 +95,9 @@ int main()
 			printf("Wrong info header size!\n");
 			continue;
 		}
-		printf("%d", bmInfoHeader.biSizeImage);
-		fseek(sourceFile, bmFileHeader.bfOffBits, SEEK_SET);
+		//fseek(sourceFile, bmFileHeader.bfOffBits, SEEK_SET);
 
-		image = (unsigned char*)malloc(bmInfoHeader.biSizeImage);
+		image = (UBYTE*)malloc(bmInfoHeader.biSizeImage);
 		if (!image)
 		{
 			free(image);
@@ -104,7 +127,34 @@ int main()
 				free(pathtarget);
 			}
 
-			/*printf("Choose filter:\n0 = Average3x3 (default)\n1 = Gaussian3x3\n2 = Sobel X\n3 = Sobel Y\n4 = GreyScale\n");
+			//new image with RGB
+			PIXEL **newImage = (PIXEL**)malloc(sizeof(PIXEL**) * height);
+			for (int i = 0; i < height; i++)
+			{
+				newImage[i] = (PIXEL*)malloc(sizeof(PIXEL*) * width);
+			}
+
+			// for writing into file
+			UBYTE pad[3] = { 0, 0, 0 };
+			int padSize = (4 - (width * 3) % 4) % 4;
+			fwrite(&bmFileHeader, sizeof(BITMAPFILEHEADER), 1, targetFile);
+			fwrite(&bmInfoHeader, sizeof(BITMAPINFOHEADER), 1, targetFile);
+			//fseek(targetFile, bmFileHeader.bfOffBits, SEEK_SET);
+
+			// pixel array
+			for (int x = 0; x < width; x++)
+			{
+				for (int y = 0; y < height; y++)
+				{
+					int offset = (x + y*width) * 3 + y * padSize;
+
+					newImage[x, y]->red = image[offset + 2];
+					newImage[x, y]->green = image[offset + 1];
+					newImage[x, y]->blue = image[offset];
+				}
+			}
+
+			printf("Choose filter:\n0 = Average3x3 (default)\n1 = Gaussian3x3\n2 = Sobel X\n3 = Sobel Y\n4 = GreyScale\n");
 			scanf("%d", &filter);
 
 			switch (filter)
@@ -122,35 +172,42 @@ int main()
 
 				break;
 			default: // avg3x3
-
+				for (int x = 0; x < width; x++)
+				{
+					for (int y = 0; y < height; y++)
+					{
+						WORD r = 0, g = 0, b = 0; // WORD used, because 255*9 > 255
+						for (int i = -1; i < 2; i++)
+						{
+							for (int j = -1; j < 2; j++)
+							{
+								if (x + i >= 0 && x + i < width && y + j >= 0 && y + j < height)
+								{
+									r += newImage[x + i, y + j]->red;
+									g += newImage[x + i, y + j]->green;
+									b += newImage[x + i, y + j]->blue;
+								}
+							}
+						}
+						newImage[x, y] = pixelNew(r / 9, g / 9, b / 9);
+					}
+				}
 				break;
-			}*/
+			}
 
-			// writing to file
-			unsigned char pad[3] = { 0, 0, 0 };
-
-			int padSize = (4 - (width * 3) % 4) % 4;
-
-			fwrite(&bmFileHeader, 1, 14, targetFile);
-			fwrite(&bmInfoHeader, 1, 40, targetFile);
-
+			// write new image to file
 			fseek(targetFile, bmFileHeader.bfOffBits, SEEK_SET);
-
 			for (int y = 0; y < height; y++)
 			{
 				for (int x = 0; x < width; x++)
 				{
-					short r = image[(x + y*width) * 3 + 2];
-					short g = image[(x + y*width) * 3 + 1];
-					short b = image[(x + y*width) * 3 + 0];
-
-					Clamp(&r);
+					/*Clamp(&r);
 					Clamp(&g);
-					Clamp(&b);
+					Clamp(&b);*/
 
-					fwrite(&b, 1, 1, targetFile);
-					fwrite(&g, 1, 1, targetFile);
-					fwrite(&r, 1, 1, targetFile);
+					fwrite(newImage[x, y]->blue, 1, 1, targetFile);
+					fwrite(newImage[x, y]->green, 1, 1, targetFile);
+					fwrite(newImage[x, y]->red, 1, 1, targetFile);
 				}
 				fwrite((char*)pad, padSize, 1, targetFile);
 			}
