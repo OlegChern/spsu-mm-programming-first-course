@@ -144,9 +144,9 @@ int main()
 			// for writing into file
 			UBYTE pad[3] = { 0, 0, 0 };
 			int padSize = (4 - (width * 3) % 4) % 4;
-			fwrite(&bmFileHeader, 1,sizeof(BITMAPFILEHEADER), targetFile);
-			fwrite(&bmInfoHeader, 1,sizeof(BITMAPINFOHEADER), targetFile);
-			//fseek(targetFile, bmFileHeader.bfOffBits, SEEK_SET);
+			fwrite(&bmFileHeader, sizeof(BITMAPFILEHEADER), 1, targetFile);
+			fwrite(&bmInfoHeader, sizeof(BITMAPINFOHEADER), 1, targetFile);
+			// fseek(targetFile, bmFileHeader.bfOffBits, SEEK_SET);
 
 			// pixel array
 			for (int x = 0; x < width; x++)
@@ -203,7 +203,7 @@ int main()
 			}
 
 			// write new image to file
-			//fseek(targetFile, bmFileHeader.bfOffBits, SEEK_SET);
+			// fseek(targetFile, bmFileHeader.bfOffBits, SEEK_SET);
 			for (int y = 0; y < height; y++)
 			{
 				for (int x = 0; x < width; x++)
