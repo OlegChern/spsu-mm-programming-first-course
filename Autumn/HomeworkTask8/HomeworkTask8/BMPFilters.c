@@ -40,20 +40,7 @@ typedef struct
 	UBYTE blue;
 } PIXEL;
 
-PIXEL* pixelNew(UBYTE r, UBYTE g, UBYTE b)
-{
-	PIXEL* p = malloc(sizeof(PIXEL));
-	p->red = r;
-	p->green = g;
-	p->blue = b;
-	return p;
-}
-
-void pixelDestroy(PIXEL *p)
-{
-	free(p);
-}
-
+PIXEL* pixelNew(UBYTE, UBYTE, UBYTE);
 void Clamp(short*);
 
 int main()
@@ -95,11 +82,12 @@ int main()
 			printf("Wrong info header size!\n");
 			continue;
 		}
-		//fseek(sourceFile, bmFileHeader.bfOffBits, SEEK_SET);
+		fseek(sourceFile, bmFileHeader.bfOffBits, SEEK_SET);
 
 		image = (UBYTE*)malloc(bmInfoHeader.biSizeImage);
 		if (!image)
 		{
+			printf("Not enough memory!\n");
 			free(image);
 			continue;
 		}
@@ -108,6 +96,7 @@ int main()
 		fread(image, bmInfoHeader.biSizeImage, 1, sourceFile);
 		if (image == NULL)
 		{
+			printf("Image is NULL!\n");
 			continue;
 		}
 
@@ -127,18 +116,36 @@ int main()
 				free(pathtarget);
 			}
 
-			//new image with RGB
-			PIXEL **newImage = (PIXEL**)malloc(sizeof(PIXEL**) * height);
-			for (int i = 0; i < height; i++)
+			if (targetFile == NULL)
 			{
-				newImage[i] = (PIXEL*)malloc(sizeof(PIXEL*) * width);
+				printf("Wrong path!\n");
+				continue;
+			}
+
+			//new image with RGB
+			PIXEL **newImage = (PIXEL**)malloc(sizeof(PIXEL**) * width);
+			if (!newImage)
+			{
+				printf("Not enough memory!\n");
+				continue;
+			}
+
+			for (int i = 0; i < width; i++)
+			{
+				newImage[i] = (PIXEL*)malloc(sizeof(PIXEL*) * height);
+				if (!newImage[i])
+				{
+					printf("Not enough memory!\n");
+					free(newImage);
+					continue;
+				}
 			}
 
 			// for writing into file
 			UBYTE pad[3] = { 0, 0, 0 };
 			int padSize = (4 - (width * 3) % 4) % 4;
-			fwrite(&bmFileHeader, sizeof(BITMAPFILEHEADER), 1, targetFile);
-			fwrite(&bmInfoHeader, sizeof(BITMAPINFOHEADER), 1, targetFile);
+			fwrite(&bmFileHeader, 1,sizeof(BITMAPFILEHEADER), targetFile);
+			fwrite(&bmInfoHeader, 1,sizeof(BITMAPINFOHEADER), targetFile);
 			//fseek(targetFile, bmFileHeader.bfOffBits, SEEK_SET);
 
 			// pixel array
@@ -148,9 +155,9 @@ int main()
 				{
 					int offset = (x + y*width) * 3 + y * padSize;
 
-					newImage[x, y]->red = image[offset + 2];
-					newImage[x, y]->green = image[offset + 1];
-					newImage[x, y]->blue = image[offset];
+					newImage[x][y].red = image[offset + 2];
+					newImage[x][y].green = image[offset + 1];
+					newImage[x][y].blue = image[offset];
 				}
 			}
 
@@ -183,20 +190,20 @@ int main()
 							{
 								if (x + i >= 0 && x + i < width && y + j >= 0 && y + j < height)
 								{
-									r += newImage[x + i, y + j]->red;
-									g += newImage[x + i, y + j]->green;
-									b += newImage[x + i, y + j]->blue;
+									r += newImage[x + i][y + j].red;
+									g += newImage[x + i][y + j].green;
+									b += newImage[x + i][y + j].blue;
 								}
 							}
 						}
-						newImage[x, y] = pixelNew(r / 9, g / 9, b / 9);
+						newImage[x][y] = *(pixelNew(r / 9, g / 9, b / 9));
 					}
 				}
 				break;
 			}
 
 			// write new image to file
-			fseek(targetFile, bmFileHeader.bfOffBits, SEEK_SET);
+			//fseek(targetFile, bmFileHeader.bfOffBits, SEEK_SET);
 			for (int y = 0; y < height; y++)
 			{
 				for (int x = 0; x < width; x++)
@@ -205,9 +212,13 @@ int main()
 					Clamp(&g);
 					Clamp(&b);*/
 
-					fwrite(newImage[x, y]->blue, 1, 1, targetFile);
-					fwrite(newImage[x, y]->green, 1, 1, targetFile);
-					fwrite(newImage[x, y]->red, 1, 1, targetFile);
+					UBYTE b = newImage[x][y].blue;
+					UBYTE g = newImage[x][y].green;
+					UBYTE r = newImage[x][y].red;
+
+					fwrite((UBYTE*)&b, 1, 1, targetFile);
+					fwrite((UBYTE*)&g, 1, 1, targetFile);
+					fwrite((UBYTE*)&r, 1, 1, targetFile);
 				}
 				fwrite((char*)pad, padSize, 1, targetFile);
 			}
@@ -227,6 +238,15 @@ int main()
 	} while (restartFileChoosing != 0);
 
 	return 0;
+}
+
+PIXEL* pixelNew(UBYTE r, UBYTE g, UBYTE b)
+{
+	PIXEL* p = malloc(sizeof(PIXEL));
+	p->red = r;
+	p->green = g;
+	p->blue = b;
+	return p;
 }
 
 void Clamp(short *value)
