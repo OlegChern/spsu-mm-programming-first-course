@@ -5,7 +5,7 @@
 int main()
 {
     printf("\nTesting chunked array.\n");
-    printf("Base length: %d", BASE_LENGTH);
+    printf("Base length: %d\n", BASE_LENGTH);
     ChunkedArray *array = buildChunkedArray();
     printf("0th element before filling the array: %08X\n", at(array, 0));
     for (int i = 0; i < 10; i++)
