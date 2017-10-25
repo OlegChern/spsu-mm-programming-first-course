@@ -1,15 +1,6 @@
 #include <stdio.h>
 #include <math.h>
-// For variadic function
-#ifdef __unix__
-
-    #include <zconf.h>
-
-#elif defined(_WIN32) || defined(WIN32)
-
-    #include <windows.h>
-
-#endif
+#include <stdarg.h>
 
 void scanPositiveReal(int n, ...)
 {
@@ -144,7 +135,7 @@ void scanPositiveReal(int n, ...)
         // Print info about newly scanned numbers
         if (index > prevIndex)
         {
-            printf("---Scaned: ");
+            printf("---Scanned: ");
             for (int i = prevIndex; i < index - 1; ++i) printf("%lf, ", x[i]);
             printf("%lf\n", x[index - 1]);
 

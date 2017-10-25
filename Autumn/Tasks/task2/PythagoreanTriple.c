@@ -1,14 +1,5 @@
 #include <stdio.h>
-// For variadic function
-#ifdef __unix__
-
-    #include <zconf.h>
-
-#elif defined(_WIN32) || defined(WIN32)
-
-    #include <windows.h>
-
-#endif
+#include <stdarg.h>
 
 void scanPositiveDecimal(int n, ...)
 {
@@ -105,7 +96,7 @@ void scanPositiveDecimal(int n, ...)
         // Print info about newly scanned numbers
         if (index > prevIndex)
         {
-            printf("---Scaned: ");
+            printf("---Scanned: ");
             for (int i = prevIndex; i < index - 1; ++i) printf("%u, ", x[i]);
             printf("%u\n", x[index - 1]);
 
