@@ -4,21 +4,23 @@
 
 int main()
 {
-    printf("Testing chunked array.\n");
+    printf("\nTesting chunked array.\n");
+    printf("Base length: %d", BASE_LENGTH);
     ChunkedArray *array = buildChunkedArray();
     printf("0th element before filling the array: %08X\n", at(array, 0));
     for (int i = 0; i < 10; i++)
     {
         addToEnd(array, i);
     }
-    addToEnd(array, VALUE_ERROR);
+    printf("Array after first filling:\n");
+    printArray(array);
     // 10 is intentionally skipped
     for (int i = 11; i < 18; i++)
     {
         addToEnd(array, i);
     }
 
-    printf("Array after filling:\n");
+    printf("Array after second filling:\n");
     printArray(array);
 
     printf("Getting all elements:\n");
