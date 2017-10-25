@@ -50,7 +50,8 @@ int main()
         // (2^p - 1) - prime  <=>  (2^p - 1) % (2 * p * j + 1) != 0 (j - natural, p - prime)
         int isPrime = 1;
         int j = 1;
-        while ((2 * p * j + 1) <= sqrt(x - 1))
+	double maxP = sqrt(x - 1);
+        while ((2 * p * j + 1) <= maxP)
         {
             if ((x - 1) % (2 * p * j + 1) == 0)
             {
