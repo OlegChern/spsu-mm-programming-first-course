@@ -1,21 +1,24 @@
 #include <stdio.h>
+#include <math.h>
 #include "BMPFilters.h"
 
 int main()
 {
-	int restartFileChoosing = 1;
+	printf("This program applies filter to image.\n");
+	printf("Source and target file must .BMP.\n\n");
+	printf("Available filters:\n0 = Average3x3 (default)\n");
+	printf("1 = Gaussian3x3\n2 = Sobel X\n3 = Sobel Y\n4 = GrayScale\n\n");
 
 	do {
+
 		FILE *sourceFile;
 		BITMAPFILEHEADER bmFileHeader;
 		BITMAPINFOHEADER bmInfoHeader;
 		UBYTE *image;
 
-		int restartFilterChoosing = 1;
-
 		{
 			char* pathsource = malloc(sizeof(char) * 64);
-			printf("Enter path to source file : \n");
+			printf("Enter path to source file: \n");
 			scanf("%s", pathsource);
 			sourceFile = fopen(pathsource, "rb");
 			free(pathsource);
@@ -50,7 +53,6 @@ int main()
 			continue;
 		}
 		
-		// read 
 		fread(image, bmInfoHeader.biSizeImage, 1, sourceFile);
 		if (image == NULL)
 		{
@@ -70,6 +72,7 @@ int main()
 				char* pathtarget = malloc(sizeof(char) * 64);
 				printf("Enter path to target file : \n");
 				scanf("%s", pathtarget);
+
 				targetFile = fopen(pathtarget, "wb");
 				free(pathtarget);
 			}
@@ -80,8 +83,8 @@ int main()
 				continue;
 			}
 
-			//new image with RGB
-			PIXEL **newImage = (PIXEL**)malloc(sizeof(PIXEL**) * width);
+			// new image with RGB
+			PIXEL **newImage = (PIXEL**)malloc(sizeof(PIXEL*) * width);
 			if (!newImage)
 			{
 				printf("Not enough memory!\n");
@@ -90,7 +93,7 @@ int main()
 
 			for (int i = 0; i < width; i++)
 			{
-				newImage[i] = (PIXEL*)malloc(sizeof(PIXEL*) * height);
+				newImage[i] = (PIXEL*)malloc(sizeof(PIXEL) * height);
 				if (!newImage[i])
 				{
 					printf("Not enough memory!\n");
@@ -119,31 +122,90 @@ int main()
 				}
 			}
 
-			printf("Choose filter:\n0 = Average3x3 (default)\n1 = Gaussian3x3\n2 = Sobel X\n3 = Sobel Y\n4 = GrayScale\n");
-			scanf("%d", &filter);
+			{
+				do {
+
+					printf("Choose filter: ");
+					scanf("%d", &filter);
+					if (filter < 0 || filter > 4)
+					{
+						printf("Wrong filter index!\n");
+						continue;
+					}
+					break;
+
+				} while (1);
+			}
 
 			switch (filter)
 			{
 			case 1: // gaussian3x3
 			{
-				int sum;
+				float sigma = 1;
+				sigma = 2 * sigma * sigma;
+				float **kernel = (float**)malloc(sizeof(float*) * 3);
 
-				break;
-			}
-			case 2: // sobelx
-			{
-				UBYTE maskx[3][3] =
+				for (char i = -1; i <= 1; i++)
 				{
-					{ -1, 0, 1 },
-					{ -2, 0, 2 },
-					{ -1, 0, 1 }
-				};
+					kernel[i + 1] = (float*)malloc(sizeof(float) * 3);
+					for (char j = -1; j <= 1; j++)
+					{
+						{
+							kernel[i + 1][j + 1] = (exp(-(i*i + j*j) / sigma)) / (PI * sigma);
+						}
+					}
+				}
 
 				for (int x = 0; x < width; x++)
 				{
 					for (int y = 0; y < height; y++)
 					{
-						short gx = 0;
+						float sum = 0;
+						float r = 0, g = 0, b = 0;
+
+						for (int i = -1; i <= 1; i++)
+						{
+							for (int j = -1; j <= 1; j++)
+							{
+								if (x + i >= 0 && x + i < width && y + j >= 0 && y + j < height)
+								{
+									PIXEL pix = newImage[x + i][y + j];
+
+									r += pix.red * kernel[i + 1][j + 1];
+									g += pix.green * kernel[i + 1][j + 1];
+									b += pix.blue * kernel[i + 1][j + 1];
+
+									sum += kernel[i + 1][j + 1];
+								}
+							}
+						}
+
+						if (sum != 0)
+						{
+							newImage[x][y].red = round(r / sum);
+							newImage[x][y].green = round(g / sum);
+							newImage[x][y].blue = round(b / sum);
+						}
+					}
+				}
+
+				break;
+			}
+			case 2: // sobelx
+			{
+				char mask[3][3] =
+				{
+					{ -1, 0, 1 },
+					{ -2, 0, 2 },
+					{ -1, 0, 1 }
+				};
+				//sobel(width, height, newImage, masky);
+
+				for (int x = 0; x < width; x++)
+				{
+					for (int y = 0; y < height; y++)
+					{
+						short g = 0;
 
 						for (int i = -1; i <= 1; i++)
 						{
@@ -152,16 +214,13 @@ int main()
 								if (x + i >= 0 && x + i < width && y + j >= 0 && y + j < height)
 								{
 									UBYTE cur = pixelGrayscaled(newImage[x + i][y + j]);
-									cur *= maskx[i][j];
-
-									gx += cur;
+									g += cur * mask[i + 1][j + 1];
 								}
 							}
 						}
 
-						gx /= 9;
-						clampToByte(&gx);
-						newImage[x][y] = *(pixelNewSame(gx));
+						clampToByte(&g);
+						newImage[x][y] = *(pixelNewSame(g));
 					}
 				}
 
@@ -169,7 +228,7 @@ int main()
 			}
 			case 3: // sobely
 			{
-				UBYTE masky[3][3] =
+				char mask[3][3] =
 				{
 					{ -1, -2, -1 },
 					{ 0, 0, 0 },
@@ -180,7 +239,7 @@ int main()
 				{
 					for (int y = 0; y < height; y++)
 					{
-						short gy = 0;
+						short g = 0;
 
 						for (int i = -1; i <= 1; i++)
 						{
@@ -189,16 +248,13 @@ int main()
 								if (x + i >= 0 && x + i < width && y + j >= 0 && y + j < height)
 								{
 									UBYTE cur = pixelGrayscaled(newImage[x + i][y + j]);
-									cur *= masky[i][j];
-
-									gy += cur;
+									g += cur * mask[i + 1][j + 1];
 								}
 							}
 						}
 
-						gy /= 9;
-						clampToByte(&gy);
-						newImage[x][y] = *(pixelNewSame(gy));
+						clampToByte(&g);
+						newImage[x][y] = *(pixelNewSame(g));
 					}
 				}
 
@@ -246,16 +302,13 @@ int main()
 				break;
 			}
 			}
+
 			// write new image to file
 			// fseek(targetFile, bmFileHeader.bfOffBits, SEEK_SET);
 			for (int y = 0; y < height; y++)
 			{
 				for (int x = 0; x < width; x++)
 				{
-					/*clampToByte(&r);
-					clampToByte(&g);
-					clampToByte(&b);*/
-
 					UBYTE b = newImage[x][y].blue;
 					UBYTE g = newImage[x][y].green;
 					UBYTE r = newImage[x][y].red;
@@ -272,14 +325,14 @@ int main()
 
 			printf("Done!\n");
 
-			restartFilterChoosing = 0;
+			break;
 
-		} while (restartFilterChoosing != 0);
+		} while (1);
 
 		fclose(sourceFile);
-		restartFileChoosing = 0;
+		break;
 
-	} while (restartFileChoosing != 0);
+	} while (1);
 
 	return 0;
 }
@@ -307,7 +360,7 @@ UBYTE* pixelGrayscaled(PIXEL p)
 	return (p.blue + p.green + p.red) / 3;
 }
 
-/*void pixelMultiply(PIXEL *p, UBYTE v)
+/*void pixelMultiply(PIXEL *p, float v)
 {
 	short value = p->red * v;
 	clampToByte(value);

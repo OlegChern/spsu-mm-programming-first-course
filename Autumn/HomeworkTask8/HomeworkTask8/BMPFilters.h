@@ -1,5 +1,7 @@
 #pragma once
 
+#define PI 3.14159
+
 typedef unsigned char UBYTE;
 typedef unsigned short WORD;
 typedef unsigned long DWORD;
@@ -43,5 +45,5 @@ typedef struct
 PIXEL* pixelNew(UBYTE, UBYTE, UBYTE);
 PIXEL* pixelNewSame(UBYTE);
 UBYTE* pixelGrayscaled(PIXEL);
-//void pixelMultiply(PIXEL*, UBYTE);
+//void pixelMultiply(PIXEL*, float);
 void clampToByte(short*);
