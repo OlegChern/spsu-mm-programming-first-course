@@ -4,7 +4,7 @@
 #include <ctype.h>
 
 /* Reverses a string */
-void strrev(char *s)
+void str_rev(char *s)
 {
     char *l, *r;
 
@@ -28,7 +28,7 @@ void strrev(char *s)
 }
 
 /* Read line in specified format. If it finds mistake prints error message and asks to repeat input*/
-char* readline(char* invite, char *input_format, int (*check)(char* s), FILE* stream)
+char* read_line(char *invite, char *input_format, int (*check)(char *s), FILE *stream)
 {
     char *buf = NULL;
     size_t buf_sz = 0;
@@ -36,18 +36,17 @@ char* readline(char* invite, char *input_format, int (*check)(char* s), FILE* st
 
     if (invite != NULL)
         printf("%s\n", invite);
-    if (input_format != NULL)
-        printf("[Requires format: %s]\n", input_format);
 
     int flag = 1;
     do {
         if (len < 0)
             printf("Can't read line. Try to reload program or repeat input.\n");
-        if (!flag) {
+        if (!flag)
+        {
             if (input_format == NULL)
                 printf("Wrong input. Try again:\n");
             else
-                printf("Wrong input. Requires format: %s. Try again:\n", input_format);
+                printf("Wrong input. requires format: %s. Try again:\n", input_format);
         }
 
         len = getline(&buf, &buf_sz, stream);
@@ -72,9 +71,9 @@ int check_word(char *s)
         if (!isalpha(s[i]))
         {
             if (isblank(s[i]))
-                printf("Incorrect character: <blank>\n");
+                printf("Incorrect character: <blank>.\n");
             else
-                printf("Incorrect character: %c\n", s[i]);
+                printf("Incorrect character: %c.\n", s[i]);
             flag = 0;
             break;
         }

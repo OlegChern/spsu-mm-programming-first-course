@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "../headers/bitfuncs.h"
-#include "../headers/strfuncs.h"
+#include "../headers/bit_funcs.h"
+#include "../headers/str_funcs.h"
 
 #define max(a,b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a > _b ? _a : _b; })
 
@@ -72,7 +72,7 @@ char* get_bin_repr_of_ieee754(double n, enum PRECISION PRECISION)
 
     for (int i = 0; int_part > 0; i++, int_part /= 2)
         before_pt[i] = (char) (int_part % 2 ? '1' : '0');
-    strrev(before_pt);
+    str_rev(before_pt);
 
     fract_part *= 2;
     for (int i = 0; i < len; i++)
