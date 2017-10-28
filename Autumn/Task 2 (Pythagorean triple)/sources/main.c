@@ -9,7 +9,8 @@ int main() {
     printf(
         "╭---------------------------- BEGIN OF USAGE ----------------------------╮\n"
         "| Program checks whether three numbers satisfy Pythagorean triple        |\n"
-        "| requirement or not and if yes whether are primitive Pythagorean triple.|\n"
+        "| requirement or not and if yes whether they are primitive Pythagorean   |\n"
+        "| triple.                                                                |\n"
         "╰---------------------------- END OF USAGE ------------------------------╯\n\n"
     );
 
