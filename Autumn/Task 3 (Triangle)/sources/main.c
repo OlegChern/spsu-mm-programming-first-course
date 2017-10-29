@@ -1,6 +1,4 @@
 #include <stdio.h>
-#include <math.h>
-#include <values.h>
 
 #include "../headers/triangle.h"
 
@@ -40,36 +38,22 @@ int main() {
 
     if (is_triangle(a, b, c))
     {
-        double angle;
-        double tmp;
+        int degrees;
+        int minutes;
+        int seconds;
 
         printf("Numbers satisfy Triangle inequality, his angles are:\n");
 
-        angle = get_angle_in_degrees(a, b, c);
-        printf(
-                "First angle: %d degrees %d minutes %d seconds\n",
-                (int) angle,
-                (int) (tmp = (angle - (int) angle) * 60),
-                (int) ((tmp - (int) tmp) * 60)
-        );
+        get_angle(a, b, c, &degrees, &minutes, &seconds);
+        printf("    1.) %d degrees %d minutes %d seconds.\n", degrees, minutes, seconds);
 
-        angle = get_angle_in_degrees(a, c, b);
-        printf(
-                "Second angle: %d degrees %d minutes %d seconds\n",
-                (int) angle,
-                (int) (tmp = (angle - (int) angle) * 60),
-                (int) ((tmp - (int) tmp) * 60)
-        );
+        get_angle(a, c, b, &degrees, &minutes, &seconds);
+        printf("    2.) %d degrees %d minutes %d seconds.\n", degrees, minutes, seconds);
 
-        angle = get_angle_in_degrees(b, c, a);
-        printf(
-                "Third angle: %d degrees %d minutes %d seconds\n",
-                (int) angle,
-                (int) (tmp = (angle - (int) angle) * 60),
-                (int) ((tmp - (int) tmp) * 60)
-        );
+        get_angle(b, c, a, &degrees, &minutes, &seconds);
+        printf("    3.) %d degrees %d minutes %d seconds.\n", degrees, minutes, seconds);;
     } else
-        printf("Numbers don't satisfy Triangle inequality\n");
+        printf("Numbers don't satisfy Triangle inequality.\n");
 
     return 0;
 }
