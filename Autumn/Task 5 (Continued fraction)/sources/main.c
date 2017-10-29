@@ -6,6 +6,14 @@
 #define MAX_COMPUTING_LEN  20000
 
 
+/*
+ * Based on algorithm: http://www.maths.surrey.ac.uk/hosted-sites/R.Knott/Fibonacci/cfINTRO.html#section6.2.2
+ * (section 6.2.2)
+ * Yes, I took that link from Kirill (╥﹏╥), because my stupid algorithm of calculation ahead
+ * was losing precision with enormous speed, so it was impossible to calculate any test
+ * which is bigger than 100 correctly.
+ */
+
 int main()
 {
     int n;
