@@ -17,4 +17,4 @@ Arguments:
             - greyen
                 - change all colours to shades of grey
 Example:
-    myInstagram.exe -s C:\sourceImage.bmp -f sobelx -o C:\destinationImage.bmp
+    myInstagram.exe -s C:\sourceImage.bmp -f gauss -o C:\destinationImage.bmp

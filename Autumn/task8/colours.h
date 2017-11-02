@@ -1,6 +1,8 @@
 #ifndef COLOURS_H
 #define COLOURS_H
 
+// It is critical to have colour structures packed
+// By default, they are packed anyway, but just in case...
 #pragma pack(push, 1)
 
 typedef struct
@@ -33,6 +35,7 @@ typedef struct
     unsigned char red;
 } LittleEndianColour32;
 
+// TODO: make RealColour24 for more efficient management of 24-bit images
 typedef struct
 {
     double red;
