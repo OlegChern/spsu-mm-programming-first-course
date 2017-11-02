@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <mem.h>
+
 #include "util.h"
 
 const char *gauss = "gauss";
@@ -295,5 +296,424 @@ int copyHeader(FILE *fileStreamIn, FILE *fileStreamOut, uint32_t headerSize)
     }
 
     free(headerBuf);
+    return 0;
+}
+
+int applyFilter(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, const double (*filter)[3], FILE *fileStreamIn, FILE *fileStreamOut, int platform)
+{
+    int result;
+    int rowSize = (biBitCount * biWidth + 31) / 32 * 4;
+    int gap = rowSize - biBitCount / 8 * biWidth;
+    char *gapBuffer = NULL;
+    if (gap != 0)
+    {
+        gapBuffer = malloc(sizeof(char) * gap);
+    }
+
+    if (platform == LITTLE_ENDIAN && biBitCount == 24)
+    {
+        // Initialize variables
+
+        // calloc is used instead of malloc so that to make sure
+        // that "previuos" line is black initially
+        // and other lines' borders are black, too.
+
+        LittleEndianColour24 *previous = calloc((size_t) biWidth + 2, sizeof(LittleEndianColour24));
+        LittleEndianColour24 *current = calloc((size_t) biWidth + 2, sizeof(LittleEndianColour24));
+        LittleEndianColour24 *next = calloc((size_t) biWidth + 2, sizeof(LittleEndianColour24));
+
+        result = fread(current + 1, sizeof(LittleEndianColour24), (size_t) biWidth, fileStreamIn);
+        FILTER_ASSERT(result == biWidth, "Error: could not read image line.\n")
+
+        if (gap != 0)
+        {
+            result = fread(gapBuffer, sizeof(char), (size_t) gap, fileStreamIn);
+            FILTER_ASSERT(result == gap, "Error reading gap between lines.\n")
+        }
+
+        // Process all lines
+
+        for (int i = 1; i < biHeight + 1; i++)
+        {
+            if (i < biHeight)
+            {
+                result = fread(next + 1, sizeof(LittleEndianColour24), (size_t) biWidth, fileStreamIn);
+                FILTER_ASSERT(result == biWidth, "Error: could not read image line.\n")
+            }
+            else
+            {
+                // Since no next line really exists, it is considered to be black
+                for (int j = 1; j < biWidth + 1; j++)
+                {
+                    next[j].red = 0;
+                    next[j].green = 0;
+                    next[j].blue = 0;
+                }
+            }
+
+            // Modify i-th line
+
+            for (int j = 1; j < biWidth + 1; j++)
+            {
+                // Calculate new pixel colour
+
+                RealColour newColour;
+                newColour.red = 0;
+                newColour.green = 0;
+                newColour.blue = 0;
+                // newColour.alpha = 0;
+
+                for (int k = 0; k < 3; k++)
+                {
+                    addToColour(&newColour, multiplyLE24(previous[j + k - 1], filter[0][k]));
+                    addToColour(&newColour, multiplyLE24(current[j + k - 1], filter[1][k]));
+                    addToColour(&newColour, multiplyLE24(next[j + k - 1], filter[2][k]));
+                }
+
+                LittleEndianColour24 savingColour;
+                savingColour.red = (unsigned char) newColour.red;
+                savingColour.green = (unsigned char) newColour.green;
+                savingColour.blue = (unsigned char) newColour.blue;
+
+                // Save new pixel colour
+
+                result = fwrite(&savingColour, sizeof(LittleEndianColour24), 1, fileStreamOut);
+                FILTER_ASSERT(result == 1, "Error: could not save image line.")
+            }
+
+            // Add current paddig and read next one if necessary
+
+            if (gap != 0)
+            {
+                result = fwrite(gapBuffer, sizeof(char), (size_t) gap, fileStreamOut);
+                FILTER_ASSERT(result == gap, "Error writing to file.\n")
+
+                if (i < biHeight)
+                {
+                    result = fread(gapBuffer, sizeof(char), (size_t) gap, fileStreamIn);
+                    FILTER_ASSERT(result == gap, "Error reading file.\n")
+                }
+            }
+
+            // In order to optimize memory usage, only three lines are kept in RAM
+
+            LittleEndianColour24 *tmp = previous;
+            previous = current;
+            current = next;
+            next = tmp;
+
+            // "next" will be overwritten anyway and doesn't have to be set to contain zeros
+        }
+
+        free(previous);
+        free(current);
+        free(next);
+    }
+    else if (platform == LITTLE_ENDIAN && biBitCount == 32)
+    {
+        // Initialize variables
+
+        // calloc is used instead of malloc so that to make sure
+        // that "previuos" line is black initially
+        // and other lines' borders are black, too.
+
+        LittleEndianColour32 *previous = calloc((size_t) biWidth + 2, sizeof(LittleEndianColour32));
+        LittleEndianColour32 *current = calloc((size_t) biWidth + 2, sizeof(LittleEndianColour32));
+        LittleEndianColour32 *next = calloc((size_t) biWidth + 2, sizeof(LittleEndianColour32));
+
+        result = fread(current + 1, sizeof(LittleEndianColour32), (size_t) biWidth, fileStreamIn);
+        FILTER_ASSERT(result == biWidth, "Error: could not read image line.\n")
+
+        if (gap != 0)
+        {
+            result = fread(gapBuffer, sizeof(char), (size_t) gap, fileStreamIn);
+            FILTER_ASSERT(result == gap, "Error reading gap between lines.\n")
+        }
+
+        // Process all lines
+
+        for (int i = 1; i < biHeight + 1; i++)
+        {
+            if (i < biHeight)
+            {
+                result = fread(next + 1, sizeof(LittleEndianColour32), (size_t) biWidth, fileStreamIn);
+                FILTER_ASSERT(result == biWidth, "Error: could not read image line.\n")
+            }
+            else
+            {
+                // Since no next line really exists, it is considered to be black
+                for (int j = 1; j < biWidth + 1; j++)
+                {
+                    next[j].red = 0;
+                    next[j].green = 0;
+                    next[j].blue = 0;
+                    next[j].alpha = 0;
+                }
+            }
+
+            // Modify i-th line
+
+            for (int j = 1; j < biWidth + 1; j++)
+            {
+                // Calculate new pixel colour
+
+                RealColour newColour;
+                newColour.red = 0;
+                newColour.green = 0;
+                newColour.blue = 0;
+                newColour.alpha = 0;
+
+                for (int k = 0; k < 3; k++)
+                {
+                    addToColour(&newColour, multiplyLE32(previous[j + k - 1], filter[0][k]));
+                    addToColour(&newColour, multiplyLE32(current[j + k - 1], filter[1][k]));
+                    addToColour(&newColour, multiplyLE32(next[j + k - 1], filter[2][k]));
+                }
+
+                LittleEndianColour32 savingColour;
+                savingColour.red = (unsigned char) newColour.red;
+                savingColour.green = (unsigned char) newColour.green;
+                savingColour.blue = (unsigned char) newColour.blue;
+                savingColour.alpha = (unsigned char) newColour.alpha;
+
+                // Save new pixel colour
+
+                result = fwrite(&savingColour, sizeof(LittleEndianColour32), 1, fileStreamOut);
+                FILTER_ASSERT(result == 1, "Error: could not save image line.")
+            }
+
+            // Add current paddig and read next one if necessary
+
+            if (gap != 0)
+            {
+                result = fwrite(gapBuffer, sizeof(char), (size_t) gap, fileStreamOut);
+                FILTER_ASSERT(result == gap, "Error writing to file.\n")
+
+                if (i < biHeight)
+                {
+                    result = fread(gapBuffer, sizeof(char), (size_t) gap, fileStreamIn);
+                    FILTER_ASSERT(result == gap, "Error reading file.\n")
+                }
+            }
+
+            // In order to optimize memory usage, only three lines are kept in RAM
+
+            LittleEndianColour32 *tmp = previous;
+            previous = current;
+            current = next;
+            next = tmp;
+
+            // "next" will be overwritten anyway and doesn't have to be set to contain zeros
+        }
+
+        free(previous);
+        free(current);
+        free(next);
+    }
+    else if (platform == BIG_ENDIAN && biBitCount == 24)
+    {
+        // Initialize variables
+
+        // calloc is used instead of malloc so that to make sure
+        // that "previuos" line is black initially
+        // and other lines' borders are black, too.
+
+        BigEndianColour24 *previous = calloc((size_t) biWidth + 2, sizeof(BigEndianColour24));
+        BigEndianColour24 *current = calloc((size_t) biWidth + 2, sizeof(BigEndianColour24));
+        BigEndianColour24 *next = calloc((size_t) biWidth + 2, sizeof(BigEndianColour24));
+
+        result = fread(current + 1, sizeof(BigEndianColour24), (size_t) biWidth, fileStreamIn);
+        FILTER_ASSERT(result == biWidth, "Error: could not read image line.\n")
+
+        if (gap != 0)
+        {
+            result = fread(gapBuffer, sizeof(char), (size_t) gap, fileStreamIn);
+            FILTER_ASSERT(result == gap, "Error reading gap between lines.\n")
+        }
+
+        // Process all lines
+
+        for (int i = 1; i < biHeight + 1; i++)
+        {
+            if (i < biHeight)
+            {
+                result = fread(next + 1, sizeof(BigEndianColour24), (size_t) biWidth, fileStreamIn);
+                FILTER_ASSERT(result == biWidth, "Error: could not read image line.\n")
+            }
+            else
+            {
+                // Since no next line really exists, it is considered to be black
+                for (int j = 1; j < biWidth + 1; j++)
+                {
+                    next[j].red = 0;
+                    next[j].green = 0;
+                    next[j].blue = 0;
+                }
+            }
+
+            // Modify i-th line
+
+            for (int j = 1; j < biWidth + 1; j++)
+            {
+                // Calculate new pixel colour
+
+                RealColour newColour;
+                newColour.red = 0;
+                newColour.green = 0;
+                newColour.blue = 0;
+                // newColour.alpha = 0;
+
+                for (int k = 0; k < 3; k++)
+                {
+                    addToColour(&newColour, multiplyBE24(previous[j + k - 1], filter[0][k]));
+                    addToColour(&newColour, multiplyBE24(current[j + k - 1], filter[1][k]));
+                    addToColour(&newColour, multiplyBE24(next[j + k - 1], filter[2][k]));
+                }
+
+                BigEndianColour24 savingColour;
+                savingColour.red = (unsigned char) newColour.red;
+                savingColour.green = (unsigned char) newColour.green;
+                savingColour.blue = (unsigned char) newColour.blue;
+
+                // Save new pixel colour
+
+                result = fwrite(&savingColour, sizeof(BigEndianColour24), 1, fileStreamOut);
+                FILTER_ASSERT(result == 1, "Error: could not save image line.")
+            }
+
+            // Add current paddig and read next one if necessary
+
+            if (gap != 0)
+            {
+                result = fwrite(gapBuffer, sizeof(char), (size_t) gap, fileStreamOut);
+                FILTER_ASSERT(result == gap, "Error writing to file.\n")
+
+                if (i < biHeight)
+                {
+                    result = fread(gapBuffer, sizeof(char), (size_t) gap, fileStreamIn);
+                    FILTER_ASSERT(result == gap, "Error reading file.\n")
+                }
+            }
+
+            // In order to optimize memory usage, only three lines are kept in RAM
+
+            BigEndianColour24 *tmp = previous;
+            previous = current;
+            current = next;
+            next = tmp;
+
+            // "next" will be overwritten anyway and doesn't have to be set to contain zeros
+        }
+
+        free(previous);
+        free(current);
+        free(next);
+    }
+    else // platform == BIG_ENDIAN && bitCount == 32
+    {
+        // Initialize variables
+
+        // calloc is used instead of malloc so that to make sure
+        // that "previuos" line is black initially
+        // and other lines' borders are black, too.
+
+        BigEndianColour32 *previous = calloc((size_t) biWidth + 2, sizeof(BigEndianColour32));
+        BigEndianColour32 *current = calloc((size_t) biWidth + 2, sizeof(BigEndianColour32));
+        BigEndianColour32 *next = calloc((size_t) biWidth + 2, sizeof(BigEndianColour32));
+
+        result = fread(current + 1, sizeof(BigEndianColour32), (size_t) biWidth, fileStreamIn);
+        FILTER_ASSERT(result == biWidth, "Error: could not read image line.\n")
+
+        if (gap != 0)
+        {
+            result = fread(gapBuffer, sizeof(char), (size_t) gap, fileStreamIn);
+            FILTER_ASSERT(result == gap, "Error reading gap between lines.\n")
+        }
+
+        // Process all lines
+
+        for (int i = 1; i < biHeight + 1; i++)
+        {
+            if (i < biHeight)
+            {
+                result = fread(next + 1, sizeof(BigEndianColour32), (size_t) biWidth, fileStreamIn);
+                FILTER_ASSERT(result == biWidth, "Error: could not read image line.\n")
+            }
+            else
+            {
+                // Since no next line really exists, it is considered to be black
+                for (int j = 1; j < biWidth + 1; j++)
+                {
+                    next[j].red = 0;
+                    next[j].green = 0;
+                    next[j].blue = 0;
+                    next[j].alpha = 0;
+                }
+            }
+
+            // Modify i-th line
+
+            for (int j = 1; j < biWidth + 1; j++)
+            {
+                // Calculate new pixel colour
+
+                RealColour newColour;
+                newColour.red = 0;
+                newColour.green = 0;
+                newColour.blue = 0;
+                newColour.alpha = 0;
+
+                for (int k = 0; k < 3; k++)
+                {
+                    addToColour(&newColour, multiplyBE32(previous[j + k - 1], filter[0][k]));
+                    addToColour(&newColour, multiplyBE32(current[j + k - 1], filter[1][k]));
+                    addToColour(&newColour, multiplyBE32(next[j + k - 1], filter[2][k]));
+                }
+
+                BigEndianColour32 savingColour;
+                savingColour.red = (unsigned char) newColour.red;
+                savingColour.green = (unsigned char) newColour.green;
+                savingColour.blue = (unsigned char) newColour.blue;
+                savingColour.alpha = (unsigned char) newColour.alpha;
+
+                // Save new pixel colour
+
+                result = fwrite(&savingColour, sizeof(BigEndianColour32), 1, fileStreamOut);
+                FILTER_ASSERT(result == 1, "Error: could not save image line.")
+            }
+
+            // Add current paddig and read next one if necessary
+
+            if (gap != 0)
+            {
+                result = fwrite(gapBuffer, sizeof(char), (size_t) gap, fileStreamOut);
+                FILTER_ASSERT(result == gap, "Error writing to file.\n")
+
+                if (i < biHeight)
+                {
+                    result = fread(gapBuffer, sizeof(char), (size_t) gap, fileStreamIn);
+                    FILTER_ASSERT(result == gap, "Error reading file.\n")
+                }
+            }
+
+            // In order to optimize memory usage, only three lines are kept in RAM
+
+            BigEndianColour32 *tmp = previous;
+            previous = current;
+            current = next;
+            next = tmp;
+
+            // "next" will be overwritten anyway and doesn't have to be set to contain zeros
+        }
+
+        free(previous);
+        free(current);
+        free(next);
+    }
+
+    if (gap != 0)
+    {
+        free(gapBuffer);
+    }
     return 0;
 }
