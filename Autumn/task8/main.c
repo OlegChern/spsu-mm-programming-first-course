@@ -63,14 +63,14 @@ int main(int argc, char **argv)
     }
 
     printf("Working...\n");
-    if (!strcmp(f, gauss))
+    if (strcmp(f, gauss) == 0)
     {
         if (applyFilter(biBitCount, biWidth, biHeight, gaussMatrix, fileStreamIn, fileStreamOut))
         {
             MAIN_ERROR();
         }
     }
-    else if (!strcmp(f, sobelx))
+    else if (strcmp(f, sobelx) == 0)
     {
         printf("Modify as sobelx NYI\n");
 //        if (applyFilter(biBitCount, biWidth, biHeight, fileStreamIn, sobelxMatrix))
@@ -78,7 +78,7 @@ int main(int argc, char **argv)
 //            MAIN_ERROR();
 //        }
     }
-    else if (!strcmp(f, sobely))
+    else if (strcmp(f, sobely) == 0)
     {
         printf("Modify as sobely NYI\n");
 //        if (applyFilter(biBitCount, biWidth, biHeight, fileStreamIn, sobelyMatrix))
@@ -86,12 +86,12 @@ int main(int argc, char **argv)
 //            MAIN_ERROR();
 //        }
     }
-    else // It has already been checked that f falls into one of these categories
+    else // strcmp(f, greyen) == 0
     {
-//        if (applyGreyen(biBitCount, biWidth, biHeight, fileStreamIn, fileStreamOut, platform))
-//        {
-//            MAIN_ERROR();
-//        }
+        if (applyGreyen(biBitCount, biWidth, biHeight, fileStreamIn, fileStreamOut, platform))
+        {
+            MAIN_ERROR();
+        }
     }
 
     fclose(fileStreamIn);

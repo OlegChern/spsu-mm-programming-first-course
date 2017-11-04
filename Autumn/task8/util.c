@@ -301,7 +301,7 @@ int copyHeader(FILE *fileStreamIn, FILE *fileStreamOut, uint32_t headerSize)
 
 // Might it be faster to use the fact that
 // line length in file should always be a multiple of 4 bytes,
-// mrge lines with gaps and view them as uint32_t?
+// mrging lines with gaps and viewing them as uint32_t?
 int applyFilter(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, const double filter[3][3], FILE *fileStreamIn, FILE *fileStreamOut)
 {
     int result;
@@ -400,7 +400,8 @@ int applyFilter(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, const do
                     filter[2][1] * next[j] +
                     filter[2][2] * next[j + bytesPerPixel];
 
-            unsigned char newByte = newValue >= 255? (unsigned char) 255: (unsigned char) newValue;
+            // This cast is always valid, provided given filter is valid, too.
+            unsigned char newByte = (unsigned char) newValue;
 
             result = fwrite(&newByte, sizeof(unsigned char), 1, fileStreamOut);
             FILTER_ASSERT(result == 1, "Error saving image line.\n")
@@ -444,80 +445,84 @@ int applyFilter(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, const do
     return 0;
 }
 
-#if 0
-/*
- * Даже когда в нашем Челябинске идёт дождь из сероводорода,
- * а все заводы стравляют химические отходы -
- * когда от смрада лысеют медведи, трескаются матрёшки
- * и сами собой лопаются струны на балалайках -
- * даже тогда вонь не столь ужасна, как та, что идёт от моего говнокода...
- *
- * This is the worst piece of sh- code I've ever written.
- * It dublicates itself many times,
- * and I really hope I shall never have to modify it.
- * A poor attempt to solve that was FILTER_ASSERT().
- * It only seems to have made things *even* worse.
- *
- * At least, I tried to comment on it as consienciously as I could.
- */
 int applyGreyen(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, FILE *fileStreamIn, FILE *fileStreamOut, int platform)
 {
     int result;
-    int rowSize = (biBitCount * biWidth + 31) / 32 * 4;
-    int gap = rowSize - biBitCount / 8 * biWidth;
-    char *gapBuffer = NULL;
-    if (gap != 0)
-    {
-        gapBuffer = malloc(sizeof(char) * gap);
-    }
+    size_t bytesPerPixel = (size_t) biBitCount / 8;
+    size_t rowSize = (size_t) (biBitCount * biWidth + 31) / 32 * 4;
 
-    if (platform == LITTLE_ENDIAN && biBitCount == 24)
-    {
-        LittleEndianColour24 *current = malloc(biWidth * sizeof(LittleEndianColour24));
+    // In this method we can merge {gapBuffer} with {line}
 
-        result = fread(current, sizeof(LittleEndianColour24), (size_t) biWidth, fileStreamIn);
-        if(result != biWidth)
+    unsigned char *line = malloc(sizeof(unsigned char) * rowSize);
+
+    // Apply filter to lines
+
+    for (int i = 0; i < biHeight; i++)
+    {
+        result = fread(line, sizeof(unsigned char), rowSize, fileStreamIn);
+        if (result != rowSize)
         {
-            printf("Error: could not read image line.\n");
-            free(current);
-            free(gapBuffer);
+            printf("Error reading line.\n");
+            free(line);
             return 1;
         }
 
-        if (gap != 0)
+        // Modify line in-place
+
+        int j = 0;
+        while (j < bytesPerPixel * biWidth)
         {
-            result = fread(gapBuffer, sizeof(char), (size_t) gap, fileStreamIn);
-            if (result == gap)
+            // Keep alpha channel
+            if (bytesPerPixel == 4 && platform == LITTLE_ENDIAN)
             {
-                printf("Error reading gap between lines.\n");
-                free(current);
-                free(gapBuffer);
-                return 1;
+                j++;
             }
+
+            double newValue = 0;
+
+            if (platform == BIG_ENDIAN)
+            {
+                newValue =
+                        LUMINANCE_RED * line[j] +
+                        LUMINANCE_GREEN * line[j + 1] +
+                        LUMINANCE_BLUE * line[j + 2];
+            }
+            else
+            {
+                newValue =
+                        LUMINANCE_BLUE * line[j] +
+                        LUMINANCE_GREEN * line[j + 1] +
+                        LUMINANCE_RED * line[j + 2];
+            }
+
+            // This cast is always valid.
+            unsigned char newByte = (unsigned char) newValue;
+
+            line[j] = newByte;
+            line[j + 1] = newByte;
+            line[j + 2] = newByte;
+
+            // Keep alpha channel
+            if (bytesPerPixel == 4 && platform == BIG_ENDIAN)
+            {
+                j++;
+            }
+
+            j += 3;
         }
 
-        // Process all lines
+        // Save modification results. Gap bytes stay untouched.
 
-        for (int i = 0; i < biHeight; i++)
+        result = fwrite(line, sizeof(unsigned char), rowSize, fileStreamOut);
+        if (result != rowSize)
         {
-
+            printf("Error saving line.\n");
+            free(line);
+            return 1;
         }
     }
-    else if (platform == LITTLE_ENDIAN && biBitCount == 32)
-    {
-    }
-    else if (platform == BIG_ENDIAN && biBitCount == 24)
-    {
-    }
-    else // platform == BIG_ENDIAN && biBitCount == 32
-    {
-    }
 
-    if (gap != 0)
-    {
-        free(gapBuffer);
-    }
+    free(line);
 
     return 0;
 }
-#endif

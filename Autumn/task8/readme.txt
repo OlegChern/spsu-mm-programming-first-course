@@ -1,5 +1,6 @@
 Description:
     Applies selected filter to selected .bmp image.
+    Argument order does not matter.
 Arguments:
     -s <source_file_name>
         - path to image to be modified. File needs to exist
@@ -16,5 +17,6 @@ Arguments:
                 -Sobel's filter on Y-axis
             - greyen
                 - change all colours to shades of grey
-Example:
+Examples:
     myInstagram.exe -s C:\sourceImage.bmp -f gauss -o C:\destinationImage.bmp
+    myInstagram.exe -f greyen -o destinationImage.bmp -s sourceImage.bmp

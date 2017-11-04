@@ -9,7 +9,11 @@
 
 #define BITMAP_FILE_HEADER_SIZE 14
 
-#define FILTER_ASSERT(condition, message) if (!(condition)) {printf(message); free(previous); free(current); free(next); free(gapBuffer); return 1;}
+#define LUMINANCE_RED 0.2126
+#define LUMINANCE_GREEN 0.7152
+#define LUMINANCE_BLUE 0.0722
+
+#define FILTER_ASSERT(condition, message) if (!(condition)) {printf(message); free(previous); free(current); free(next); if (gap != 0) free(gapBuffer); return 1;}
 
 const char *gauss;
 const char *sobelx;
@@ -41,14 +45,13 @@ int checkSizes(uint32_t, uint32_t, uint32_t, int32_t, int32_t, uint16_t);
 int copyHeader(FILE*, FILE*, uint32_t);
 
 /// Returns 0 on success, non-zero value otherwise
-// TODO: somehow split this huge method into smaller ones
 // TODO: test with other pixel size
 // Image is considered to be 2 pixels wider and 2 pixels higher than it actually is,
 // forming black outline out of those extra pixels,
 // so that gauss filter can be applied.
 int applyFilter(uint16_t, int32_t, int32_t, const double[3][3], FILE*, FILE*);
 
-// int applyGreyen(uint16_t, int32_t, int32_t, FILE*, FILE*, int);
+int applyGreyen(uint16_t, int32_t, int32_t, FILE*, FILE*, int);
 
 #endif /* UTIL_H */
 
