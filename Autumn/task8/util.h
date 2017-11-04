@@ -30,6 +30,9 @@ int exists(const char*, const char*);
 int choose(const char*, char*, char**, char**, char**);
 
 /// Returns 0 on success, non-zero value otherwise
+void printArguments(char*, char *, char*);
+
+/// Returns 0 on success, non-zero value otherwise
 int handleArguments(int, char**, char**, char**, char**);
 
 /// Returns 0 on success, non-zero value otherwise

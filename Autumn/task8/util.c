@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <malloc.h>
-#include <mem.h>
+#include <string.h>
 
 #include "util.h"
 
@@ -72,6 +72,13 @@ int choose(const char *type, char *value, char **s, char **f, char **o)
     return 1;
 }
 
+void printArguments(char *source, char *filter, char *destination)
+{
+    printf("Selected filter: \"%s\"\n", filter);
+    printf("Source file path: \"%s\"\n", source);
+    printf("Destination file path: \"%s\"\n", destination);
+}
+
 int handleArguments(int argc, char **argv, char **s, char **f, char **o)
 {
     *s = NULL;
@@ -103,24 +110,9 @@ int handleArguments(int argc, char **argv, char **s, char **f, char **o)
         printf("Error: source file not provided.\n");
         return 1;
     }
-    if (!exists(*s, "rb"))
-    {
-        printf("Error: source file doesn't exist.\n");
-        return 1;
-    }
     if (*o == NULL)
     {
         printf("Error: destination file not provided.\n");
-        return 1;
-    }
-    if (exists(*o, "rb") && !confirm("Warning: destination file already exists. Proceed anyway? [Y/n]: "))
-    {
-        printf("Abort.\n");
-        return 1;
-    }
-    if (!exists(*o, "wb"))
-    {
-        printf("Error: couldn't create destination file.\n");
         return 1;
     }
     if (*f == NULL)
@@ -128,9 +120,42 @@ int handleArguments(int argc, char **argv, char **s, char **f, char **o)
         printf("Error: filter type not provided.\n");
         return 1;
     }
+
+    printArguments(*s, *f, *o);
+
+    if (!exists(*s, "rb"))
+    {
+        printf("Error: source file doesn't exist.\n");
+        return 1;
+    }
     if (strcmp(*f, gauss) != 0 && strcmp(*f, sobelx) != 0 && strcmp(*f, sobely) != 0 && strcmp(*f, greyen) != 0)
     {
         printf("Error: unknown filter type: \"%s\"", *f);
+        return 1;
+    }
+    if (exists(*o, "rb"))
+    {
+        if (strcmp(*s, *o) == 0)
+        {
+            printf("Error: destination file path is equal to source file path.\n");
+            return 1;
+        }
+        else if (!confirm("Warning: destination file already exists. Proceed anyway? [Y/n]: "))
+        {
+            printf("Abort.\n");
+            return 1;
+        }
+
+    }
+    else if (!confirm("Proceed? [Y/n]: "))
+    {
+        printf("Abort.\n");
+        return 1;
+    }
+
+    if (!exists(*o, "wb"))
+    {
+        printf("Error: couldn't write to destination file.\n");
         return 1;
     }
     return 0;

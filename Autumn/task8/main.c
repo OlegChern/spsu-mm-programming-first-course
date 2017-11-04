@@ -18,8 +18,6 @@ const double gaussMatrix[3][3] = {{1.0 / 9, 1.0 / 9, 1.0 / 9},
 // const double sobelxMatrix[3][3] = {{}};
 // const double sobelyMatrix[3][3] = {{}};
 
-// TODO: print what file is being modified and how
-// TODO: assert that source and destination file paths are different
 int main(int argc, char **argv)
 {
     char *s; // Argument passed after -s, source file path
@@ -97,6 +95,5 @@ int main(int argc, char **argv)
     fclose(fileStreamIn);
     fclose(fileStreamOut);
     printf("Done.\n");
-    getchar();
     return 0;
 }
