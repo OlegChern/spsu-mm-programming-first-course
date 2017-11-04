@@ -18,6 +18,8 @@ const double gaussMatrix[3][3] = {{1.0 / 9, 1.0 / 9, 1.0 / 9},
 // const double sobelxMatrix[3][3] = {{}};
 // const double sobelyMatrix[3][3] = {{}};
 
+// TODO: print what file is being modified and how
+// TODO: assert that source and destination file paths are different
 int main(int argc, char **argv)
 {
     char *s; // Argument passed after -s, source file path
@@ -60,10 +62,10 @@ int main(int argc, char **argv)
         MAIN_ERROR();
     }
 
+    printf("Working...\n");
     if (!strcmp(f, gauss))
     {
-        printf("Working...\n");
-        if (applyFilter(biBitCount, biWidth, biHeight, gaussMatrix, fileStreamIn, fileStreamOut, platform))
+        if (applyFilter(biBitCount, biWidth, biHeight, gaussMatrix, fileStreamIn, fileStreamOut))
         {
             MAIN_ERROR();
         }
@@ -86,8 +88,7 @@ int main(int argc, char **argv)
     }
     else // It has already been checked that f falls into one of these categories
     {
-        printf("Modify with greying NYI\n");
-//        if (applyFilter(biBitCount, biWidth, biHeight, fileStreamIn, greyingMatrix))
+//        if (applyGreyen(biBitCount, biWidth, biHeight, fileStreamIn, fileStreamOut, platform))
 //        {
 //            MAIN_ERROR();
 //        }

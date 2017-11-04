@@ -3,6 +3,6 @@ project(task8)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES main.c colours.h util.h colours.c util.c)
+set(SOURCE_FILES main.c util.h util.c)
 
 add_executable(junk ${SOURCE_FILES})
