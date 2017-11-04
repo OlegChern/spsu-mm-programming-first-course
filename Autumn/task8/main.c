@@ -9,15 +9,22 @@
 
 #include "util.h"
 
-#define MAIN_ERROR() fclose(fileStreamIn); fclose(fileStreamOut); return 1
+const double gaussMatrix[3][3] = {{1.0 / 16, 1.0 / 8, 1.0 / 16},
+                                  {1.0 / 8, 1.0 / 4, 1.0 / 8},
+                                  {1.0 / 16, 1.0 / 8, 1.0 / 16}};
 
-const double gaussMatrix[3][3] = {{1.0 / 9, 1.0 / 9, 1.0 / 9},
-                                  {1.0 / 9, 1.0 / 9, 1.0 / 9},
-                                  {1.0 / 9, 1.0 / 9, 1.0 / 9}};
+// resulting image is no brighter than the original one.
+// I used normalisation so that to make sure
 
-// const double sobelxMatrix[3][3] = {{}};
-// const double sobelyMatrix[3][3] = {{}};
+const double sobelxMatrix[3][3] = {{-3.0 / 32, 0, 3.0 / 32},
+                                   {-10.0 / 32, 0, 10.0 / 32},
+                                   {-3.0 / 32, 0, 3.0 / 32}};
 
+const double sobelyMatrix[3][3] = {{-3.0 / 32, -10.0 / 32, -3.0 / 32},
+                                   {0, 0, 0},
+                                   {3.0 / 32, 10.0 / 32, 3.0 / 32}};
+
+// TODO: also implement absolute sobel filter
 int main(int argc, char **argv)
 {
     char *s; // Argument passed after -s, source file path
@@ -54,42 +61,18 @@ int main(int argc, char **argv)
             checkSizes(bfSize, bfOffBits, biSize, biWidth, biHeight, biBitCount) ||
             // I know using fseek is a bad thing to do, but I use fseek just once, what can possibly go wrong?
             fseek(fileStreamIn, 0, SEEK_SET) ||
-            copyHeader(fileStreamIn, fileStreamOut, bfOffBits)
+            copyHeader(fileStreamIn, fileStreamOut, bfOffBits) ||
+            printf("Working...\n") < 0 ||
+            strcmp(f, gauss) == 0 && applyKernel(biBitCount, biWidth, biHeight, gaussMatrix, fileStreamIn, fileStreamOut, &toByte) ||
+            // Note: it is not clear whether I should greyen image when applying sobel filter ir not.
+            strcmp(f, sobelx) == 0 && applyKernel(biBitCount, biWidth, biHeight, sobelxMatrix, fileStreamIn, fileStreamOut, &absToByte) ||
+            strcmp(f, sobely) == 0 && applyKernel(biBitCount, biWidth, biHeight, sobelyMatrix, fileStreamIn, fileStreamOut, &absToByte) ||
+            strcmp(f, greyen) == 0 && applyGreyen(biBitCount, biWidth, biHeight, fileStreamIn, fileStreamOut, platform)
     )
     {
-        MAIN_ERROR();
-    }
-
-    printf("Working...\n");
-    if (strcmp(f, gauss) == 0)
-    {
-        if (applyFilter(biBitCount, biWidth, biHeight, gaussMatrix, fileStreamIn, fileStreamOut))
-        {
-            MAIN_ERROR();
-        }
-    }
-    else if (strcmp(f, sobelx) == 0)
-    {
-        printf("Modify as sobelx NYI\n");
-//        if (applyFilter(biBitCount, biWidth, biHeight, fileStreamIn, sobelxMatrix))
-//        {
-//            MAIN_ERROR();
-//        }
-    }
-    else if (strcmp(f, sobely) == 0)
-    {
-        printf("Modify as sobely NYI\n");
-//        if (applyFilter(biBitCount, biWidth, biHeight, fileStreamIn, sobelyMatrix))
-//        {
-//            MAIN_ERROR();
-//        }
-    }
-    else // strcmp(f, greyen) == 0
-    {
-        if (applyGreyen(biBitCount, biWidth, biHeight, fileStreamIn, fileStreamOut, platform))
-        {
-            MAIN_ERROR();
-        }
+        fclose(fileStreamIn);
+        fclose(fileStreamOut);
+        return 1;
     }
 
     fclose(fileStreamIn);

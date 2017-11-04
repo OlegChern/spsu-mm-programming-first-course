@@ -9,6 +9,28 @@ const char *sobelx = "sobelx";
 const char *sobely = "sobely";
 const char *greyen = "greyen";
 
+unsigned char toByte(double value)
+{
+    if (value < 0)
+    {
+        return 0;
+    }
+    if (value > 255)
+    {
+        return 255;
+    }
+    return (unsigned char) value;
+}
+
+unsigned char absToByte(double value)
+{
+    if (abs((int)  value) > 255)
+    {
+        return 255;
+    }
+    return (unsigned char) abs((int) value);
+}
+
 int confirm(char *message)
 {
     while (1)
@@ -72,13 +94,6 @@ int choose(const char *type, char *value, char **s, char **f, char **o)
     return 1;
 }
 
-void printArguments(char *source, char *filter, char *destination)
-{
-    printf("Selected filter: \"%s\"\n", filter);
-    printf("Source file path: \"%s\"\n", source);
-    printf("Destination file path: \"%s\"\n", destination);
-}
-
 int handleArguments(int argc, char **argv, char **s, char **f, char **o)
 {
     *s = NULL;
@@ -121,7 +136,9 @@ int handleArguments(int argc, char **argv, char **s, char **f, char **o)
         return 1;
     }
 
-    printArguments(*s, *f, *o);
+    printf("Selected filter: \"%s\"\n", *f);
+    printf("Source file path: \"%s\"\n", *s);
+    printf("Destination file path: \"%s\"\n", *o);
 
     if (!exists(*s, "rb"))
     {
@@ -140,14 +157,10 @@ int handleArguments(int argc, char **argv, char **s, char **f, char **o)
             printf("Error: destination file path is equal to source file path.\n");
             return 1;
         }
-        else if (!confirm("Warning: destination file already exists. Proceed anyway? [Y/n]: "))
-        {
-            printf("Abort.\n");
-            return 1;
-        }
+        printf("Warning: destination file already exists.\n");
 
     }
-    else if (!confirm("Proceed? [Y/n]: "))
+    if (!confirm("Proceed? [Y/n]: "))
     {
         printf("Abort.\n");
         return 1;
@@ -324,10 +337,16 @@ int copyHeader(FILE *fileStreamIn, FILE *fileStreamOut, uint32_t headerSize)
     return 0;
 }
 
+// Image is considered to be 2 pixels wider and 2 pixels higher than it actually is,
+// forming black outline out of those extra pixels,
+// so that 3x3 kernel can be applied.
+
 // Might it be faster to use the fact that
 // line length in file should always be a multiple of 4 bytes,
-// mrging lines with gaps and viewing them as uint32_t?
-int applyFilter(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, const double filter[3][3], FILE *fileStreamIn, FILE *fileStreamOut)
+// merging lines with gaps and viewing them as (uint32_t*)?
+
+int applyKernel(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, const double kernel[3][3],
+                FILE *fileStreamIn, FILE *fileStreamOut, unsigned char (*castFunction)(double))
 {
     int result;
     size_t bytesPerPixel = (size_t)  biBitCount / 8;
@@ -347,7 +366,7 @@ int applyFilter(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, const do
 
     // Following arrays contain lines of bytes as stored in file
     // They also provide buffers of 1 black pixel in the beginning and end
-    // so that filter can be propperly applied.
+    // so that kernel can be propperly applied.
     // They don't contain any space for gap
 
     unsigned char *previous = calloc(sizeof(unsigned char), bytesPerPixel * (biWidth + 2));
@@ -380,7 +399,7 @@ int applyFilter(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, const do
         FILTER_ASSERT(result == gap, "Error reading line gap.\n")
     }
 
-    // Now, apply filter to lines.
+    // Now, apply kernel to lines.
 
     for (int i = 0; i < biHeight; i++)
     {
@@ -401,7 +420,7 @@ int applyFilter(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, const do
             // next[j] for other j's are 0 anyay
         }
 
-        // Apply filter
+        // Apply kernel
         // In fact, we don't have to care which byte means what,
         // we can work with all ow them in the same way.
 
@@ -413,20 +432,19 @@ int applyFilter(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, const do
 
             // We don't need to know which value exactly it represents
             double newValue =
-                    filter[0][0] * previous[j - bytesPerPixel] +
-                    filter[0][1] * previous[j] +
-                    filter[0][2] * previous[j + bytesPerPixel] +
+                    kernel[0][0] * previous[j - bytesPerPixel] +
+                    kernel[0][1] * previous[j] +
+                    kernel[0][2] * previous[j + bytesPerPixel] +
 
-                    filter[1][0] * current[j - bytesPerPixel] +
-                    filter[1][1] * current[j] +
-                    filter[1][2] * current[j + bytesPerPixel] +
+                    kernel[1][0] * current[j - bytesPerPixel] +
+                    kernel[1][1] * current[j] +
+                    kernel[1][2] * current[j + bytesPerPixel] +
 
-                    filter[2][0] * next[j - bytesPerPixel] +
-                    filter[2][1] * next[j] +
-                    filter[2][2] * next[j + bytesPerPixel];
+                    kernel[2][0] * next[j - bytesPerPixel] +
+                    kernel[2][1] * next[j] +
+                    kernel[2][2] * next[j + bytesPerPixel];
 
-            // This cast is always valid, provided given filter is valid, too.
-            unsigned char newByte = (unsigned char) newValue;
+            unsigned char newByte = (*castFunction)(newValue);
 
             result = fwrite(&newByte, sizeof(unsigned char), 1, fileStreamOut);
             FILTER_ASSERT(result == 1, "Error saving image line.\n")

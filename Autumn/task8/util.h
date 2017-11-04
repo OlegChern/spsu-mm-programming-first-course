@@ -20,6 +20,10 @@ const char *sobelx;
 const char *sobely;
 const char *greyen;
 
+unsigned char toByte(double);
+
+unsigned char absToByte(double);
+
 /// Returns whether user approves requested action or not.
 int confirm(char*);
 
@@ -28,9 +32,6 @@ int exists(const char*, const char*);
 /// Returns 0 on success, non-zero value otherwise
 /// type[0] is supposed be '-'.
 int choose(const char*, char*, char**, char**, char**);
-
-/// Returns 0 on success, non-zero value otherwise
-void printArguments(char*, char *, char*);
 
 /// Returns 0 on success, non-zero value otherwise
 int handleArguments(int, char**, char**, char**, char**);
@@ -47,12 +48,11 @@ int checkSizes(uint32_t, uint32_t, uint32_t, int32_t, int32_t, uint16_t);
 /// Returns 0 on success, non-zero value otherwise
 int copyHeader(FILE*, FILE*, uint32_t);
 
+// Following two methods could have been implemented in a different way
+// by creating a single modify() method that accepts function pointer as an argument.
+
 /// Returns 0 on success, non-zero value otherwise
-// TODO: test with other pixel size
-// Image is considered to be 2 pixels wider and 2 pixels higher than it actually is,
-// forming black outline out of those extra pixels,
-// so that gauss filter can be applied.
-int applyFilter(uint16_t, int32_t, int32_t, const double[3][3], FILE*, FILE*);
+int applyKernel(uint16_t, int32_t, int32_t, const double[3][3], FILE*, FILE*, unsigned char (*)(double));
 
 int applyGreyen(uint16_t, int32_t, int32_t, FILE*, FILE*, int);
 
