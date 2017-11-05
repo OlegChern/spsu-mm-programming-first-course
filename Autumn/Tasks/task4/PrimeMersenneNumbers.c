@@ -33,11 +33,11 @@ int main()
     printf("Prime Mersenne numbers:\n");
 
     int degree = 0;
-    long x = 1; // x = 2^degree
+    int x = 1; // x = 2^degree
     pIndex = 0;
 
     // (2^i - 1) - prime  =>  i - prime
-    while (primes[pIndex] <= 31 && pIndex < pN)
+    while (pIndex < pN && primes[pIndex] <= 31)
     {
         int p = primes[pIndex];
 
@@ -50,8 +50,7 @@ int main()
         // (2^p - 1) - prime  <=>  (2^p - 1) % (2 * p * j + 1) != 0 (j - natural, p - prime)
         int isPrime = 1;
         int j = 1;
-	double maxP = sqrt(x - 1);
-        while ((2 * p * j + 1) <= maxP)
+        while ((2 * p * j + 1) <= sqrt(x - 1))
         {
             if ((x - 1) % (2 * p * j + 1) == 0)
             {
@@ -61,12 +60,10 @@ int main()
             j++;
         }
 
-        if (isPrime) printf("%d ", p);
+        if (isPrime) printf("2^%d - 1 = %d\n", p, (x - 1));
 
         pIndex++;
     }
-
-    printf("\n");
 
 
     return 0;
