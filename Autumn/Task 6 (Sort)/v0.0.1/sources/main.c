@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <memory.h>
+#include <string.h>
 
 #include "../headers/qsort.h"
 
@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
     else if (strcmp(argv[1], "--help") == 0)
     {
         printf(
-                "╭---------------------------- BEGIN OF USAGE ----------------------------╮\n"
+                "#---------------------------- BEGIN OF USAGE ----------------------------#\n"
                 "| Program sorts file consisting of strings separated by '\\n'             |\n"
                 "| Sorting description:                                                   |\n"
                 "|  * quick_sort by using mapped files - fast variant but requires        |\n"
@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
                 "|    Get usage.                                                          |\n"
                 "| Usage example:                                                         |\n"
                 "|  * sorter sample/file_with_strings.txt                                 |\n"
-                "╰---------------------------- END OF USAGE ------------------------------╯\n"
+                "#---------------------------- END OF USAGE ------------------------------#\n"
         );
         return 0;
     }
