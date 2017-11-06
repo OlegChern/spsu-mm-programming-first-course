@@ -1,4 +1,4 @@
-#include <memory.h>
+#include <string.h>
 #include <stdlib.h>
 #include <math.h>
 
@@ -11,8 +11,9 @@ char* get_bin_repr_of_int(int n, enum ARCH ARCH_TYPE)
 {
     size_t len = ARCH_TYPE == $32ARCH ? 32 : 64;
 
-    char* buf = malloc(len);
+    char* buf = malloc(len + 1);
     memset(buf, '0', len);
+    buf[len] = '\0';
 
     int sign = (n > 0) ? 1 : (n < 0 ? -1 : 0);
     n = abs(n);
@@ -53,15 +54,16 @@ char* get_bin_repr_of_ieee754(double n, enum PRECISION PRECISION)
 {
     size_t len = PRECISION == SINGLE ? 32 : 64;
 
-    char* buf = malloc(len);
+    char* buf = malloc(len + 1);
     memset(buf, '0', len);
+    buf[len] = '\0';
 
     /* counting of offset and non-shifted mantissa */
 
-    char* before_pt = malloc(len);
-    before_pt[0] = '\0';
-    char* after_pt = malloc(len);
-    after_pt[0] = '\0';
+    char* before_pt = malloc(len + 1);
+    before_pt[len] = '\0';
+    char* after_pt = malloc(len + 1);
+    after_pt[len] = '\0';
 
     int sign = (n > 0) ? 1 : (n < 0 ? -1 : 0);
     n = fabs(n);
@@ -70,8 +72,12 @@ char* get_bin_repr_of_ieee754(double n, enum PRECISION PRECISION)
 
     double fract_part = n - int_part;
 
+    int before_pt_len = 0;
     for (int i = 0; int_part > 0; i++, int_part /= 2)
+    {
         before_pt[i] = (char) (int_part % 2 ? '1' : '0');
+        before_pt_len++;
+    }
     str_rev(before_pt);
 
     fract_part *= 2;
@@ -82,7 +88,6 @@ char* get_bin_repr_of_ieee754(double n, enum PRECISION PRECISION)
         fract_part = modf(fract_part, &lost) * 2;
     }
 
-    int before_pt_len = (int) strlen(before_pt);
     int after_pt_len = 0;
     while (after_pt[after_pt_len] == '0')
         after_pt_len++;
@@ -92,7 +97,7 @@ char* get_bin_repr_of_ieee754(double n, enum PRECISION PRECISION)
 
     int offset_len = PRECISION == SINGLE ? 8 : 11;
     char offset_bin[offset_len];
-    memset(offset_bin, '0', 8);
+    memset(offset_bin, '0', (size_t) offset_len);
     for (int i = offset_len - 1; offset > 0; i--, offset /= 2)
         offset_bin[i] = (char) (offset % 2 ? '1' : '0');
 
@@ -101,12 +106,12 @@ char* get_bin_repr_of_ieee754(double n, enum PRECISION PRECISION)
     if (sign < 0)
         buf[0] = '1';
 
-    strcpy(buf + 1, offset_bin);
+    strncpy(buf + 1, offset_bin, (size_t) offset_len);
 
     if (shift >= 0)
     {
         if (before_pt_len > 1)
-            strcpy(buf + 1 + offset_len, before_pt + 1);
+            strncpy(buf + 1 + offset_len, before_pt + 1, (size_t) before_pt_len - 1);
 
         strncpy(
                 buf + 1 + offset_len + max(before_pt_len - 1, 0),

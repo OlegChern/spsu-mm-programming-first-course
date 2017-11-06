@@ -1,26 +1,28 @@
 #include <stdio.h>
-#include <values.h>
+#include <limits.h>
+
 #include "../headers/pythagorean.h"
+#include "../headers/str_funcs.h"
 
 
 int main() {
     int a, b, c;
 
     printf(
-        "╭---------------------------- BEGIN OF USAGE ----------------------------╮\n"
+        "#---------------------------- BEGIN OF USAGE ----------------------------#\n"
         "| Program checks whether three numbers satisfy Pythagorean triple        |\n"
         "| requirement or not and if yes whether they are primitive Pythagorean   |\n"
         "| triple.                                                                |\n"
-        "╰---------------------------- END OF USAGE ------------------------------╯\n\n"
+        "#---------------------------- END OF USAGE ------------------------------#\n\n"
     );
 
     printf("Please, input three numbers separated by spaces:\n");
 
     while (1)
     {
-        char *s;
+        char *s = NULL;
         size_t sz = 0;
-        int gl_res = (int) getline(&s, &sz, stdin);
+        int gl_res = getline(&s, &sz, stdin);
         int sc_res = sscanf(s, "%d %d %d", &a, &b, &c);
 
         if (gl_res == -1)

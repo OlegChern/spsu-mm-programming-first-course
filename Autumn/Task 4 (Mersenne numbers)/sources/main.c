@@ -6,7 +6,7 @@
 int main() {
 
     printf(
-            "╭---------------------------- BEGIN OF USAGE ----------------------------╮\n"
+            "#---------------------------- BEGIN OF USAGE ----------------------------#\n"
             "|     That very interesting program shows you all prime Mersenne numbers |\n"
             "| in segment [1; 2^31 - 1], i.e. it shows which Mersenne numbers from    |\n"
             "| first to 31-th are prime.                                              |\n"
@@ -19,7 +19,7 @@ int main() {
             "| the first known prime with at least 10 million digits. The prime was   |\n"
             "| found on a Dell OptiPlex 745 on August 23, 2008. This was the eighth   |\n"
             "| Mersenne prime discovered at UCLA.\"                                    |\n"
-            "╰---------------------------- END OF USAGE ------------------------------╯\n\n"
+            "#---------------------------- END OF USAGE ------------------------------#\n\n"
     );
 
     for (int i = 1; i < 32; ++i)

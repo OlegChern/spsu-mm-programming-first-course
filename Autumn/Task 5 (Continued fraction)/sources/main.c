@@ -2,16 +2,17 @@
 #include <math.h>
 
 #include "../headers/fractions.h"
+#include "../headers/str_funcs.h"
 
-#define MAX_COMPUTING_LEN  20000
+#define MAX_COMPUTING_COUNT 1000000
 
 
 /*
  * Based on algorithm: http://www.maths.surrey.ac.uk/hosted-sites/R.Knott/Fibonacci/cfINTRO.html#section6.2.2
  * (section 6.2.2)
  * Yes, I took that link from Kirill (╥﹏╥), because my stupid algorithm of calculation ahead
- * was losing precision with enormous speed, so it was impossible to calculate any test
- * which is bigger than 100 correctly.
+ * was losing precision with enormous speed, so it was impossible to calculate correctly any test
+ * which was bigger than 100.
  */
 
 int main()
@@ -19,7 +20,7 @@ int main()
     int n;
 
     printf(
-            "╭---------------------------- BEGIN OF USAGE ----------------------------╮\n"
+            "#---------------------------- BEGIN OF USAGE ----------------------------#\n"
             "| Program gets n non-negative integer number and returns representation  |\n"
             "| of his square root as continued fraction in format:                    |\n"
             "|  *  [a0; a1, ..., an] if square root is NOT integer                    |\n"
@@ -27,16 +28,16 @@ int main()
             "|     representation.                                                    |\n"
             "|  *  [a0] if square root IS integer                                     |\n"
             "|     where 'a0' integer square root                                     |\n"
-            "╰----------------------------- END OF USAGE -----------------------------╯\n\n"
+            "#----------------------------- END OF USAGE -----------------------------#\n\n"
     );
 
     printf("Please, input an integer number :\n");
 
     while (1)
     {
-        char *s;
+        char *s = NULL;
         size_t sz = 0;
-        int gl_res = (int) getline(&s, &sz, stdin);
+        int gl_res = getline(&s, &sz, stdin);
         int sc_res = sscanf(s, "%d", &n);
 
         if (gl_res == -1)
@@ -49,45 +50,45 @@ int main()
             break;
     }
 
-    double m = sqrt(n);
+    int sqrt_of_n = (int) sqrt(n);
 
-    if ((int) m * m == n)
-        printf("Representation has been computed successfully:\n[%d]\n", (int) m);
+    if (sqrt_of_n * sqrt_of_n == n)
+        printf("Representation has been computed successfully:\n[%d]\n", sqrt_of_n);
     else
     {
-        int sqrt_of_n = (int) m;
+        int first[3], second[3];
 
-        int x[MAX_COMPUTING_LEN][3];
+        int x[2][3];
 
-        x[0][0] = 0;
-        x[0][1] = 1;
-        x[0][2] = sqrt_of_n;
+        first[0] = 0;
+        first[1] = 1;
+        first[2] = sqrt_of_n;
 
-        get_next_repr(n, sqrt_of_n, x[0], x[1]);
+        get_next_repr(n, sqrt_of_n, first, second);
+
+        x[0][0] = second[0];
+        x[0][1] = second[1];
+        x[0][2] = second[2];
+
+        printf("Representation has been computed successfully:\n");
+        printf("[%d; %d", first[2], second[2]);
 
         int period = -1;
-        for (int i = 2; i < MAX_COMPUTING_LEN; ++i)
+        for (int i = 2, st = 1; i < MAX_COMPUTING_COUNT; ++i, st = 1 - st)
         {
-            get_next_repr(n, sqrt_of_n, x[i - 1], x[i]);
+            get_next_repr(n, sqrt_of_n, x[1 - st], x[st]);
 
-            if (x[i][0] == x[1][0] && x[i][1] == x[1][1])
+            if (x[st][0] == second[0] && x[st][1] == second[1])
             {
                 period = i - 1;
                 break;
             }
-        }
 
-        if (period == -1)
-            printf("It is not enough MAX_COMPUTING_LEN constant to compute this representation...\n");
-        else
-        {
-            printf("Representation has been computed successfully:\n");
-            printf("[%d; ", x[0][2]);
-            for (int i = 1; i <= period; ++i)
-                printf("%d%s", x[i][2], i == period ? "]\n" : ", ");
-
-            printf("where period length is %d\n", period);
+            printf(", %d", x[st][2]);
         }
+        printf("]\n");
+
+        printf("where period length is %d\n", period);
     }
 
     return 0;

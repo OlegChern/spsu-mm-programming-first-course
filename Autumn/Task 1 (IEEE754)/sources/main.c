@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <memory.h>
+#include <string.h>
 #include <stdlib.h>
 
 #include "../headers/str_funcs.h"
@@ -12,13 +12,13 @@ int main()
     char *tmp;
 
     printf(
-            "╭---------------------------- BEGIN OF USAGE ----------------------------╮\n"
+            "#---------------------------- BEGIN OF USAGE ----------------------------#\n"
             "| That program takes your name, surname and patronymic then counts their |\n"
             "| production and presents it in three formats:                           |\n"
             "|   1.) Two's complement code of negative production.                    |\n"
             "|   2.) IEEE754 with single precision code of positive production.       |\n"
             "|   3.) IEEE754 with double precision code of negative production.       |\n"
-            "╰---------------------------- END OF USAGE ------------------------------╯\n\n"
+            "#---------------------------- END OF USAGE ------------------------------#\n\n"
     );
 
     name = read_line("Please, enter your name:", "<continuous string of letters>", check_word, stdin);

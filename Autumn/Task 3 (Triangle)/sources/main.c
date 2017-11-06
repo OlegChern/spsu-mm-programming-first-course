@@ -1,25 +1,26 @@
 #include <stdio.h>
 
 #include "../headers/triangle.h"
+#include "../headers/str_funcs.h"
 
 
 int main() {
     double a, b, c;
 
     printf(
-            "╭---------------------------- BEGIN OF USAGE ----------------------------╮\n"
+            "#---------------------------- BEGIN OF USAGE ----------------------------#\n"
             "| Program checks whether three numbers satisfy Triangle requirement or   |\n"
             "| not and if yes prints his angles with precision to seconds.            |\n"
-            "╰---------------------------- END OF USAGE ------------------------------╯\n\n"
+            "#---------------------------- END OF USAGE ------------------------------#\n\n"
     );
 
     printf("Please, input three numbers separated by spaces:\n");
 
     while (1)
     {
-        char *s;
+        char *s = NULL;
         size_t sz = 0;
-        int gl_res = (int) getline(&s, &sz, stdin);
+        int gl_res = getline(&s, &sz, stdin);
         int sc_res = sscanf(s, "%lf %lf %lf", &a, &b, &c);
 
         if (gl_res == -1)
