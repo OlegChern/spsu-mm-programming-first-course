@@ -13,8 +13,8 @@ const double gaussMatrix[3][3] = {{1.0 / 16, 1.0 / 8, 1.0 / 16},
                                   {1.0 / 8, 1.0 / 4, 1.0 / 8},
                                   {1.0 / 16, 1.0 / 8, 1.0 / 16}};
 
-// resulting image is no brighter than the original one.
 // I used normalisation so that to make sure
+// resulting image is no brighter than the original one.
 
 const double sobelxMatrix[3][3] = {{-3.0 / 32, 0, 3.0 / 32},
                                    {-10.0 / 32, 0, 10.0 / 32},
