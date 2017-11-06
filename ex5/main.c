@@ -27,7 +27,7 @@ int continuedFraction(int ideal, double n, int t)
 
     printf("%d ", ideal);
 
-    while ((num/den != (n + ideal)) || (i == 1))
+    do
     {
         num = (n + delta);
         den = (t - delta*delta)/den;
@@ -37,7 +37,8 @@ int continuedFraction(int ideal, double n, int t)
 
         printf("%d ", k);
         i++;
-    }
+    }while ((num/den != (n + ideal)));
+
     return i;
 }
 
