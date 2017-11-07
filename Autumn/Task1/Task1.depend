@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1508252905 source:c:\ide\common7\ide\task1\multiplofnames.c
+	<stdio.h>
+	<string.h>
+
