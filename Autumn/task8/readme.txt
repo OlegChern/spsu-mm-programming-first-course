@@ -2,12 +2,12 @@ Description:
     Applies selected filter to selected .bmp image.
     Argument order does not matter.
 Arguments:
-    -s <source_file_name>
+    -i <source_file_name>
         - path to image to be modified. File needs to exist
     -o <destination_file_name>
         - path to desired destination of new image.
     -f <filter_name>
-        - name of filter to be applied. If not provided, image will be copied without any filter.
+        - name of filter to be applied.
         - possible filters:
             - gauss
                 - Gauss' filter 3x3

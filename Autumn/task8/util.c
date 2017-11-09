@@ -58,47 +58,47 @@ int exists(const char *fileName, const char *mode)
     return !fclose(file);
 }
 
-int choose(const char *type, char *value, char **s, char **f, char **o)
+int choose(const char *type, char *value, char **source, char **filter, char **destination)
 {
     if (type[1] == 's' && type[2] == '\0')
     {
-        if (*s == NULL)
+        if (*source == NULL)
         {
-            *s = value;
+            *source = value;
             return 0;
         }
-        printf("Error: -s value provided more than once.\n");
+        printf("Error: -source parameter provided more than once.\n");
         return 1;
     }
     else if (type[1] == 'f' && type[2] == '\0')
     {
-        if (*f == NULL)
+        if (*filter == NULL)
         {
-            *f = value;
+            *filter = value;
             return 0;
         }
-        printf("Error: -f value provided more than once.\n");
+        printf("Error: -f parameter provided more than once.\n");
         return 1;
     }
     else if (type[1] == 'o' && type[2] == '\0')
     {
-        if (*o == NULL)
+        if (*destination == NULL)
         {
-            *o = value;
+            *destination = value;
             return 0;
         }
-        printf("Error: -o value provided more than once.\n");
+        printf("Error: -o parameter provided more than once.\n");
         return 1;
     }
     printf("Error: \"%s\" is unknown argument specifier.\n", value);
     return 1;
 }
 
-int handleArguments(int argc, char **argv, char **s, char **f, char **o)
+int handleArguments(int argc, char **argv, char **source, char **filter, char **destination)
 {
-    *s = NULL;
-    *f = NULL;
-    *o = NULL;
+    *source = NULL;
+    *filter = NULL;
+    *destination = NULL;
     int i = 1;
     while (i < argc)
     {
@@ -109,7 +109,7 @@ int handleArguments(int argc, char **argv, char **s, char **f, char **o)
                 printf("Error: no value is provided after \"%s\".\n", argv[i]);
                 return 1;
             }
-            if (choose(argv[i], argv[i + 1], s, f, o))
+            if (choose(argv[i], argv[i + 1], source, filter, destination))
                 return 1; // choose() will have already printf'ed error type
             i += 2;
         }
@@ -120,39 +120,39 @@ int handleArguments(int argc, char **argv, char **s, char **f, char **o)
         }
     }
 
-    if (*s == NULL)
+    if (*source == NULL)
     {
         printf("Error: source file not provided.\n");
         return 1;
     }
-    if (*o == NULL)
+    if (*destination == NULL)
     {
         printf("Error: destination file not provided.\n");
         return 1;
     }
-    if (*f == NULL)
+    if (*filter == NULL)
     {
         printf("Error: filter type not provided.\n");
         return 1;
     }
 
-    printf("Selected filter: \"%s\"\n", *f);
-    printf("Source file path: \"%s\"\n", *s);
-    printf("Destination file path: \"%s\"\n", *o);
+    printf("Selected filter: \"%s\"\n", *filter);
+    printf("Source file path: \"%s\"\n", *source);
+    printf("Destination file path: \"%s\"\n", *destination);
 
-    if (!exists(*s, "rb"))
+    if (!exists(*source, "rb"))
     {
         printf("Error: source file doesn't exist.\n");
         return 1;
     }
-    if (strcmp(*f, gauss) != 0 && strcmp(*f, sobelx) != 0 && strcmp(*f, sobely) != 0 && strcmp(*f, greyen) != 0)
+    if (strcmp(*filter, gauss) != 0 && strcmp(*filter, sobelx) != 0 && strcmp(*filter, sobely) != 0 && strcmp(*filter, greyen) != 0)
     {
-        printf("Error: unknown filter type: \"%s\"", *f);
+        printf("Error: unknown filter type: \"%s\"", *filter);
         return 1;
     }
-    if (exists(*o, "rb"))
+    if (exists(*destination, "rb"))
     {
-        if (strcmp(*s, *o) == 0)
+        if (strcmp(*source, *destination) == 0)
         {
             printf("Error: destination file path is equal to source file path.\n");
             return 1;
@@ -166,7 +166,7 @@ int handleArguments(int argc, char **argv, char **s, char **f, char **o)
         return 1;
     }
 
-    if (!exists(*o, "wb"))
+    if (!exists(*destination, "wb"))
     {
         printf("Error: couldn't write to destination file.\n");
         return 1;
@@ -222,8 +222,7 @@ int handleBitmapFileHeader(FILE *fileStreamIn, uint16_t *bfType, uint32_t *bfSiz
     return 0;
 }
 
-int
-handleBitmapInfoHeader(FILE *fileStreamIn, uint32_t *biSize, int32_t *biWidth, int32_t *biHeight, uint16_t *biPlains, uint16_t *biBitCount)
+int handleBitmapInfoHeader(FILE *fileStreamIn, uint32_t *biSize, int32_t *biWidth, int32_t *biHeight, uint16_t *biPlains, uint16_t *biBitCount)
 {
     if (!fread(biSize, 4, 1, fileStreamIn))
     {

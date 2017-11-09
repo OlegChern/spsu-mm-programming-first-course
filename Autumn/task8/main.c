@@ -9,12 +9,17 @@
 
 #include "util.h"
 
+const char *about = "This is utility that applies selected filter to selected .bmp image.\n"
+                    "Arguments:\n"
+                    "-i: path to file to be modified.\n"
+                    "-f: filter to be applied.\n";
+
 const double gaussMatrix[3][3] = {{1.0 / 16, 1.0 / 8, 1.0 / 16},
                                   {1.0 / 8, 1.0 / 4, 1.0 / 8},
                                   {1.0 / 16, 1.0 / 8, 1.0 / 16}};
 
-// resulting image is no brighter than the original one.
 // I used normalisation so that to make sure
+// resulting image is no brighter than the original one.
 
 const double sobelxMatrix[3][3] = {{-3.0 / 32, 0, 3.0 / 32},
                                    {-10.0 / 32, 0, 10.0 / 32},
@@ -27,15 +32,21 @@ const double sobelyMatrix[3][3] = {{-3.0 / 32, -10.0 / 32, -3.0 / 32},
 // TODO: also implement absolute sobel filter
 int main(int argc, char **argv)
 {
-    char *s; // Argument passed after -s, source file path
-    char *f; // Argument passed after -f, filter type
-    char *o; // Argument passed after -o, destination file path
+    if (argc == 0)
+    {
+        printf("");
+        return 0;
+    }
 
-    if (handleArguments(argc, argv, &s, &f, &o))
+    char *source; // Argument passed after -s, source file path
+    char *filter; // Argument passed after -f, filter type
+    char *destination; // Argument passed after -o, destination file path
+
+    if (handleArguments(argc, argv, &source, &filter, &destination))
         return 1;
 
-    FILE *fileStreamIn = fopen(s, "rb");
-    FILE *fileStreamOut = fopen(o, "wb");
+    FILE *fileStreamIn = fopen(source, "rb");
+    FILE *fileStreamOut = fopen(destination, "wb");
 
     // All ugly variable names are equal to the ones in documentation.
 
@@ -53,8 +64,7 @@ int main(int argc, char **argv)
 
     int platform;
 
-    // I am uncertain whether it is good or not to write conditions like this one.
-    // Welllll, it is beautiful, isn't it?
+    // If it isn't beautiful, huh?
     if (
             handleBitmapFileHeader(fileStreamIn, &bfType, &bfSize, &bfReserved1, &bfReserved2, &bfOffBits, &platform) ||
             handleBitmapInfoHeader(fileStreamIn, &biSize, &biWidth, &biHeight, &biPlains, &biBitCount) ||
@@ -63,11 +73,11 @@ int main(int argc, char **argv)
             fseek(fileStreamIn, 0, SEEK_SET) ||
             copyHeader(fileStreamIn, fileStreamOut, bfOffBits) ||
             printf("Working...\n") < 0 ||
-            strcmp(f, gauss) == 0 && applyKernel(biBitCount, biWidth, biHeight, gaussMatrix, fileStreamIn, fileStreamOut, &toByte) ||
+            strcmp(filter, gauss) == 0 && applyKernel(biBitCount, biWidth, biHeight, gaussMatrix, fileStreamIn, fileStreamOut, &toByte) ||
             // Note: it is not clear whether I should greyen image when applying sobel filter ir not.
-            strcmp(f, sobelx) == 0 && applyKernel(biBitCount, biWidth, biHeight, sobelxMatrix, fileStreamIn, fileStreamOut, &absToByte) ||
-            strcmp(f, sobely) == 0 && applyKernel(biBitCount, biWidth, biHeight, sobelyMatrix, fileStreamIn, fileStreamOut, &absToByte) ||
-            strcmp(f, greyen) == 0 && applyGreyen(biBitCount, biWidth, biHeight, fileStreamIn, fileStreamOut, platform)
+            strcmp(filter, sobelx) == 0 && applyKernel(biBitCount, biWidth, biHeight, sobelxMatrix, fileStreamIn, fileStreamOut, &absToByte) ||
+            strcmp(filter, sobely) == 0 && applyKernel(biBitCount, biWidth, biHeight, sobelyMatrix, fileStreamIn, fileStreamOut, &absToByte) ||
+            strcmp(filter, greyen) == 0 && applyGreyen(biBitCount, biWidth, biHeight, fileStreamIn, fileStreamOut, platform)
     )
     {
         fclose(fileStreamIn);
