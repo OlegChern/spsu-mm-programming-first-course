@@ -174,18 +174,23 @@ int handleArguments(int argc, char **argv, char **source, char **filter, char **
     return 0;
 }
 
-int handleBitmapFileHeader(FILE *fileStreamIn, uint16_t *bfType, uint32_t *bfSize, uint16_t *bfReserved1, uint16_t *bfReserved2, uint32_t *bfOffBits, int *platform)
+int handleBitmapFileHeader(FILE *fileStreamIn, BITMAPFILEHEADER *header, int *platform)
 {
-    if (!fread(bfType, 2, 1, fileStreamIn))
+    // Following operation is based on assumption that
+    // integer representation in RAM is equal to the one on HDD.
+    // Thus, it can't propperly manage images imported from
+    // another platform type (big/little endian).
+    if (!fread(header, sizeof(BITMAPFILEHEADER), 1, fileStreamIn))
     {
         printf("Error: could not read file header.\n");
         return 1;
     }
-    if (*bfType == 0x4D42)
+    // These magic constants are default bmp header beginnings
+    if (header->bfType == 0x4D42)
     {
         *platform = LITTLE_ENDIAN;
     }
-    else if (*bfType == 0x424D)
+    else if (header->bfType == 0x424D)
     {
         *platform = BIG_ENDIAN;
     }
@@ -193,117 +198,57 @@ int handleBitmapFileHeader(FILE *fileStreamIn, uint16_t *bfType, uint32_t *bfSiz
     {
         printf("Error: file doesn't start with a valid bmp header.\n");
         printf("Header expected: 4D42 or 424D.\n");
-        printf("Header found: %02X", *bfType);
+        printf("Header found: %02X", header->bfType);
         return 1;
     }
-
-    if (!fread(bfSize, 4, 1, fileStreamIn))
-    {
-        printf("Error: could not read file size.\n");
-        return 1;
-    }
-
-    if (!fread(bfReserved1, 2, 1, fileStreamIn) || !fread(bfReserved2, 2, 1, fileStreamIn))
-    {
-        printf("Error: could not read reserved areas.\n");
-        return 1;
-    }
-    if (*bfReserved1 || *bfReserved2)
+    if (header->bfReserved1 != 0 || header->bfReserved2 != 0)
     {
         printf("Error: reserved regions contain non-zero value.\n");
         return 1;
     }
-
-    if (!fread(bfOffBits, 4, 1, fileStreamIn))
-    {
-        printf("Error: could not read data offset.\n");
-        return 1;
-    }
     return 0;
 }
 
-int handleBitmapInfoHeader(FILE *fileStreamIn, uint32_t *biSize, int32_t *biWidth, int32_t *biHeight, uint16_t *biPlains, uint16_t *biBitCount)
+int handleBitmapInfoHeader(FILE *fileStreamIn, BITMAPINFOHEADER *infoHeader)
 {
-    if (!fread(biSize, 4, 1, fileStreamIn))
+    // Same as handleBitmapFileHeader()
+    if (!fread(infoHeader, sizeof(BITMAPINFOHEADER), 1, fileStreamIn))
     {
-        printf("Error: could not read bitmap-info-header size.\n");
+        printf("Error: could not read bitmap info header.\n");
         return 1;
     }
-
-    // "BITMAPCOREHEADER" format is also supported
-    if (*biSize == 12)
-    {
-        uint16_t bcWidth;
-        uint16_t bcHeight;
-
-        if (!fread(&bcWidth, 2, 1, fileStreamIn) || !fread(&bcHeight, 2, 1, fileStreamIn))
-        {
-            printf("Error: could not read file dimensions.\n");
-            return 1;
-        }
-
-        *biWidth = (int32_t) bcWidth;
-        *biHeight = (int32_t) bcHeight;
-    }
-    else if (*biSize < 16)
-    {
-        printf("Error: unexpected info header size: \"%d\"", *biSize);
-        return 1;
-    }
-    else
-    {
-        if (!fread(biWidth, 4, 1, fileStreamIn) || !fread(biHeight, 4, 1, fileStreamIn))
-        {
-            printf("Error: could not read file dimensions.\n");
-            return 1;
-        }
-    }
-
-    if (*biWidth <= 0 || *biHeight <= 0)
+    if (infoHeader->biWidth <= 0 || infoHeader->biHeight <= 0)
     {
         printf("Error: found non-positive values for image dimensions.\n");
         return 0;
     }
-
-    if (!fread(biPlains, 2, 1, fileStreamIn))
+    if (infoHeader->biPlains != 1)
     {
-        printf("Error: could not read colour planes number.\n");
-        return 1;
-    }
-
-    if (*biPlains != 1)
-    {
-        printf("Error: unexpected number of colour planes: \"%d\".\n", *biPlains);
-        return 1;
-    }
-
-    if (!fread(biBitCount, 2, 1, fileStreamIn))
-    {
-        printf("Error: could not read bit per pixel count.\n");
+        printf("Error: unexpected number of colour planes: \"%d\".\n", infoHeader->biPlains);
         return 1;
     }
     return 0;
 }
 
-int checkSizes(uint32_t bfSize, uint32_t bfOffBits, uint32_t biSize, int32_t biWidth, int32_t biHeight, uint16_t biBitCount)
+int checkSizes(BITMAPFILEHEADER *fileHeader, BITMAPINFOHEADER *infoHeader)
 {
-    if (bfOffBits < BITMAP_FILE_HEADER_SIZE + biSize)
+    if (fileHeader->bfOffBits < sizeof(BITMAPFILEHEADER) + infoHeader->biSize)
     {
         printf("Error: file contents are not valid: data offset is less that total length of headers.\n");
         return 1;
     }
-    if (biBitCount != 24 && biBitCount != 32)
+    if (infoHeader->biBitCount != 24 && infoHeader->biBitCount != 32)
     {
-        printf("Error: images with \"%d\" bits per pixel are not supported.\n", biBitCount);
+        printf("Error: images with \"%d\" bits per pixel are not supported.\n", infoHeader->biBitCount);
         return 1;
     }
-    int rowSize = (biBitCount * biWidth + 31) / 32 * 4;
-    if (rowSize * biHeight + bfOffBits != bfSize)
+    int rowSize = (infoHeader->biBitCount * infoHeader->biWidth + 31) / 32 * 4;
+    if (rowSize * infoHeader->biHeight + fileHeader->bfOffBits != fileHeader->bfSize)
     {
         printf("Error: file size doesn't match declared data.\n");
         return 1;
     }
-    if (biHeight <= 2)
+    if (infoHeader->biHeight <= 2 || infoHeader->biWidth <= 2)
     {
         printf("Error: image height is too small to apply filters.\n");
         return 1;
@@ -336,25 +281,22 @@ int copyHeader(FILE *fileStreamIn, FILE *fileStreamOut, uint32_t headerSize)
     return 0;
 }
 
-// Image is considered to be 2 pixels wider and 2 pixels higher than it actually is,
+// Image is considered to be 2 pixels wider
+// and 2 pixels higher than it actually is,
 // forming black outline out of those extra pixels,
 // so that 3x3 kernel can be applied.
 
-// Might it be faster to use the fact that
-// line length in file should always be a multiple of 4 bytes,
-// merging lines with gaps and viewing them as (uint32_t*)?
-
-int applyKernel(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, const double kernel[3][3],
+int applyKernel(BITMAPINFOHEADER *infoHeader, const double kernel[3][3],
                 FILE *fileStreamIn, FILE *fileStreamOut, unsigned char (*castFunction)(double))
 {
     int result;
-    size_t bytesPerPixel = (size_t)  biBitCount / 8;
-    int rowSize = (biBitCount * biWidth + 31) / 32 * 4;
+    size_t bytesPerPixel = (size_t)  infoHeader->biBitCount / 8;
+    int rowSize = (infoHeader->biBitCount * infoHeader->biWidth + 31) / 32 * 4;
 
     // Line length in file should always be a multiple of 4 bytes.
     // Hence, gap sometimes has to be added.
 
-    int gap = rowSize - bytesPerPixel * biWidth;
+    int gap = rowSize - bytesPerPixel * infoHeader->biWidth;
     char *gapBuffer = NULL;
     if (gap != 0)
     {
@@ -368,11 +310,11 @@ int applyKernel(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, const do
     // so that kernel can be propperly applied.
     // They don't contain any space for gap
 
-    unsigned char *previous = calloc(sizeof(unsigned char), bytesPerPixel * (biWidth + 2));
+    unsigned char *previous = calloc(sizeof(unsigned char), bytesPerPixel * (infoHeader->biWidth + 2));
     // Since no previous line exists, let it be black.
     // calloc is more efficient than malloc + manually setting colours to black
-    unsigned char *current = malloc(sizeof(unsigned char) * bytesPerPixel * (biWidth + 2));
-    unsigned char *next = malloc(sizeof(unsigned char) * bytesPerPixel * (biWidth + 2));
+    unsigned char *current = malloc(sizeof(unsigned char) * bytesPerPixel * (infoHeader->biWidth + 2));
+    unsigned char *next = malloc(sizeof(unsigned char) * bytesPerPixel * (infoHeader->biWidth + 2));
 
     // Make sure buffer pixels of current and next are black
     // (pixels of previous are all black anyway)
@@ -383,14 +325,14 @@ int applyKernel(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, const do
         current[i] = 0;
         next[i] = 0;
         // ...and at the end.
-        current[bytesPerPixel * (biWidth + 1) + i] = 0;
-        next[bytesPerPixel * (biWidth + 1) + i] = 0;
+        current[bytesPerPixel * (infoHeader->biWidth + 1) + i] = 0;
+        next[bytesPerPixel * (infoHeader->biWidth + 1) + i] = 0;
     }
 
     // Read first line (and it's gap if necessary).
 
-    result = fread(current + bytesPerPixel, sizeof(unsigned char), bytesPerPixel * biWidth, fileStreamIn);
-    FILTER_ASSERT(result == bytesPerPixel * biWidth, "Error reading image line.\n")
+    result = fread(current + bytesPerPixel, sizeof(unsigned char), bytesPerPixel * infoHeader->biWidth, fileStreamIn);
+    FILTER_ASSERT(result == bytesPerPixel * infoHeader->biWidth, "Error reading image line.\n")
 
     if (gap != 0)
     {
@@ -400,19 +342,19 @@ int applyKernel(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, const do
 
     // Now, apply kernel to lines.
 
-    for (int i = 0; i < biHeight; i++)
+    for (int i = 0; i < infoHeader->biHeight; i++)
     {
         // Read next line
         // Or clear it, if the image is over
 
-        if (i != biHeight - 1)
+        if (i != infoHeader->biHeight - 1)
         {
-            result = fread(next + bytesPerPixel, sizeof(unsigned char), bytesPerPixel * biWidth, fileStreamIn);
-            FILTER_ASSERT(result == bytesPerPixel * biWidth, "Error reading image line.\n")
+            result = fread(next + bytesPerPixel, sizeof(unsigned char), bytesPerPixel * infoHeader->biWidth, fileStreamIn);
+            FILTER_ASSERT(result == bytesPerPixel * infoHeader->biWidth, "Error reading image line.\n")
         }
         else
         {
-            for (int j = bytesPerPixel; j < bytesPerPixel * (biWidth + 1); j++)
+            for (int j = bytesPerPixel; j < bytesPerPixel * (infoHeader->biWidth + 1); j++)
             {
                 next[j] = 0;
             }
@@ -423,7 +365,7 @@ int applyKernel(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, const do
         // In fact, we don't have to care which byte means what,
         // we can work with all ow them in the same way.
 
-        for (int j = bytesPerPixel; j < bytesPerPixel * (biWidth + 1); j++)
+        for (int j = bytesPerPixel; j < bytesPerPixel * (infoHeader->biWidth + 1); j++)
         {
             // previous[j - bytesPerPixel], previous[j], previous[j + bytesPerPixel],
             // current[j - bytesPerPixel],  current[j],  current[j + bytesPerPixel],
@@ -456,7 +398,7 @@ int applyKernel(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, const do
             result = fwrite(gapBuffer, sizeof(unsigned char), (size_t) gap, fileStreamOut);
             FILTER_ASSERT(result == gap, "Error saving line gap.\n")
 
-            if (i != biHeight - 1)
+            if (i != infoHeader->biHeight - 1)
             {
                 // This gap can't and doesn't have to be read
                 // Since {next} is currently just a black buffer
@@ -487,11 +429,11 @@ int applyKernel(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, const do
     return 0;
 }
 
-int applyGreyen(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, FILE *fileStreamIn, FILE *fileStreamOut, int platform)
+int applyGreyen(BITMAPINFOHEADER *infoHeader, FILE *fileStreamIn, FILE *fileStreamOut, int platform)
 {
     int result;
-    size_t bytesPerPixel = (size_t) biBitCount / 8;
-    size_t rowSize = (size_t) (biBitCount * biWidth + 31) / 32 * 4;
+    size_t bytesPerPixel = (size_t) infoHeader->biBitCount / 8;
+    size_t rowSize = (size_t) (infoHeader->biBitCount * infoHeader->biWidth + 31) / 32 * 4;
 
     // In this method we can merge {gapBuffer} with {line}
 
@@ -499,7 +441,7 @@ int applyGreyen(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, FILE *fi
 
     // Apply filter to lines
 
-    for (int i = 0; i < biHeight; i++)
+    for (int i = 0; i < infoHeader->biHeight; i++)
     {
         result = fread(line, sizeof(unsigned char), rowSize, fileStreamIn);
         if (result != rowSize)
@@ -512,7 +454,7 @@ int applyGreyen(uint16_t biBitCount, int32_t biWidth, int32_t biHeight, FILE *fi
         // Modify line in-place
 
         int j = 0;
-        while (j < bytesPerPixel * biWidth)
+        while (j < bytesPerPixel * infoHeader->biWidth)
         {
             // Keep alpha channel
             if (bytesPerPixel == 4 && platform == LITTLE_ENDIAN)
