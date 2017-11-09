@@ -35,4 +35,6 @@ void printList(LinkedList*);
 
 void freeList(LinkedList*);
 
+void freeListContents(LinkedList*);
+
 #endif /* LINKEDLIST_H */

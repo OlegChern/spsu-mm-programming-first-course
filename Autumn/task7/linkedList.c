@@ -100,8 +100,15 @@ void freeList(LinkedList *list)
 {
     if (list == NULL)
         return;
-    Element *current = list->first;
+    freeListContents(list);
     free(list);
+}
+
+void freeListContents(LinkedList *list)
+{
+    if (list == NULL)
+        return;
+    Element *current = list->first;
     while (current != NULL)
     {
         Element *tmp = current;

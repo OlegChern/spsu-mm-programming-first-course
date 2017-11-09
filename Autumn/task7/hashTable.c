@@ -44,7 +44,7 @@ void extendHashTable(HashTable *table)
         }
     }
     for (int i = 0; i < table->length; i++)
-        freeList(table->bins + i);
+        freeListContents(table->bins + i);
     free(table->bins);
     table->bins = newBins;
     table->length = newLength;
@@ -123,9 +123,8 @@ void freeHashTable(HashTable *table)
 {
     if (table == NULL)
         return;
-    for (int i = 1; i < table->length; i++)
-        freeList(table->bins + i);
-    freeList(table->bins);
-    // By this moment, table->bins will already have been freed by freeList()
+    for (int i = 0; i < table->length; i++)
+        freeListContents(table->bins + i);
+    free(table->bins);
     free(table);
 }
