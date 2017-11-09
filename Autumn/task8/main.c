@@ -1,8 +1,3 @@
-/**
- * The dark side of force keeps calling me to use goto's.
- * I don't know for how long i'll manage to resist that...
- */
-
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
@@ -12,7 +7,13 @@
 const char *about = "This is utility that applies selected filter to selected .bmp image.\n"
                     "Arguments:\n"
                     "-i: path to file to be modified.\n"
-                    "-f: filter to be applied.\n";
+                    "-o: path to desired destination of resulting image.\n"
+                    "-f: filter to be applied.\n"
+                    "  possible filters:\n"
+                    "    gauss\n"
+                    "    sobelx\n"
+                    "    sobely\n"
+                    "    greyen\n";
 
 const double gaussMatrix[3][3] = {{1.0 / 16, 1.0 / 8, 1.0 / 16},
                                   {1.0 / 8, 1.0 / 4, 1.0 / 8},
@@ -30,15 +31,16 @@ const double sobelyMatrix[3][3] = {{-3.0 / 32, -10.0 / 32, -3.0 / 32},
                                    {3.0 / 32, 10.0 / 32, 3.0 / 32}};
 
 // TODO: also implement absolute sobel filter
+
 int main(int argc, char **argv)
 {
-    if (argc == 0)
+    if (argc == 1)
     {
-        printf("");
+        printf(about);
         return 0;
     }
 
-    char *source; // Argument passed after -s, source file path
+    char *source; // Argument passed after -i, source file path
     char *filter; // Argument passed after -f, filter type
     char *destination; // Argument passed after -o, destination file path
 

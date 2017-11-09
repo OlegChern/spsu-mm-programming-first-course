@@ -60,14 +60,14 @@ int exists(const char *fileName, const char *mode)
 
 int choose(const char *type, char *value, char **source, char **filter, char **destination)
 {
-    if (type[1] == 's' && type[2] == '\0')
+    if (type[1] == 'i' && type[2] == '\0')
     {
         if (*source == NULL)
         {
             *source = value;
             return 0;
         }
-        printf("Error: -source parameter provided more than once.\n");
+        printf("Error: -i parameter provided more than once.\n");
         return 1;
     }
     else if (type[1] == 'f' && type[2] == '\0')
