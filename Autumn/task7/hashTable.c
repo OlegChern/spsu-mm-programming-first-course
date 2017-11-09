@@ -2,8 +2,6 @@
 #include <malloc.h>
 
 #include "hashTable.h"
-#include "linkedList.h"
-#include "pair.h"
 
 int hash(HASHTABLE_KEY_TYPE key)
 {

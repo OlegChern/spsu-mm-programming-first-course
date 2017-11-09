@@ -4,7 +4,7 @@
 #include <math.h>
 
 #define HASHTABLE_KEY_TYPE int
-#define HASHTABLE_VALUE_TYPE double
+#define HASHTABLE_VALUE_TYPE float
 #define HASHTABLE_VALUE_NOT_FOUND NAN
 
 typedef struct

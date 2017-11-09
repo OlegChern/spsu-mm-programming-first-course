@@ -1,6 +1,5 @@
 #include <stdio.h>
 
-#include "linkedList.h"
 #include "hashTable.h"
 
 int main()
@@ -10,7 +9,8 @@ int main()
     HashTable *table = buildHashTable();
 
     for (int i = 0; i < 20; i++)
-        addToHashTable(table, i, (double)i);
+        addToHashTable(table, i, (float) i);
+
     addToHashTable(table, 42, NAN);
 
     printf("After filling the table:\n");

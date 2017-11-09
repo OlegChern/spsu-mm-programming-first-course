@@ -2,7 +2,6 @@
 #include <malloc.h>
 
 #include "linkedList.h"
-#include "pair.h"
 
 int equal(LIST_VALUE_TYPE first, LIST_VALUE_TYPE second)
 {
@@ -81,7 +80,10 @@ void removeKeyFromList(LinkedList *list, HASHTABLE_KEY_TYPE key)
 void printList(LinkedList *list)
 {
     if (list == NULL)
+    {
         printf("NULL");
+        return;
+    }
     printf("[");
     Element *current = list->first;
     while (current != NULL)
