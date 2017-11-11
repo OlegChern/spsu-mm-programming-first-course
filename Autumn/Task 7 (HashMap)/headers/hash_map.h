@@ -16,11 +16,11 @@ struct tagHash_map
 
 typedef struct tagHash_map Hash_map;
 
-int init(Hash_map **map);
-int put(Hash_map *hash_map, int v, char *k);
-int get(Hash_map *hash_map, char *k, int *result);
-int pop(Hash_map *hash_map, char *k, int *result);
-
-void print(Hash_map *hash_map);
+int init_map(Hash_map **map);
+int put_in_map(Hash_map *map, int v, char *k);
+int get_from_map(Hash_map *map, char *k, int *result);
+int pop_from_map(Hash_map *map, char *k, int *result);
+void free_map(Hash_map *map);
+void print_map(Hash_map *map);
 
 #endif //TEST_HASH_MAP_H

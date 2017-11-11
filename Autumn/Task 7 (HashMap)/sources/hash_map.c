@@ -2,11 +2,13 @@
 // Created by rinsl_000 on 06.11.2017.
 //
 
+#include "../headers/list.h"
 #include "../headers/hash_map.h"
+
 #include "../headers/pair.h"
 
 
-int init(Hash_map **map)
+int init_map(Hash_map **map)
 {
     if (*map == NULL)
     {
@@ -42,7 +44,7 @@ static int get_hash(char *s, int mod)
     return (int) hash % mod;
 }
 
-int put(Hash_map *hash_map, int v, char *k)
+int put_in_map(Hash_map *map, int v, char *k)
 {
     Pair *p;
     if ((p = malloc(sizeof(Pair))) == NULL)
@@ -51,57 +53,65 @@ int put(Hash_map *hash_map, int v, char *k)
     p->v = v;
     p->k = k;
 
-    if (hash_map == NULL)
+    if (map == NULL)
         return 0;
 
-    int hash = get_hash(p->k, hash_map->length);
+    int hash = get_hash(p->k, map->length);
 
-    int r = put_to_list(&hash_map->h[hash], p);
+    int r = put_in_list(&map->h[hash], p);
     if (r)
-        hash_map->size--;
+        map->size--;
 
     return r;
 }
 
-int get(Hash_map *hash_map, char *k, int *result)
+int get_from_map(Hash_map *map, char *k, int *result)
 {
-    if (hash_map == NULL)
+    if (map == NULL)
         return 0;
 
-    int hash = get_hash(k, hash_map->length);
+    int hash = get_hash(k, map->length);
 
-    return get_from_list(hash_map->h[hash], k, result);
+    return get_from_list(map->h[hash], k, result);
 }
 
-int pop(Hash_map *hash_map, char *k, int *result)
+int pop_from_map(Hash_map *map, char *k, int *result)
 {
-    if (hash_map == NULL)
+    if (map == NULL)
         return 0;
 
-    int hash = get_hash(k, hash_map->length);
+    int hash = get_hash(k, map->length);
 
-    int r = pop_from_list(&hash_map->h[hash], k, result);
+    int r = pop_from_list(&map->h[hash], k, result);
     if (r)
-        hash_map->size--;
+        map->size--;
 
     return r;
 }
 
-void print(Hash_map *hash_map)
+void print_map(Hash_map *map)
 {
-    if (hash_map == NULL)
+    if (map == NULL)
     {
         printf("<empty map>\n");
         return;
     }
 
     printf("[\n");
-    for (int i = 0; i < hash_map->length; ++i) {
-        if (hash_map->h[i] != NULL)
-            print_list(hash_map->h[i]);
+    for (int i = 0; i < map->length; ++i) {
+        if (map->h[i] != NULL)
+            print_list(map->h[i]);
 
-        if (i != hash_map->length - 1)
+        if (i != map->length - 1)
             printf(",\n");
     }
     printf("\n]\n");
+}
+
+void free_map(Hash_map *map)
+{
+    for (int i = 0; i < map->length; ++i)
+        free_list(&map->h[i]);
+
+    free(map);
 }

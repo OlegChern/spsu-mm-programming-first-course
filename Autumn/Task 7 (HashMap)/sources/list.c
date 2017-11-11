@@ -105,6 +105,22 @@ int pop_from_list(List **head, char *s, int *result)
     return 0;
 }
 
+void free_list(List **head)
+{
+    if (*head == NULL)
+        return;
+
+    List *l = *head;
+    *head = NULL;
+
+    while (l != NULL)
+    {
+        List *tmp = l;
+        l = l->next;
+        free(tmp);
+    }
+}
+
 void print_list(List *l)
 {
     if (l == NULL)

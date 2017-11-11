@@ -12,26 +12,26 @@ int main() {
             "| type and supports three operations:                                     |\n"
             "|  * PRINT                                                                |\n"
             "|    Syntax:                                                              |\n"
-            "|        print                                                            |\n"
+            "|        print_map                                                            |\n"
             "|    Description:                                                         |\n"
             "|        prints current list in format [val1, val2, ..., val_last].       |\n"
             "|    Examples:                                                            |\n"
             "|    >>> # void list                                                      |\n"
-            "|    >>> print                                                            |\n"
+            "|    >>> print_map                                                            |\n"
             "|    >>> []                                                               |\n"
             "|    >>> # list 1->2->3                                                   |\n"
-            "|    >>> print                                                            |\n"
+            "|    >>> print_map                                                            |\n"
             "|    >>> [1, 2, 3]                                                        |\n"
             "|  * APPEND                                                               |\n"
             "|    Syntax:                                                              |\n"
-            "|        put <value>                                                   |\n"
+            "|        put_in_map <value>                                                   |\n"
             "|    Description:                                                         |\n"
             "|        adds value to the end of the list.                               |\n"
             "|    Examples:                                                            |\n"
-            "|    >>> print                                                            |\n"
+            "|    >>> print_map                                                            |\n"
             "|    >>> [1, 2]                                                           |\n"
-            "|    >>> put 3                                                         |\n"
-            "|    >>> print                                                            |\n"
+            "|    >>> put_in_map 3                                                         |\n"
+            "|    >>> print_map                                                            |\n"
             "|    >>> [1, 2, 3]                                                        |\n"
             "|  * AT                                                                   |\n"
             "|    Syntax:                                                              |\n"
@@ -39,7 +39,7 @@ int main() {
             "|    Description:                                                         |\n"
             "|        prints value from specified position. Numeration starts from 0.  |\n"
             "|    Examples:                                                            |\n"
-            "|    >>> print                                                            |\n"
+            "|    >>> print_map                                                            |\n"
             "|    >>> [1, 2, 3]                                                        |\n"
             "|    >>> at 1                                                             |\n"
             "|    >>> 2                                                                |\n"
@@ -52,7 +52,7 @@ int main() {
     );
 
     Hash_map *hash_map = NULL;
-    init(&hash_map);
+    init_map(&hash_map);
     char *request = NULL;
     size_t request_len = 0;
 
@@ -64,24 +64,65 @@ int main() {
 
         printf(">>> ");
         getline(&request, &request_len, stdin);
+        printf("request_len: %d, request: %s\n", (int) request_len, request);
 
-        if (strcmp(request, "print") == 0)
+        char **splitted = NULL;
+        size_t splitted_len = 0;
+        split(request, &splitted, &splitted_len, ' ', 1);
+
+        /* ---------  debug input -----------
+         * if (splitted == NULL) {
+            printf("len: 0, NULL\n");
+            continue;
+        }
+
+        printf("________________\n");
+        for (int i = 0; i < splitted_len; ++i) {
+            printf("len: %d, str: %s\n", (int) splitted_len, splitted[i]);
+        }
+        printf("________________\n");
+
+        if (strcmp(splitted[0], "quit") == 0)
+            break;
+            -------------------------------------*/
+
+        if (strcmp(splitted[0], "print") == 0)
         {
-            printf(">>> ");
-            print(hash_map);
+            print_map(hash_map);
             printf("\n");
         }
-        else if (starts_with(request, "put "))
+        else if (strcmp(splitted[0], "put") == 0)
         {
+            if (splitted_len < 3)
+                printf("Too few arguments: %d when expected 2\n", (int) (splitted_len - 1));
+            else if (splitted_len > 3)
+                printf("Too many arguments: %d when expected 2\n", (int) (splitted_len - 1));
+            else
+            {
+                if (splitted[1][0])
+            }
+        }
+        else if (strcmp(splitted[0], "get") == 0)
+        {
+            printf(">>> ");
+
             int error;
             char *k = parse_word(request + 4);
-            int v = parse_int(request + 4 + strlen(k), &error);
             if (error)
-                printf(">>> <Unrecognized syntax>\n");
+                printf("Unrecognized syntax\n");
             else
-                put(hash_map, v, k);
+            {
+                int result;
+                int success = get_from_map(hash_map, k, &result);
+                if (!success)
+                    printf("There is no such key in map\n");
+                else
+                    printf("%d", result);
+            }
+
+            printf("\n");
         }
-        else if (starts_with(request, "get "))
+        else if (strcmp(splitted[0], "pop") == 0)
         {
             printf(">>> ");
 
@@ -92,7 +133,7 @@ int main() {
             else
             {
                 int result;
-                int success = get(hash_map, k, &result);
+                int success = pop_from_map(hash_map, k, &result);
                 if (!success)
                     printf("There is no such key in map\n");
                 else
@@ -101,31 +142,15 @@ int main() {
 
             printf("\n");
         }
-        else if (starts_with(request, "pop "))
-        {
-            printf(">>> ");
-
-            int error;
-            char *k = parse_word(request + 4);
-            if (error)
-                printf("<Unrecognized syntax>\n");
-            else
-            {
-                int result;
-                int success = pop(hash_map, k, &result);
-                if (!success)
-                    printf("There is no such key in map\n");
-                else
-                    printf("%d", result);
-            }
-
-            printf("\n");
-        }
-        else if (strcmp(request, "quit") == 0) {
+        else if (strcmp(splitted[0], "quit") == 0) {
             break;
         }
         else
             printf("<Unrecognized syntax>\n");
+
+        for (int i = 0; i < splitted_len; ++i)
+            free(splitted[i]);
+        free(splitted);
     }
 
     free(request);
