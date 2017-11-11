@@ -2,36 +2,34 @@
 // Created by rinsl_000 on 06.11.2017.
 //
 
+#include <string.h>
 #include "../headers/list.h"
 #include "../headers/hash_map.h"
 
 #include "../headers/pair.h"
 
 
-int init_map(Hash_map **map)
+int balance(Hash_map **map);
+
+int init_map(Hash_map **map, int len)
 {
-    if (*map == NULL)
-    {
-        if ((map = malloc(sizeof(Hash_map))) == NULL)
-            return 0;
+    if ((*map = malloc(sizeof(Hash_map))) == NULL)
+        return 0;
 
-        (*map)->length = 16;
-        (*map)->size = 0;
-        if (((*map)->h = malloc((*map)->length * sizeof(List*))) == NULL)
-            return 0;
+    (*map)->length = len;
+    (*map)->size = 0;
+    if (((*map)->h = malloc((*map)->length * sizeof(List*))) == NULL)
+        return 0;
 
-        for (int i = 0; i < (*map)->length; ++i)
-            (*map)->h[i] = NULL;
+    for (int i = 0; i < (*map)->length; ++i)
+        (*map)->h[i] = NULL;
 
-        return 1;
-    }
-
-    return 0;
+    return 1;
 }
 
 static int get_hash(char *s, int mod)
 {
-    const int P = 177;
+    const int P = 31;
     const int Q = 1000000007;
 
     long hash = 0;
@@ -44,23 +42,31 @@ static int get_hash(char *s, int mod)
     return (int) hash % mod;
 }
 
-int put_in_map(Hash_map *map, int v, char *k)
+int put_in_map(Hash_map **map, char *k, int v)
 {
     Pair *p;
     if ((p = malloc(sizeof(Pair))) == NULL)
         return 0;
 
     p->v = v;
-    p->k = k;
+    p->k = malloc(sizeof(char) * strlen(k));
+    if (!p->k)
+        return 0;
+    strcpy(p->k, k);
 
     if (map == NULL)
         return 0;
 
-    int hash = get_hash(p->k, map->length);
+    int hash = get_hash(p->k, (*map)->length);
 
-    int r = put_in_list(&map->h[hash], p);
+    int r = put_in_list(&(*map)->h[hash], p);
     if (r)
-        map->size--;
+        (*map)->size++;
+    else
+        return 0;
+
+    if ((*map)->size > (*map)->length * 2)
+        return balance(map);
 
     return r;
 }
@@ -98,20 +104,50 @@ void print_map(Hash_map *map)
     }
 
     printf("[\n");
-    for (int i = 0; i < map->length; ++i) {
+    int first = 1;
+    for (int i = 0; i < map->length; ++i)
         if (map->h[i] != NULL)
-            print_list(map->h[i]);
+        {
+            if (first)
+                first = 0;
+            else
+                printf(",\n");
 
-        if (i != map->length - 1)
-            printf(",\n");
-    }
+            print_list(map->h[i]);
+        }
+
     printf("\n]\n");
 }
 
-void free_map(Hash_map *map)
+void free_map(Hash_map **map)
 {
-    for (int i = 0; i < map->length; ++i)
-        free_list(&map->h[i]);
+    for (int i = 0; i < (*map)->length; ++i)
+        free_list(&(*map)->h[i]);
 
-    free(map);
+    free(*map);
+    *map = NULL;
+}
+
+Hash_map *wrapper;
+
+static void put_to_map_wrapper(const List *l)
+{
+    put_in_map(&wrapper, l->p->k, l->p->v);
+}
+
+int balance(Hash_map **map)
+{
+    Hash_map *tmp = NULL;
+
+    if (!init_map(&tmp, (*map)->length * 2 + 1))
+        return 0;
+
+    wrapper = tmp;
+    for (int i = 0; i < (*map)->length; ++i)
+        iterate_list((*map)->h[i], put_to_map_wrapper);
+
+    free_map(map);
+    *map = tmp;
+
+    return 1;
 }

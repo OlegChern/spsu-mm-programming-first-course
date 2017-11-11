@@ -7,33 +7,47 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "../headers/array_utils.h"
+#include "../headers/str_funcs.h"
 
 
-int starts_with(char *s1, char *s2)
-{
-    size_t s1_len = strlen(s1);
-    size_t s2_len = strlen(s2);
+const int EMPTY = 1;
+const int TOO_BIG = 2;
+const int NAN = 3;
 
-    return s1_len < s2_len ? 0 : !strncmp(s1, s2, s2_len);
-}
 
 int parse_int(char *s, int *error)
 {
     char *begin = s;
-    while (!isdigit(*s))
-        s++;
 
-    if (*s == '\0')
+    if (*s == 0)
     {
-        *error = 1;
+        *error = EMPTY;
         return 0;
     }
+
+    while (*s != 0)
+    {
+        if (!isdigit(*s))
+        {
+            *error = NAN;
+            return 0;
+        }
+        s++;
+    }
+
+    s = begin;
 
     int v = 0;
     int sign = (s > begin && *(s - 1) == '-') ? -1 : 1;
 
     while (isdigit(*s))
     {
+        if (v > INT_MAX / 10 || v * 10 > INT_MAX - (*s - '0'))
+        {
+            *error = TOO_BIG;
+            return 0;
+        }
+
         v = v * 10 + (*s - '0');
         s++;
     }
@@ -82,7 +96,7 @@ int getline(char **line, size_t *n, FILE *stream)
     return cnt;
 }
 
-static int isNotEmpty(const void *s)
+static int is_not_empty(const void *s)
 {
     return (*(char**)s)[0] != 0;
 }
@@ -92,7 +106,7 @@ static void free_str(void *s)
     free((*(char**)s));
 }
 
-int split(const char *s, char ***result, size_t *result_len, char delim, int doFilter)
+int split(const char *s, char ***result, size_t *result_len, char delim, int do_filter)
 {
     int cnt = 0;
 
@@ -143,10 +157,10 @@ int split(const char *s, char ***result, size_t *result_len, char delim, int doF
     strncpy(res[r_i], &s[s_i - len], (size_t) len);
     res[r_i][len] = 0;
 
-    if (doFilter)
+    if (do_filter)
     {
         size_t res_len = (size_t) cnt;
-        filter((void **) &res, sizeof(char*), &res_len, isNotEmpty, free_str);
+        filter((void **) &res, sizeof(char *), &res_len, is_not_empty, free_str);
 
         *result = res;
         *result_len = res_len;
@@ -160,3 +174,13 @@ int split(const char *s, char ***result, size_t *result_len, char delim, int doF
     return 1;
 }
 
+int is_consisted_of_letters(const char *s)
+{
+    if (s == NULL || s[0] == 0)
+        return 0;
+
+    for (int i = 0; s[i] != 0; ++i)
+        if (!isalpha(s[i]))
+            return 0;
+    return 1;
+}

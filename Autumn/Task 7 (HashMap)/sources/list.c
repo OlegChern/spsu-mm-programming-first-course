@@ -9,6 +9,15 @@
 #include "../headers/pair.h"
 
 
+void iterate_list(List *head, void (*f)(const List *l))
+{
+    while (head != NULL)
+    {
+        f(head);
+        head = head->next;
+    }
+}
+
 int put_in_list(List **head, Pair *p)
 {
     if (*head == NULL)

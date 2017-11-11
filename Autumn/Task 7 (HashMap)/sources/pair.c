@@ -8,5 +8,5 @@
 
 void print_pair(Pair *p)
 {
-    printf("    {%s: %d}", p->k, p->v);
+    printf("  {%s: %d}", p->k, p->v);
 }

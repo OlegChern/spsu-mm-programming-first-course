@@ -37,8 +37,10 @@ int filter(
     if (!res)
         return 0;
 
-    for (int i = 0, res_i = 0; i < *len; ++i) {
-        if (condition(*arr + size * i)) {
+    for (int i = 0, res_i = 0; i < *len; ++i)
+    {
+        if (condition(*arr + size * i))
+        {
             memcpy(res + size * res_i, *arr + size * i, size);
             res_i++;
         }
