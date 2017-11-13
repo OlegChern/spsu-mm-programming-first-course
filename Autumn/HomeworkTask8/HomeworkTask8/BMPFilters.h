@@ -57,6 +57,8 @@ void sobel(int, int, char[3][3], PIXEL**);
 void grayscale(int, int, PIXEL**);
 void average3x3(int, int, PIXEL**);
 
+void closeFiles(FILE*, FILE*);
+
 PIXEL *pixelNew(UBYTE r, UBYTE g, UBYTE b)
 {
 	PIXEL* p = (PIXEL*)malloc(sizeof(PIXEL));
@@ -195,4 +197,10 @@ void average3x3(int width, int height, PIXEL **newImage)
 			newImage[x][y] = *(pixelNew(r / 9, g / 9, b / 9));
 		}
 	}
+}
+
+void closeFiles(FILE *file1, FILE *file2)
+{
+	fclose(file1);
+	fclose(file2);
 }

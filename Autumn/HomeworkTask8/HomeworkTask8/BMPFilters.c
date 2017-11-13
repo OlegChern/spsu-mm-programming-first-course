@@ -25,19 +25,22 @@ int main(int argc, char **argv)
 	BITMAPFILEHEADER bmFileHeader;
 	BITMAPINFOHEADER bmInfoHeader;
 
-	int bit32 = 0;
+	printf("Wait. ");
 
 	sourceFile = fopen(argv[1], "rb");
 	if (sourceFile == NULL)
 	{
-		printf("Wrong path!\n");
+		printf("Wrong source path!\n");
 		return 0;
 	}
 
-	targetFile = fopen(argv[2], "wb");
+	targetFile = fopen(argv[3], "wb");
 	if (targetFile == NULL)
 	{
-		printf("Wrong path!\n");
+		printf("Wrong target path!\n");
+
+		fclose(sourceFile);
+
 		return 0;
 	}
 
@@ -45,6 +48,9 @@ int main(int argc, char **argv)
 	if (bmFileHeader.bfType != 0x4D42)
 	{
 		printf("Wrong file header type!\n");
+
+		closeFiles(sourceFile, targetFile);
+
 		return 0;
 	}
 
@@ -52,6 +58,9 @@ int main(int argc, char **argv)
 	if (bmInfoHeader.biSize != 0x28)
 	{
 		printf("Wrong info header size!\n");
+
+		closeFiles(sourceFile, targetFile);
+
 		return 0;
 	}
 
@@ -62,7 +71,9 @@ int main(int argc, char **argv)
 	if (!image)
 	{
 		printf("Not enough memory!\n");
-		free(image);
+
+		closeFiles(sourceFile, targetFile);
+
 		return 0;
 	}
 
@@ -76,6 +87,10 @@ int main(int argc, char **argv)
 	if (!newImage)
 	{
 		printf("Not enough memory!\n");
+		free(image);
+
+		closeFiles(sourceFile, targetFile);
+
 		return 0;
 	}
 
@@ -85,7 +100,11 @@ int main(int argc, char **argv)
 		if (!newImage[i])
 		{
 			printf("Not enough memory!\n");
+			free(image);
 			free(newImage);
+
+			closeFiles(sourceFile, targetFile);
+
 			return 0;
 		}
 	}
@@ -97,12 +116,13 @@ int main(int argc, char **argv)
 	fwrite(&bmFileHeader, sizeof(BITMAPFILEHEADER), 1, targetFile);
 	fwrite(&bmInfoHeader, sizeof(BITMAPINFOHEADER), 1, targetFile);
 
-	// pixel array
+	int pixelSize = bmInfoHeader.biBitCount == 32 ? 4 : 3; // 32bit image check
+
 	for (int x = 0; x < width; x++)
 	{
 		for (int y = 0; y < height; y++)
 		{
-			int offset = (x + y * width) * 3 + y * padSize;
+			int offset = (x + y * width) * pixelSize + y * padSize;
 
 			newImage[x][y].red = image[offset + 2];
 			newImage[x][y].green = image[offset + 1];
@@ -113,6 +133,8 @@ int main(int argc, char **argv)
 	// applying filter
 	if (strcmp(argv[2], "Gauss") == 0) // argv[2] == "Gauss")
 	{
+		printf("Applying Gauss3x3 filter\n");
+
 		float sigma = 1;
 		sigma = 2 * sigma * sigma;
 
@@ -130,6 +152,8 @@ int main(int argc, char **argv)
 	}
 	else if (strcmp(argv[2], "SobelX") == 0) // argv[2] == "SobelX")
 	{
+		printf("Applying SobelX filter\n");
+
 		char maskx[3][3] =
 		{
 			{ -1, 0, 1 },
@@ -141,6 +165,8 @@ int main(int argc, char **argv)
 	}
 	else if (strcmp(argv[2], "SobelY") == 0) // argv[2] == "SobelY")
 	{
+		printf("Applying SobelY filter\n");
+
 		char masky[3][3] =
 		{
 			{ -1, -2, -1 },
@@ -152,10 +178,14 @@ int main(int argc, char **argv)
 	}
 	else if (strcmp(argv[2], "GrayScale") == 0) // argv[2] == "GrayScale")
 	{
+		printf("Applying GrayScale filter\n");
+
 		grayscale(width, height, newImage);
 	}
 	else if (strcmp(argv[2], "Average") == 0) // argv[2] == "Average")
 	{
+		printf("Applying Average3x3 filter\n");
+
 		average3x3(width, height, newImage);
 	}
 	else
@@ -166,6 +196,10 @@ int main(int argc, char **argv)
 		printf("- SobelY\n");
 		printf("- GrayScale\n");
 		printf("- Average\n");
+
+		closeFiles(sourceFile, targetFile);
+
+		return 0;
 	}
 
 	// write new image to file
@@ -181,14 +215,20 @@ int main(int argc, char **argv)
 			fwrite((UBYTE*)&b, 1, 1, targetFile);
 			fwrite((UBYTE*)&g, 1, 1, targetFile);
 			fwrite((UBYTE*)&r, 1, 1, targetFile);
+
+			if (pixelSize == 4) // if 32bit image
+			{
+				UBYTE a = 0; // just delete alpha channel
+				fwrite((UBYTE*)&a, 1, 1, targetFile);
+			}
 		}
 		fwrite((char*)pad, padSize, 1, targetFile);
 	}
 
 	free(image);
+	free(newImage);
 
-	fclose(sourceFile);
-	fclose(targetFile);
+	closeFiles(sourceFile, targetFile);
 
 	printf("Done!\n");
 
