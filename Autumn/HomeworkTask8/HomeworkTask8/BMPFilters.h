@@ -47,17 +47,43 @@ typedef struct
 	UBYTE blue;
 } PIXEL;
 
+int createImage(int, int, PIXEL**);
+
 PIXEL  *pixelNew(UBYTE, UBYTE, UBYTE);
 PIXEL *pixelNewSame(UBYTE);
 UBYTE pixelGrayscaled(PIXEL);
 UBYTE clampToUByte(short);
 
-void gauss3x3(int, int, float**, PIXEL**);
-void sobel(int, int, char[3][3], PIXEL**);
-void grayscale(int, int, PIXEL**);
-void average3x3(int, int, PIXEL**);
+int gauss3x3(int, int, float**, PIXEL**);
+int sobel(int, int, char[3][3], PIXEL**);
+int grayscale(int, int, PIXEL**);
+int average3x3(int, int, PIXEL**);
 
+int compare(const char*, const char*);
 void closeFiles(FILE*, FILE*);
+void closeAll(FILE*, FILE*, UBYTE*, PIXEL**);
+
+int createImage(int width, int height, PIXEL **target)
+{
+	//target = (PIXEL**)malloc(sizeof(PIXEL*) * width);
+	if (!target)
+	{
+		printf("Not enough memory!\n");
+		return 0;
+	}
+
+	for (int i = 0; i < width; i++)
+	{
+		target[i] = (PIXEL*)malloc(sizeof(PIXEL) * height);
+		if (!target[i])
+		{
+			printf("Not enough memory!\n");
+			return 0;
+		}
+	}
+
+	return 1;
+}
 
 PIXEL *pixelNew(UBYTE r, UBYTE g, UBYTE b)
 {
@@ -101,11 +127,11 @@ UBYTE roundUBYTE(float f)
 	return rounded;
 }
 
-void gauss3x3(int width, int height, float **kernel, PIXEL **newImage)
+int gauss3x3(int width, int height, float **kernel, PIXEL **newImage)
 {
-	for (int x = 0; x < width; x++)
+	for (int x = 1; x < width - 1; x++)
 	{
-		for (int y = 0; y < height; y++)
+		for (int y = 1; y < height - 1; y++)
 		{
 			float sum = 0;
 			float r = 0, g = 0, b = 0;
@@ -114,16 +140,13 @@ void gauss3x3(int width, int height, float **kernel, PIXEL **newImage)
 			{
 				for (int j = -1; j <= 1; j++)
 				{
-					if (x + i >= 0 && x + i < width && y + j >= 0 && y + j < height)
-					{
-						PIXEL pix = newImage[x + i][y + j];
+					PIXEL pix = newImage[x + i][y + j];
 
-						r += pix.red * kernel[i + 1][j + 1];
-						g += pix.green * kernel[i + 1][j + 1];
-						b += pix.blue * kernel[i + 1][j + 1];
+					r += pix.red * kernel[i + 1][j + 1];
+					g += pix.green * kernel[i + 1][j + 1];
+					b += pix.blue * kernel[i + 1][j + 1];
 
-						sum += kernel[i + 1][j + 1];
-					}
+					sum += kernel[i + 1][j + 1];
 				}
 			}
 
@@ -135,13 +158,22 @@ void gauss3x3(int width, int height, float **kernel, PIXEL **newImage)
 			}
 		}
 	}
+
+	return 1;
 }
 
-void sobel(int width, int height, char mask[3][3], PIXEL **newImage)
+int sobel(int width, int height, char mask[3][3], PIXEL **targetImage)
 {
-	for (int x = 0; x < width; x++)
+	PIXEL **temp = (PIXEL**)malloc(sizeof(PIXEL*) * width);
+	if (!createImage(width, height, temp))
 	{
-		for (int y = 0; y < height; y++)
+		printf("Not enough memory!\n");
+		return 0;
+	}
+
+	for (int x = 1; x < width - 1; x++)
+	{
+		for (int y = 1; y < height - 1; y++)
 		{
 			short sum = 0;
 
@@ -149,21 +181,28 @@ void sobel(int width, int height, char mask[3][3], PIXEL **newImage)
 			{
 				for (int j = -1; j <= 1; j++)
 				{
-					if (x + i >= 0 && x + i < width && y + j >= 0 && y + j < height)
-					{
-						UBYTE cur = pixelGrayscaled(newImage[x + i][y + j]);
-						sum += cur * mask[i + 1][j + 1];
-					}
+					UBYTE cur = pixelGrayscaled(targetImage[x + i][y + j]);
+					sum += cur * mask[i + 1][j + 1];
 				}
 			}
 
 			UBYTE clamped = clampToUByte(sum);
-			newImage[x][y] = *(pixelNewSame(clamped));
+			temp[x][y] = *(pixelNewSame(clamped));
 		}
 	}
+
+	for (int x = 0; x < width; x++)
+	{
+		for (int y = 0; y < height; y++)
+		{
+			targetImage[x][y] = temp[x][y];
+		}
+	}
+
+	return 1;
 }
 
-void grayscale(int width, int height, PIXEL **newImage)
+int grayscale(int width, int height, PIXEL **newImage)
 {
 	for (int x = 0; x < width; x++)
 	{
@@ -173,34 +212,49 @@ void grayscale(int width, int height, PIXEL **newImage)
 			newImage[x][y] = *(pixelNewSame(grayscale));
 		}
 	}
+
+	return 1;
 }
 
-void average3x3(int width, int height, PIXEL **newImage)
+int average3x3(int width, int height, PIXEL **newImage)
 {
-	for (int x = 0; x < width; x++)
+	for (int x = 1; x < width - 1; x++)
 	{
-		for (int y = 0; y < height; y++)
+		for (int y = 1; y < height - 1; y++)
 		{
 			USHORT r = 0, g = 0, b = 0; // USHORT used, because 255*9 > 255
 			for (int i = -1; i <= 1; i++)
 			{
 				for (int j = -1; j <= 1; j++)
 				{
-					if (x + i >= 0 && x + i < width && y + j >= 0 && y + j < height)
-					{
-						r += newImage[x + i][y + j].red;
-						g += newImage[x + i][y + j].green;
-						b += newImage[x + i][y + j].blue;
-					}
+					r += newImage[x + i][y + j].red;
+					g += newImage[x + i][y + j].green;
+					b += newImage[x + i][y + j].blue;
 				}
 			}
 			newImage[x][y] = *(pixelNew(r / 9, g / 9, b / 9));
 		}
 	}
+
+	return 1;
+}
+
+int compare(const char *c1, const char*c2)
+{
+	return strcmp(c1, c2) == 0;
 }
 
 void closeFiles(FILE *file1, FILE *file2)
 {
+	fclose(file1);
+	fclose(file2);
+}
+
+void closeAll(FILE *file1, FILE *file2, UBYTE *img1, PIXEL **img2)
+{
+	free(img1);
+	free(img2);
+
 	fclose(file1);
 	fclose(file2);
 }

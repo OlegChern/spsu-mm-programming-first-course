@@ -15,7 +15,17 @@ int main(int argc, char **argv)
 
 	if (argc < 4)
 	{
-		printf("Not enough arguments!");
+		printf("Not enough arguments! Should be:\n");
+
+		printf("[source path] [filter name] [target path]\n\n");
+
+		printf("Available filters:\n");
+		printf("- Gauss\n");
+		printf("- SobelX\n");
+		printf("- SobelY\n");
+		printf("- GrayScale\n");
+		printf("- Average\n");
+
 		return 0;
 	}
 
@@ -83,30 +93,12 @@ int main(int argc, char **argv)
 	int height = bmInfoHeader.biHeight;
 
 	// new image with RGB
+
 	PIXEL **newImage = (PIXEL**)malloc(sizeof(PIXEL*) * width);
-	if (!newImage)
+	if (!createImage(width, height, newImage))
 	{
-		printf("Not enough memory!\n");
 		free(image);
-
 		closeFiles(sourceFile, targetFile);
-
-		return 0;
-	}
-
-	for (int i = 0; i < width; i++)
-	{
-		newImage[i] = (PIXEL*)malloc(sizeof(PIXEL) * height);
-		if (!newImage[i])
-		{
-			printf("Not enough memory!\n");
-			free(image);
-			free(newImage);
-
-			closeFiles(sourceFile, targetFile);
-
-			return 0;
-		}
 	}
 
 	// padding
@@ -116,7 +108,7 @@ int main(int argc, char **argv)
 	fwrite(&bmFileHeader, sizeof(BITMAPFILEHEADER), 1, targetFile);
 	fwrite(&bmInfoHeader, sizeof(BITMAPINFOHEADER), 1, targetFile);
 
-	int pixelSize = bmInfoHeader.biBitCount == 32 ? 4 : 3; // 32bit image check
+	int pixelSize = bmInfoHeader.biBitCount / 8; // 32bit image check
 
 	for (int x = 0; x < width; x++)
 	{
@@ -131,9 +123,9 @@ int main(int argc, char **argv)
 	}
 
 	// applying filter
-	if (strcmp(argv[2], "Gauss") == 0) // argv[2] == "Gauss")
+	if (compare(argv[2], "Gauss"))//(strcmp(argv[2], "Gauss") == 0)
 	{
-		printf("Applying Gauss3x3 filter\n");
+		printf("Applying Gauss3x3 filter.\n");
 
 		float sigma = 1;
 		sigma = 2 * sigma * sigma;
@@ -148,9 +140,12 @@ int main(int argc, char **argv)
 			}
 		}
 
-		gauss3x3(width, height, kernel, newImage);
+		if (!gauss3x3(width, height, kernel, newImage))
+		{
+			closeAll(sourceFile, targetFile, image, newImage);
+		}
 	}
-	else if (strcmp(argv[2], "SobelX") == 0) // argv[2] == "SobelX")
+	else if (compare(argv[2], "SobelX"))
 	{
 		printf("Applying SobelX filter\n");
 
@@ -161,11 +156,14 @@ int main(int argc, char **argv)
 			{ -1, 0, 1 }
 		};
 
-		sobel(width, height, maskx, newImage);
+		if (!sobel(width, height, maskx, newImage))
+		{
+			closeAll(sourceFile, targetFile, image, newImage);
+		}
 	}
-	else if (strcmp(argv[2], "SobelY") == 0) // argv[2] == "SobelY")
+	else if (compare(argv[2], "SobelY"))
 	{
-		printf("Applying SobelY filter\n");
+		printf("Applying SobelY filter.\n");
 
 		char masky[3][3] =
 		{
@@ -174,17 +172,20 @@ int main(int argc, char **argv)
 			{ 1, 2, 1 }
 		};
 
-		sobel(width, height, masky, newImage);
+		if (!sobel(width, height, masky, newImage))
+		{
+			closeAll(sourceFile, targetFile, image, newImage);
+		}
 	}
-	else if (strcmp(argv[2], "GrayScale") == 0) // argv[2] == "GrayScale")
+	else if (compare(argv[2], "GrayScale"))
 	{
-		printf("Applying GrayScale filter\n");
+		printf("Applying GrayScale filter.\n");
 
 		grayscale(width, height, newImage);
 	}
-	else if (strcmp(argv[2], "Average") == 0) // argv[2] == "Average")
+	else if (compare(argv[2], "Average"))
 	{
-		printf("Applying Average3x3 filter\n");
+		printf("Applying Average3x3 filter.\n");
 
 		average3x3(width, height, newImage);
 	}
@@ -197,7 +198,7 @@ int main(int argc, char **argv)
 		printf("- GrayScale\n");
 		printf("- Average\n");
 
-		closeFiles(sourceFile, targetFile);
+		closeAll(sourceFile, targetFile, image, newImage);
 
 		return 0;
 	}
@@ -225,10 +226,7 @@ int main(int argc, char **argv)
 		fwrite((char*)pad, padSize, 1, targetFile);
 	}
 
-	free(image);
-	free(newImage);
-
-	closeFiles(sourceFile, targetFile);
+	closeAll(sourceFile, targetFile, image, newImage);
 
 	printf("Done!\n");
 
