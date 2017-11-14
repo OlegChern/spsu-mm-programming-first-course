@@ -4,112 +4,124 @@
 // add new key and value
 void add(HashTable *table, char* key, int value)
 {
-	UINT hashKey = hash(table, key);
-	HashTableChain *chain = findChain(table, hashKey);
+	HashTableChain *chain = table->chains[hash(table, key)];
 
-	if (chain == NULL) // wasn't found
+	if (chain->elementCount + 1 >= MAXCHAINSIZE)
 	{
-		chain = addEmptyChain(table);
-		chain->hashKey = hashKey;
-		table->chains[hashKey] = chain;
+		rebalance(table);
+		chain = table->chains[hash(table, key)]; // calculate hash with new table
 	}
 
-	HashTableElement *element = addEmptyElement(chain);
+	HashTableElement *element = (HashTableElement*)malloc(sizeof(HashTableElement));
 	element->value = value;
 	element->key = key;
 
-	chain->elementCount++;
+	chain->elements[chain->elementCount++] = element;
 
-	if (chain->elementCount >= MAXBINSIZE)
-	{
-		rebalance(table);
-	}
 }
 
-// find pointer to value with given key, returns NULL if key wasn't found
-int *findValue(HashTable *table, char* key)
+// find pointer to value with given key, returns 0 if key wasn't found
+int findValue(int *buffer, HashTable *table, char* key)
 {
-	HashTableChain *chain = findChain(table, hash(table, key));
-	if (chain != NULL)
+	HashTableChain *chain = table->chains[hash(table, key)];
+
+	HashTableElement *element = findElement(chain, key);
+	if (element != NULL)
 	{
-		HashTableElement *element = findElement(chain, key);
-		if (element != NULL) // was found
-		{
-			return &(element->value);
-		}
+		*buffer = element->value;
+		return 1;
 	}
 
-	return NULL;
+	buffer = NULL;
+	return 0;
 }
 
 // remove key and value
 void removeElement(HashTable *table, char* key)
 {
-	HashTableChain *chain = findChain(table, hash(table, key));
-	if (chain != NULL)
+	HashTableChain *chain = table->chains[hash(table, key)];
+
+	int index = findElementIndex(chain, key);
+	if (index >= 0) // was found
 	{
-		HashTableElement *element = findElement(chain, key);
-		if (element != NULL) // was found
+		for (int i = index; i < chain->elementCount - 1; i++)
 		{
-			element = NULL;
-			free(element);
+			chain->elements[i] = chain->elements[i + 1];
 		}
+
+		free(chain->elements[chain->elementCount--]);
 	}
 }
 
 void printTable(HashTable* table)
 {
-	for (UINT i = 0; i < table->chainCount; i++)
+	printf("\nHash table: [hash key] [key] [value]");
+
+	for (int i = 0; i < table->chainCount; i++)
 	{
 		HashTableChain *chain = table->chains[i];
 
-		if (chain != NULL)
+		if (chain->elementCount > 0)
 		{
 			printf("\n");
 			
-			for (UINT j = 0; j < chain->elementCount; j++)
+			for (int j = 0; j < chain->elementCount; j++)
 			{
-				//if (chain->elements[j] != NULL)
+				HashTableElement *element = chain->elements[j];
+
+				if (element != NULL)
 				{
-					printf("%04d ", chain->hashKey);
-					printf("%8s  %6d\n", chain->elements[j]->key, chain->elements[j]->value);
+					printf("%04d ", hash(table, element->key));
+					printf("%8s  %6d\n", element->key, element->value);
 				}
 			}
 		}
 	}
+
+	printf("\n");
 }
 
 int main()
 {
 	printf("Hash table.\n");
-	printf("Collision resolution: separate chaining with list head cells.\n\n");
+	printf("Collision resolution: separate chaining with list head cells.\n");
 
 	HashTable *table = newHashTable();
-	add(table, "QWERTY", 1248);
-	add(table, "QWERTY", 1250);
-	add(table, "QWERTY", 1252);
-	add(table, "QWERTY", 1248);
-	add(table, "QWERTY", 1250);
-	add(table, "QWERTY", 1252);
-	add(table, "QWERTY", 1248);
-	add(table, "QWERTY", 1250);
-	add(table, "QWERTY", 1252);
-	add(table, "QWERTY", 1248);
-	add(table, "QWERTY", 1250);
-	add(table, "QWERTY", 1252);
-	add(table, "QWERTY", 1248);
-	add(table, "QWERTY", 1250);
-	add(table, "QWERTY", 1252);
+	add(table, "WADX", 1248);
+	add(table, "EDSF", 1250);
+	add(table, "ZXC", 1252);
+	add(table, "ASDX", 1248);
+	add(table, "ZXCV", 1250);
 	add(table, "WASD", 1254);
 	add(table, "WASD", 1256);
 	add(table, "ASDF", 1254);
-	add(table, "ASDF", 1256);
-	add(table, "ASDF", 1258);
+	add(table, "ZXCV", 1256);
+	add(table, "ASDFDS", 1258);
 	add(table, "ASDFWD", 1258);
 
+	printTable(table);
+
+	printf("Removing elements with keys \"ASDFDS\" and \"ASDFWD\"\n");
+
+	removeElement(table, "ASDFDS");
 	removeElement(table, "ASDFWD");
 
 	printTable(table);
+
+	int buffer;
+	char key[2][5] = { "ZXCV", "TEST" };
+
+	for (int i = 0; i < 2; i++)
+	{
+		if (findValue(&buffer, table, key[i]))
+		{
+			printf("Value of element with key \"%s\": %d\n", key[i], buffer);
+		}
+		else
+		{
+			printf("Value of element with key \"%s\" not found\n", key[i]);
+		}
+	}
 
 	return 0;
 }
