@@ -1,6 +1,11 @@
 #pragma once
 
-#define BINSIZE 10 // max number elements in chain
+#include <stdlib.h>
+
+#define DEFAULTTABLESIZE 16 // default number of chains in table
+#define MAXBINSIZE 4 // max number elements in chain
+
+typedef unsigned int UINT;
 
 typedef struct
 {
@@ -10,19 +15,19 @@ typedef struct
 
 typedef struct
 {
-	int hashKey;
+	UINT hashKey;
 	HashTableElement **elements; // array of pointers to elements
-	int elementCount; // count of elements in chain
+	UINT elementCount; // count of elements in chain
 } HashTableChain;
 
 typedef struct
 {
 	HashTableChain **chains; // array of pointers to chains
-	int chainCount; // count of chains
+	UINT chainCount; // count of chains
 } HashTable;
 
-// hash key, just using sum of char indexes mod size
-int hash(HashTable*, char*);
+// hash key, just using sum of char indices mod size
+UINT hash(HashTable*, char*);
 
 // create new hash table
 HashTable *newHashTable();
@@ -30,7 +35,7 @@ HashTableChain *addEmptyChain(HashTable*);
 HashTableElement *addEmptyElement(HashTableChain*);
 
 // find address of chain with given hashKey, returns NULL if key wasn't found
-HashTableChain *findChain(HashTable*, int);
+HashTableChain *findChain(HashTable*, UINT);
 // find address of element with given hashKey, returns NULL if key wasn't found
 HashTableElement *findElement(HashTableChain*, char*);
 
@@ -44,63 +49,73 @@ int *findValue(HashTable*, char*);
 // remove key and value
 void removeElement(HashTable*, char*);
 
-int hash(HashTable* table, char* key)
+UINT hash(HashTable* table, char* key)
 {
-	int sum = 0;
+	UINT sum = 0;
 	while (*key != '\0')
 	{
 		sum += (int)*key;
 		key++;
 	}
 
-	return sum % (table->chainCount);
+	return (UINT)(sum % (table->chainCount));
 }
 
 HashTable *newHashTable()
 {
 	HashTable *table = (HashTable*)malloc(sizeof(HashTable));
-	table->chains = (HashTableChain**)malloc(sizeof(HashTableChain*));
-	table->chainCount = 0;
+	table->chainCount = DEFAULTTABLESIZE;
+	table->chains = (HashTableChain**)malloc(sizeof(HashTableChain*) * DEFAULTTABLESIZE);
+	for (UINT i = 0; i < DEFAULTTABLESIZE; i++)
+	{
+		table->chains[i] = addEmptyChain(table);
+	}
 
 	return table;
 }
 
 HashTableChain *addEmptyChain(HashTable *table)
 {
-	table->chainCount++;
-
 	HashTableChain *chain = (HashTableChain*)malloc(sizeof(HashTableChain));
 	chain->elementCount = 0;
+
+	chain->elements = (HashTableElement**)malloc(sizeof(HashTableElement*) * MAXBINSIZE);
+	for (UINT i = 0; i < MAXBINSIZE; i++)
+	{
+		chain->elements[i] = addEmptyElement(chain);
+	}
 
 	return chain;
 }
 
 HashTableElement *addEmptyElement(HashTableChain *chain)
 {
-	chain->elementCount++;
-
 	HashTableElement *element = (HashTableElement*)malloc(sizeof(HashTableElement));
+	chain->elements[chain->elementCount] = element;
 
 	return element;
 }
 
-HashTableChain *findChain(HashTable *table, int hashKey)
+HashTableChain *findChain(HashTable *table, UINT hashKey)
 {
-	for (int i = 0; i < table->chainCount; i++)
+	for (UINT i = 0; i < table->chainCount; i++) // DELETE this
 	{
 		HashTableChain *chain = table->chains[i];
-		if (chain->hashKey == hashKey)
+		if (chain != NULL && chain->elementCount > 0)
 		{
-			return chain;
+			if (chain->hashKey == hashKey) // DELETE this
+			{
+				return chain;
+			}
 		}
 	}
-
+	
 	return NULL;
 }
 
 HashTableElement *findElement(HashTableChain *chain, char* key)
 {
-	for (int i = 0; i < chain->elementCount; i++)
+	for (UINT i = 0; i < chain->elementCount; i++)
 	{
 		HashTableElement *element = chain->elements[i];
 		if (element->key == key)
@@ -114,15 +129,45 @@ HashTableElement *findElement(HashTableChain *chain, char* key)
 
 void rebalance(HashTable *table)
 {
-	for (int i = 0; i < table->chainCount; i++)
-	{
-		HashTableChain *chain = table->chains[i];
+	UINT prevCount = table->chainCount;
+	table->chainCount = (table->chainCount * 3 / 2);
 
-		// if there is at least one element
-		if (chain->elementCount > 0)
+	//table->chains = (HashTableChain**)realloc(sizeof(HashTableChain*) * table->chainCount);
+
+	// creating temp array of pointer for changing indices
+	HashTableChain **temp = (HashTableChain**)malloc(sizeof(HashTableChain*) * table->chainCount);
+
+	for (UINT i = 0; i < table->chainCount; i++)
+	{
+		HashTableChain *chain; 
+		
+		if (i < prevCount)
 		{
-			// new hashKey for current chain
-			chain->hashKey = hash(table, chain->elements[0]->key);
+			chain = table->chains[i];
+		}
+		else
+		{
+			chain = addEmptyChain(table);
+			//table->chains[i] = chain;
+		}
+
+		temp[i] = (HashTableChain*)malloc(sizeof(HashTableChain));
+
+		if (chain != NULL)
+		{
+			// if there is at least one element recalculating hash key
+			if (chain->elementCount > 0)
+			{
+				UINT hashKey = hash(table, chain->elements[0]->key);
+				temp[i] = table->chains[hashKey];
+				temp[i]->hashKey = hashKey;
+			}
+		}
+		else
+		{
+			temp[i] = NULL;
 		}
 	}
+
+	table->chains = temp;
 }

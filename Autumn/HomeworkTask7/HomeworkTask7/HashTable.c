@@ -4,32 +4,39 @@
 // add new key and value
 void add(HashTable *table, char* key, int value)
 {
-	HashTableChain *chain = findChain(table, hash(table, key));
+	UINT hashKey = hash(table, key);
+	HashTableChain *chain = findChain(table, hashKey);
 
 	if (chain == NULL) // wasn't found
 	{
 		chain = addEmptyChain(table);
+		chain->hashKey = hashKey;
+		table->chains[hashKey] = chain;
 	}
 
 	HashTableElement *element = addEmptyElement(chain);
 	element->value = value;
 	element->key = key;
 
-	// rebalance
-	if (chain->elementCount > BINSIZE)
+	chain->elementCount++;
+
+	if (chain->elementCount >= MAXBINSIZE)
 	{
 		rebalance(table);
 	}
 }
 
-// find value with given key, returns NULL if key wasn't found
+// find pointer to value with given key, returns NULL if key wasn't found
 int *findValue(HashTable *table, char* key)
 {
 	HashTableChain *chain = findChain(table, hash(table, key));
-	HashTableElement *element = findElement(chain, key);
-	if (element != NULL) // was found
+	if (chain != NULL)
 	{
-		return element->value;
+		HashTableElement *element = findElement(chain, key);
+		if (element != NULL) // was found
+		{
+			return &(element->value);
+		}
 	}
 
 	return NULL;
@@ -39,25 +46,35 @@ int *findValue(HashTable *table, char* key)
 void removeElement(HashTable *table, char* key)
 {
 	HashTableChain *chain = findChain(table, hash(table, key));
-	HashTableElement *element = findElement(chain, key);
-	if (element != NULL) // was found
+	if (chain != NULL)
 	{
-		
+		HashTableElement *element = findElement(chain, key);
+		if (element != NULL) // was found
+		{
+			element = NULL;
+			free(element);
+		}
 	}
 }
 
 void printTable(HashTable* table)
 {
-	for (int i = 0; i < table->chainCount; i++)
+	for (UINT i = 0; i < table->chainCount; i++)
 	{
-		printf("\n");
-
 		HashTableChain *chain = table->chains[i];
 
-		for (int j = 0; j < chain->elementCount; j++)
+		if (chain != NULL)
 		{
-			printf("%010d ", chain->hashKey);
-			printf("%12s  %010d\n", chain->elements[j]->key, chain->elements[j]->value);
+			printf("\n");
+			
+			for (UINT j = 0; j < chain->elementCount; j++)
+			{
+				//if (chain->elements[j] != NULL)
+				{
+					printf("%04d ", chain->hashKey);
+					printf("%8s  %6d\n", chain->elements[j]->key, chain->elements[j]->value);
+				}
+			}
 		}
 	}
 }
@@ -71,11 +88,26 @@ int main()
 	add(table, "QWERTY", 1248);
 	add(table, "QWERTY", 1250);
 	add(table, "QWERTY", 1252);
+	add(table, "QWERTY", 1248);
+	add(table, "QWERTY", 1250);
+	add(table, "QWERTY", 1252);
+	add(table, "QWERTY", 1248);
+	add(table, "QWERTY", 1250);
+	add(table, "QWERTY", 1252);
+	add(table, "QWERTY", 1248);
+	add(table, "QWERTY", 1250);
+	add(table, "QWERTY", 1252);
+	add(table, "QWERTY", 1248);
+	add(table, "QWERTY", 1250);
+	add(table, "QWERTY", 1252);
 	add(table, "WASD", 1254);
 	add(table, "WASD", 1256);
 	add(table, "ASDF", 1254);
 	add(table, "ASDF", 1256);
 	add(table, "ASDF", 1258);
+	add(table, "ASDFWD", 1258);
+
+	removeElement(table, "ASDFWD");
 
 	printTable(table);
 
