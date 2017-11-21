@@ -8,11 +8,10 @@ all: main str_funcs bit_funcs
 	gcc $(OBJECTS_DIR)/*.o -o $(EXE_NAME) -lm
 
 clean:
-	if exist $(EXE_NAME).exe del /Q $(EXE_NAME).exe
-	if exist $(OBJECTS_DIR) rmdir /S /Q $(OBJECTS_DIR)
+	rm -rf $(EXE_NAME).exe $(OBJECTS_DIR)
 
 objects_dir:
-	if not exist $(OBJECTS_DIR) mkdir $(OBJECTS_DIR)
+	mkdir -p $(OBJECTS_DIR)
 		
 main: $(SOURCES_DIR)/main.c objects_dir
 	gcc -c $(SOURCES_DIR)/$@.c -o $(OBJECTS_DIR)/$@.o

@@ -2,16 +2,17 @@
 
 SOURCES_DIR = sources
 OBJECTS_DIR = objects
-EXE_NAME = triangle
+EXE_NAME = pythagorean
 
-all: main str_funcs triangle
+all: main str_funcs pythagorean
 	gcc $(OBJECTS_DIR)/*.o -o $(EXE_NAME) -lm
 
 clean:
-	rm -rf $(EXE_NAME).exe $(OBJECTS_DIR)
+	if exist $(EXE_NAME).exe del /Q $(EXE_NAME).exe
+	if exist $(OBJECTS_DIR) rmdir /S /Q $(OBJECTS_DIR)
 
 objects_dir:
-	mkdir -p $(OBJECTS_DIR)
+	if not exist $(OBJECTS_DIR) mkdir $(OBJECTS_DIR)
 		
 main: $(SOURCES_DIR)/main.c objects_dir
 	gcc -c $(SOURCES_DIR)/$@.c -o $(OBJECTS_DIR)/$@.o
@@ -19,5 +20,5 @@ main: $(SOURCES_DIR)/main.c objects_dir
 str_funcs: $(SOURCES_DIR)/str_funcs.c objects_dir
 	gcc -c $(SOURCES_DIR)/$@.c -o $(OBJECTS_DIR)/$@.o
 
-triangle: $(SOURCES_DIR)/triangle.c objects_dir
+pythagorean: $(SOURCES_DIR)/pythagorean.c objects_dir
 	gcc -c $(SOURCES_DIR)/$@.c -o $(OBJECTS_DIR)/$@.o
