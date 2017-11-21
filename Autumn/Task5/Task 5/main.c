@@ -10,7 +10,8 @@ int main()
 {
 	int inputNumber, period, i;
 	long double number;
-	int a[100000];
+	int *a;
+	int l = 1;
 
 	int k = 0;
 
@@ -40,6 +41,9 @@ int main()
 	i = 1;
 	period = 0;
 	number = sqrt(inputNumber);
+
+	a = (int*)malloc(sizeof(int) * l);
+
 	a[0] = (int)number;
 	long double numerator, denominator;
 	numerator = a[0];
@@ -54,6 +58,8 @@ int main()
 	do
 	{
 		period++;
+		l++;
+		a = (int*)realloc(a, sizeof(int) * l);
 		a[i] = (int)((number + numerator) / denominator);
 		numerator = a[i] * denominator - numerator;
 		denominator = (inputNumber - numerator * numerator) / denominator;
@@ -61,6 +67,8 @@ int main()
 	} while (denominator != 1);
 	
 	period++;
+	l++;
+	a = (int*)realloc(a, sizeof(int) * l);
 	a[i] = a[0] + numerator;
 
 	printf("Period = %d\n", period);
