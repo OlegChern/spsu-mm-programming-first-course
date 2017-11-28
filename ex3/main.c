@@ -64,6 +64,8 @@ int main() {
     b = input(1);
     c = input(2);
 
+    printf("The numbers are %f, %f, %f\n", a,b,c);
+
     double q = angle(a,b,c);
     double w = angle(a,c,b);
     double e = angle(c,b,a);
