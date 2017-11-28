@@ -51,6 +51,8 @@ int main()
 
     t = input();
 
+    printf("The square root of the entered number is %f\n", sqrt(t));
+
 
     printf("\n%s%d", "Period = ", continuedFraction((int) sqrt(t), sqrt(t),(int) t));
 
