@@ -53,6 +53,8 @@ int main() {
     y = input(1);
     z = input(2);
 
+    printf("The numbers are %lld, %lld, %lld\n", x, y, z);
+
     if ((x*x + y*y == z*z) || (x*x + z*z == y*y) || (y*y + z*z == x*x)) // finding out if the numbers are a pythagorean triple
     {
         mark = true;
