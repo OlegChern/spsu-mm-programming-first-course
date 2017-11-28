@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1510132310 source:c:\ide\common7\ide\task10\englishcoins.c
+	<stdio.h>
+	<math.h>
+
