@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdlib.h>
-
 #define TRUE			1
 #define FALSE			0
 #define MAXLISTCOUNT	16
@@ -9,57 +7,30 @@
 
 typedef unsigned char UCHAR;
 
-#pragma pack(1)
 typedef struct
 {
 	char		isFree;
 	UCHAR		listIndex;
 } CHUNK;
-#pragma pack()
 
 typedef struct
 {
-	CHUNK		*chunks;
+	CHUNK**		chunks;
 	size_t		size;
 } CHUNKLIST;
 
 typedef struct
 {
-	CHUNKLIST	*lists;
+	CHUNKLIST**	lists;
 	size_t		availableSize;
 } MEMORY;
 
-MEMORY			memory;
+void*	myMalloc(size_t);
+void	myFree(void*);
+void*	myRealloc(void*, size_t);
 
-void init()
-{
-	memory.availableSize = 0;
+void	init();
+void	close(); // free all allocated memory
+CHUNK*	findFreeChunk(CHUNKLIST*);
 
-	memory.lists = (CHUNKLIST*)malloc(MAXLISTCOUNT * sizeof(CHUNKLIST));
-
-	for (int i = 0; i < MAXLISTCOUNT; i++)
-	{
-		size_t size = (1 << i) * sizeof(int);
-
-		memory.lists[i].size = size;
-		memory.lists[i].chunks = (CHUNK*)malloc(sizeof(CHUNK) + size);
-		for (int j = 0; j < MAXCHUNKCOUNT; j++)
-		{
-			memory.lists[i].chunks[j].isFree = TRUE;
-			memory.lists[i].chunks[j].listIndex = i;
-		}
-	}
-}
-
-CHUNK *findFreeChunk(CHUNKLIST *list)
-{
-	for (int i = 0; i < MAXCHUNKCOUNT; i++)
-	{
-		if (list->chunks[i].isFree)
-		{
-			return &(list->chunks[i]);
-		}
-	}
-	
-	return NULL;
-}
+MEMORY	memory;

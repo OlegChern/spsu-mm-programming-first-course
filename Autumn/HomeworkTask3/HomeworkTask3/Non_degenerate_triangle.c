@@ -1,11 +1,12 @@
-﻿#include <stdio.h>
+﻿#include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
 #define TRUE 1
 #define FALSE 0
 #define CHUNK 4
 
-#define PI 3.141592
+#define PI 3.141592f
 
 void print_degrees(float, float, float);
 void getFloat(float*);
@@ -16,16 +17,37 @@ int main()
 
 	printf("Non-degenerate triangle check. All symbols except numbers will be ignored.\n\n");
 
-	printf("Enter first number: ");
-	getFloat(&a);
+	while (TRUE)
+	{
+		printf("Enter first number: ");
+		getFloat(&a);
 
-	printf("Enter second number: ");
-	getFloat(&b);
+		printf("Enter second number: ");
+		getFloat(&b);
 
-	printf("Enter third number: ");
-	getFloat(&c);
+		printf("Enter third number: ");
+		getFloat(&c);
 
-	printf("\n(%f, %f, %f) is ", a, b, c);
+		printf("\n");
+
+		if (a == 0 || b == 0 || c == 0)
+		{
+			printf("Please enter numbers again:\n");
+			continue;
+		}
+		else if (a + b < c || c + a < b || b + c < a)
+		{
+			printf("Tringle with given sides isn't possible.\n");
+			printf("Please enter numbers again:\n");
+			continue;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	printf("(%f, %f, %f) is ", a, b, c);
 
 	if (a + b != c && b + c != a && a + c != b)
 	{
@@ -44,8 +66,8 @@ int main()
 
 void print_degrees(float a, float b, float c)
 {
-	float angle = acosf((b*b + c*c - a*a) / (2 * b*c)); // radians
-	angle = angle * 180 / PI; // decimal degrees
+	float angle = acosf((b * b + c * c - a * a) / (2 * b * c)); // radians
+	angle = angle * 180.f / PI; // decimal degrees
 
 	int degrees = (int)angle;
 	int minutes = (int)((angle - degrees) * 60);
@@ -75,7 +97,8 @@ void getFloat(float *target)
 			if (current == '\n') // if end of the line
 			{
 				source[length] = '\0';
-				(*target) = atof(source);
+				(*target) = (float)atof(source);
+				free(source);
 
 				return;
 			}

@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 
 #define SURNAME 11
@@ -5,7 +6,7 @@
 #define MIDDLENAME 11
 #define CHUNK 8
 
-void printBinary(__int64);
+void printBinary(char*, int);
 
 int main()
 {
@@ -15,40 +16,29 @@ int main()
 	float b = (float)compos;
 	double c = (double)-compos;
 
-	printBinary(a);
-	printBinary(b);
-	printBinary(c);
+	printf("A: ");
+	printBinary((char*)&a, sizeof(__int32));
+
+	printf("B: ");
+	printBinary((char*)&b, sizeof(float));
+
+	printf("C: ");
+	printBinary((char*)&c, sizeof(double));
 
 	return 0;
 }
 
-void printBinary(__int64 source)
+void printBinary(char *number, int size)
 {
-	char positive = source > 0 ? 1 : 0;
-	char* invBinary = (char*)malloc(sizeof(char) * CHUNK); // dynamic array
-	size_t chunkSize = 4, index = 0;
+	char bit;
 
-	if (!positive)
+	for (int i = 0; i < size; i++)
 	{
-		printf("-");
-		source = -source;
-	}
-
-	while (source > 0)
-	{
-		if (index >= chunkSize)
+		for (int j = 0; j < 8; j++)
 		{
-			chunkSize += CHUNK;
-			invBinary = (char*)realloc(invBinary, sizeof(char)*chunkSize);
+			bit = number[i] >> j;
+			printf("%d %d\n", bit, bit & 1);
 		}
-
-		invBinary[index++] = (char)(source % 2);
-		source /= 2;
-	}
-
-	for (int i = index - 1; i >= 0; i--)
-	{
-		printf("%d", invBinary[i]);
 	}
 
 	printf("\n");

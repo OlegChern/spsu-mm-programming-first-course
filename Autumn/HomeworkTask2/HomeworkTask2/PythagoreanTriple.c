@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 
 #define FALSE 0
@@ -15,16 +16,31 @@ int main()
 
 	printf("Pythagorean triple check. All symbols except numbers will be ignored.\n\n");
 
-	printf("Enter first number: ");
-	getInt(&a);
+	while (TRUE) 
+	{
+		printf("Enter first number: ");
+		getInt(&a);
 
-	printf("Enter second number: ");
-	getInt(&b);
+		printf("Enter second number: ");
+		getInt(&b);
 
-	printf("Enter third number: ");
-	getInt(&c);
+		printf("Enter third number: ");
+		getInt(&c);
 
-	printf("\n(%d, %d, %d) is", a, b, c);
+		printf("\n");
+
+		if (a == 0 || b == 0 || c == 0)
+		{
+			printf("Please enter numbers again:\n");
+			continue;
+		}
+		else
+		{
+			break;
+		}
+	} 
+
+	printf("(%d, %d, %d) is", a, b, c);
 
 	if (check_pyth_triple(a, b, c))
 	{
@@ -47,7 +63,7 @@ int main()
 
 int check_pyth_triple(long a, long b, long c)
 {
-	if (a*a + b*b == c*c || a*a + c*c == b*b || b*b + c*c == a*a)
+	if (a * a + b * b == c * c || a * a + c * c == b * b || b * b + c * c == a * a)
 	{
 		return 1;
 	}
@@ -106,6 +122,7 @@ void getInt(int *target)
 			{
 				source[length] = '\0';
 				(*target) = atoi(source);
+				free(source);
 
 				return;
 			}
