@@ -8,7 +8,14 @@ int main()
 	init();
 
 	int *a = (int*)myMalloc(sizeof(int));
+	*a = 4;
 
+	a = myRealloc(a, sizeof(int) * 2);
+	*a = 6;
+
+	myFree(a);
+
+	close();
 	return 0;
 }
 
@@ -32,7 +39,7 @@ void* myMalloc(size_t size)
 				chunk->isFree = FALSE;
 				memory.availableSize -= chunkSize;
 
-				return (void*)chunk;
+				return (void*)(chunk + 1); // return pointer to data (just shift by sizeof(CHUNK))
 			}
 			else
 			{
@@ -48,6 +55,8 @@ void* myMalloc(size_t size)
 void myFree(void* ptr)
 {
 	CHUNK* chunk = ptr;
+	chunk--; // shift to chunk data
+
 	chunk->isFree = TRUE;
 
 	size_t chunkSize = memory.lists[chunk->listIndex]->size;
@@ -57,6 +66,7 @@ void myFree(void* ptr)
 void* myRealloc(void* ptr, size_t newSize)
 {
 	CHUNK* chunk = (CHUNK*)ptr;
+	chunk--; // shift to chunk data, ptr is pointer to data area
 
 	if (chunk->isFree)
 	{
@@ -64,9 +74,8 @@ void* myRealloc(void* ptr, size_t newSize)
 		return NULL;
 	}
 
-	size_t over = sizeof(char) + sizeof(UCHAR); // beginning of data area
+	size_t data = sizeof(char) + sizeof(UCHAR); // beginning of data area
 	size_t size = memory.lists[chunk->listIndex]->size; // size of source chunk with variables
-	size_t delta = newSize - size;
 
 	if (newSize < size)
 	{
@@ -74,7 +83,7 @@ void* myRealloc(void* ptr, size_t newSize)
 		return NULL;
 	}
 
-	if (memory.availableSize < delta) // check available memory to allocate
+	if (memory.availableSize < newSize) // check available memory to allocate
 	{
 		printf("Not enough memory!");
 		return NULL;
@@ -82,15 +91,28 @@ void* myRealloc(void* ptr, size_t newSize)
 
 	char* charChunk = (char*)ptr;
 	char* newCharChunk = (char*)myMalloc(newSize);
-	
-	for (size_t i = over; i < size; i++)
+
+	for (size_t i = 0; i < size - data; i++) 	// writing data from source, ONLY data
 	{
-		newCharChunk[i] = charChunk[i]; // writing data from source
+		newCharChunk[i] = charChunk[i];
 	}
 
-	memory.availableSize -= delta;
+	memory.availableSize -= newSize - size;
 
 	return (void*)newCharChunk;
+}
+
+CHUNK* findFreeChunk(CHUNKLIST* list)
+{
+	for (int i = 0; i < MAXCHUNKCOUNT; i++)
+	{
+		if (list->chunks[i]->isFree)
+		{
+			return list->chunks[i];
+		}
+	}
+
+	return NULL;
 }
 
 void init()
@@ -102,7 +124,7 @@ void init()
 	{
 		memory.lists[i] = (CHUNKLIST*)malloc(sizeof(CHUNKLIST));
 
-		size_t size = (1 << i) * sizeof(int);
+		size_t size = (1 << i) * sizeof(int); // chunk size is power of 2 * sizeof(int)
 
 		memory.lists[i]->size = size;
 		memory.lists[i]->chunks = (CHUNK**)malloc(MAXCHUNKCOUNT * sizeof(CHUNK*));
@@ -113,6 +135,8 @@ void init()
 
 			memory.lists[i]->chunks[j]->isFree = TRUE;
 			memory.lists[i]->chunks[j]->listIndex = i;
+
+			memory.availableSize += size;
 		}
 	}
 
@@ -132,17 +156,4 @@ void close()
 	}
 
 	free(memory.lists);
-}
-
-CHUNK* findFreeChunk(CHUNKLIST* list)
-{
-	for (int i = 0; i < MAXCHUNKCOUNT; i++)
-	{
-		if (list->chunks[i]->isFree)
-		{
-			return list->chunks[i];
-		}
-	}
-
-	return NULL;
 }

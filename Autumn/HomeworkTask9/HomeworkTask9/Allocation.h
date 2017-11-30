@@ -29,7 +29,7 @@ void*	myMalloc(size_t);
 void	myFree(void*);
 void*	myRealloc(void*, size_t);
 
-void	init();
+void	init(); // initialize 
 void	close(); // free all allocated memory
 CHUNK*	findFreeChunk(CHUNKLIST*);
 
