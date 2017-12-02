@@ -4,13 +4,15 @@
 #define SURNAME 11
 #define NAME 7
 #define MIDDLENAME 11
-#define CHUNK 8
+
+#define LITTLEENDIAN (*(char *)&(int){1})
 
 void printBinary(char*, int);
 
 int main()
 {
 	int compos = SURNAME * NAME * MIDDLENAME;
+	printf("Compostion: %d\n", compos);
 
 	__int32 a = (__int32)-compos;
 	float b = (float)compos;
@@ -30,17 +32,31 @@ int main()
 
 void printBinary(char *number, int size)
 {
-	char bit;
+	unsigned char bit;
+
+#ifdef LITTLEENDIAN
+
+	for (int i = size - 1; i >= 0; i--)
+	{
+		for (int j = 7; j >= 0; j--)
+		{
+			bit = (number[i] >> j) & 1;
+			printf("%u", bit);
+		}
+	}
+
+#else
 
 	for (int i = 0; i < size; i++)
 	{
 		for (int j = 0; j < 8; j++)
 		{
-			bit = number[i] >> j;
-			printf("%d %d\n", bit, bit & 1);
+			bit = (number[i] >> j) & 1;
+			printf("%u", bit);
 		}
 	}
 
+#endif // LITTLEENDIAN
+
 	printf("\n");
 }
-
