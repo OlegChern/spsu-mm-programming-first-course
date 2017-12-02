@@ -53,7 +53,8 @@ void	closeImage(int, PIXEL**);
 PIXEL	*pixelNew(UBYTE, UBYTE, UBYTE);
 PIXEL	*pixelNewSame(UBYTE);
 UBYTE	pixelGrayscaled(PIXEL);
-UBYTE	clampToUByte(short);
+UBYTE	clampToUBYTE(short);
+UBYTE	roundUBYTE(float f);
 
 int		gauss3x3(int, int, float**, PIXEL**);
 int		sobel(int, int, char[3][3], PIXEL**);

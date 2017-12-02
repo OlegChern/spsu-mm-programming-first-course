@@ -299,7 +299,7 @@ UBYTE pixelGrayscaled(PIXEL p)
 	return (UBYTE)((p.blue + p.green + p.red) / 3);
 }
 
-UBYTE clampToUByte(short value)
+UBYTE clampToUBYTE(short value)
 {
 	UBYTE clamped =
 		value < 0 ? 0 :
@@ -343,9 +343,7 @@ int gauss3x3(int width, int height, float **kernel, PIXEL **newImage)
 
 			if (sum != 0)
 			{
-				newImage[x][y].red = roundUBYTE(r / sum);
-				newImage[x][y].green = roundUBYTE(g / sum);
-				newImage[x][y].blue = roundUBYTE(b / sum);
+				newImage[x][y] = *(pixelNew(roundUBYTE(r / sum), roundUBYTE(g / sum), roundUBYTE(b / sum)));
 			}
 		}
 	}
@@ -377,7 +375,7 @@ int sobel(int width, int height, char mask[3][3], PIXEL **targetImage)
 				}
 			}
 
-			UBYTE clamped = clampToUByte(sum);
+			UBYTE clamped = clampToUBYTE(sum);
 			temp[x][y] = *(pixelNewSame(clamped));
 		}
 	}
