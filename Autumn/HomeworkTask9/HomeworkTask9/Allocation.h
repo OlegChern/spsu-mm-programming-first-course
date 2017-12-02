@@ -5,12 +5,12 @@
 #define MAXLISTCOUNT	16
 #define MAXCHUNKCOUNT	16
 
-typedef unsigned char UCHAR;
+typedef unsigned char INDICES;
 
 typedef struct
 {
 	char		isFree;
-	UCHAR		listIndex;
+	INDICES		listIndex;
 } CHUNK;
 
 typedef struct
@@ -25,12 +25,21 @@ typedef struct
 	size_t		availableSize;
 } MEMORY;
 
-void*	myMalloc(size_t);
-void	myFree(void*);
-void*	myRealloc(void*, size_t);
+typedef struct
+{
+	float		position[3];
+	float		rotation[4];
+} TRANSFORM;								// struct for example
 
-void	init(); // initialize 
-void	close(); // free all allocated memory
-CHUNK*	findFreeChunk(CHUNKLIST*);
+void			intExample();
+void			structExample();
 
-MEMORY	memory;
+void*			myMalloc(size_t);
+void			myFree(void*);
+void*			myRealloc(void*, size_t);
+
+void			init();						// initialize 
+void			close();					// free all allocated memory
+CHUNK*			findFreeChunk(CHUNKLIST*);
+
+MEMORY			memory;

@@ -7,6 +7,15 @@ int main()
 {
 	init();
 
+	intExample();
+	structExample();
+
+	close();
+	return 0;
+}
+
+void intExample()
+{
 	int *a = (int*)myMalloc(sizeof(int));
 	*a = 4;
 
@@ -14,9 +23,22 @@ int main()
 	*a = 6;
 
 	myFree(a);
+}
 
-	close();
-	return 0;
+void structExample()
+{
+	TRANSFORM *transform = (TRANSFORM*)myMalloc(sizeof(TRANSFORM));
+
+	transform->position[0] = 1.0f;
+	transform->position[1] = 0.5f;
+	transform->position[2] = -1.5f;
+
+	transform->rotation[0] = 0.5f;
+	transform->rotation[1] = -0.1f;
+	transform->rotation[2] = 0.2f;
+	transform->rotation[3] = 1.0f;
+
+	myFree(transform);
 }
 
 void* myMalloc(size_t size)
@@ -74,7 +96,7 @@ void* myRealloc(void* ptr, size_t newSize)
 		return NULL;
 	}
 
-	size_t data = sizeof(char) + sizeof(UCHAR); // beginning of data area
+	size_t data = sizeof(char) + sizeof(INDICES); // beginning of data area
 	size_t size = memory.lists[chunk->listIndex]->size; // size of source chunk with variables
 
 	if (newSize < size)
@@ -124,7 +146,7 @@ void init()
 	{
 		memory.lists[i] = (CHUNKLIST*)malloc(sizeof(CHUNKLIST));
 
-		size_t size = (1 << i) * sizeof(int); // chunk size is power of 2 * sizeof(int)
+		size_t size = (1 << i) * sizeof(int); // chunk size is (power of 2) * sizeof(int)
 
 		memory.lists[i]->size = size;
 		memory.lists[i]->chunks = (CHUNK**)malloc(MAXCHUNKCOUNT * sizeof(CHUNK*));
