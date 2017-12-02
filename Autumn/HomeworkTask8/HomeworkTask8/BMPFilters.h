@@ -2,10 +2,10 @@
 
 #include <stdlib.h>
 
-#define PI 3.14159
-#define FALSE 1
-#define TRUE 1
-#define CHUNK 8
+#define PI		3.14159
+#define FALSE	0
+#define TRUE	1
+#define CHUNK	8
 
 typedef unsigned char UBYTE;
 typedef unsigned short USHORT;

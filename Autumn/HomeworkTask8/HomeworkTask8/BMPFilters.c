@@ -8,12 +8,6 @@
 
 int main(int argc, char **argv)
 {
-	//Gauss
-	//SobelX
-	//SobelY 
-	//GrayScale
-	//Average
-
 	if (argc < 4)
 	{
 		printf("Not enough arguments! Should be:\n");
