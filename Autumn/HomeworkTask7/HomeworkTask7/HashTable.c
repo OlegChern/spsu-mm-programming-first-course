@@ -1,6 +1,52 @@
 #include <stdio.h>
 #include "HashTable.h"
 
+int main()
+{
+	printf("Hash table.\n");
+	printf("Collision resolution: separate chaining with list head cells.\n");
+
+	HashTable *table = newHashTable();
+	add(table, "WADX", 1248);
+	add(table, "EDSF", 1250);
+	add(table, "ZXC", 1252);
+	add(table, "ASDX", 1248);
+	add(table, "ZXCV", 1250);
+	add(table, "WASD", 1254);
+	add(table, "WASD", 1256);
+	add(table, "ASDF", 1254);
+	add(table, "ZXCV", 1256);
+	add(table, "ASDFDS", 1258);
+	add(table, "ASDFWD", 1258);
+
+	printTable(table);
+
+	printf("Removing elements with keys \"ASDFDS\" and \"ASDFWD\"\n");
+
+	remove(table, "ASDFDS");
+	remove(table, "ASDFWD");
+
+	printTable(table);
+
+	int buffer;
+	char key[2][5] = { "ZXCV", "TEST" };
+
+	for (int i = 0; i < 2; i++)
+	{
+		if (findValue(&buffer, table, key[i]))
+		{
+			printf("Value of element with key \"%s\": %d\n", key[i], buffer);
+		}
+		else
+		{
+			printf("Value of element with key \"%s\" not found\n", key[i]);
+		}
+	}
+
+	return 0;
+}
+
+
 // add new key and value
 void add(HashTable *table, char* key, int value)
 {
@@ -37,7 +83,7 @@ int findValue(int *buffer, HashTable *table, char* key)
 }
 
 // remove key and value
-void removeElement(HashTable *table, char* key)
+void remove(HashTable *table, char* key)
 {
 	HashTableChain *chain = table->chains[hash(table, key)];
 
@@ -81,47 +127,100 @@ void printTable(HashTable* table)
 	printf("\n");
 }
 
-int main()
+int hash(HashTable* table, char* key)
 {
-	printf("Hash table.\n");
-	printf("Collision resolution: separate chaining with list head cells.\n");
-
-	HashTable *table = newHashTable();
-	add(table, "WADX", 1248);
-	add(table, "EDSF", 1250);
-	add(table, "ZXC", 1252);
-	add(table, "ASDX", 1248);
-	add(table, "ZXCV", 1250);
-	add(table, "WASD", 1254);
-	add(table, "WASD", 1256);
-	add(table, "ASDF", 1254);
-	add(table, "ZXCV", 1256);
-	add(table, "ASDFDS", 1258);
-	add(table, "ASDFWD", 1258);
-
-	printTable(table);
-
-	printf("Removing elements with keys \"ASDFDS\" and \"ASDFWD\"\n");
-
-	removeElement(table, "ASDFDS");
-	removeElement(table, "ASDFWD");
-
-	printTable(table);
-
-	int buffer;
-	char key[2][5] = { "ZXCV", "TEST" };
-
-	for (int i = 0; i < 2; i++)
+	int sum = 0;
+	while (*key != '\0')
 	{
-		if (findValue(&buffer, table, key[i]))
+		sum += (int)*key;
+		key++;
+	}
+
+	return (int)(sum % (table->chainCount));
+}
+
+HashTable *newHashTable()
+{
+	HashTable *table = (HashTable*)malloc(sizeof(HashTable));
+
+	table->chainCount = DEFAULTTABLESIZE;
+	table->chains = (HashTableChain**)malloc(sizeof(HashTableChain*) * DEFAULTTABLESIZE);
+
+	for (int i = 0; i < DEFAULTTABLESIZE; i++)
+	{
+		table->chains[i] = addEmptyChain(table);
+	}
+
+	return table;
+}
+
+HashTableChain *addEmptyChain(HashTable *table)
+{
+	HashTableChain *chain = (HashTableChain*)malloc(sizeof(HashTableChain));
+
+	chain->elementCount = 0;
+	chain->elements = (HashTableElement**)malloc(sizeof(HashTableElement*) * MAXCHAINSIZE);
+
+	for (int i = 0; i < MAXCHAINSIZE; i++)
+	{
+		chain->elements[i] = (HashTableElement*)malloc(sizeof(HashTableElement));
+	}
+
+	return chain;
+}
+
+HashTableElement *findElementInChain(HashTableChain *chain, char* key)
+{
+	for (int i = 0; i < chain->elementCount; i++)
+	{
+		HashTableElement *element = chain->elements[i];
+		if (strcmp(element->key, key) == 0)
 		{
-			printf("Value of element with key \"%s\": %d\n", key[i], buffer);
-		}
-		else
-		{
-			printf("Value of element with key \"%s\" not found\n", key[i]);
+			return element;
 		}
 	}
 
-	return 0;
+	return NULL;
+}
+
+int findElementIndexInChain(HashTableChain *chain, char* key)
+{
+	for (int i = 0; i < chain->elementCount; i++)
+	{
+		if (strcmp(chain->elements[i]->key, key) == 0)
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+void rebalance(HashTable *table)
+{
+	int prevCount = table->chainCount;
+	table->chainCount = (int)(prevCount * 3 / 2);
+
+	// creating temp array of pointer for changing indices
+	HashTableChain **temp = (HashTableChain**)malloc(sizeof(HashTableChain*) * table->chainCount);
+	for (int i = 0; i < table->chainCount; i++)
+	{
+		temp[i] = addEmptyChain(table);
+	}
+
+	for (int i = 0; i < prevCount; i++)
+	{
+		HashTableChain *sourceChain = table->chains[i];
+
+		if (sourceChain->elementCount > 0)
+		{
+			int hashKey = hash(table, sourceChain->elements[0]->key);
+			temp[hashKey] = sourceChain;
+		}
+	}
+
+	for (int i = 0; i < table->chainCount; i++)
+	{
+		table->chains[i] = temp[i];
+	}
 }
