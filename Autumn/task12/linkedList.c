@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <malloc.h>
+#include <stdarg.h>
 
 #include "linkedList.h"
+#include "util.h"
 
 /* ==== ==== implementation-dependent ==== ==== */
 
@@ -29,6 +31,7 @@ LinkedList *buildLinkedList()
 {
     LinkedList *result = malloc(sizeof(LinkedList));
     result->first = NULL;
+    result->last = NULL;
     result->length = 0;
     return result;
 }
@@ -37,18 +40,33 @@ void addToList(LinkedList *list, LIST_VALUE_TYPE value)
 {
     if (list == NULL)
         return;
+    if (xor(list->first == NULL,  list->last == NULL))
+    {
+        printf("Error: list is likely corrupted.");
+        return;
+    }
     Element *newElement = buildElement(value);
     if (list->first == NULL)
     {
         list->first = newElement;
+        list->last = newElement;
         list->length = 1;
         return;
     }
-    Element *current = list->first;
-    while (current->next != NULL)
-        current = current->next;
-    current->next = newElement;
+    list->last->next = newElement;
     list->length++;
+    list->last = newElement;
+}
+
+void addAllToList(LinkedList *list, int count, ...)
+{
+    va_list arg_list;
+    va_start(arg_list, count);
+    for (int i = 0; i < count; i++)
+    {
+        LIST_VALUE_TYPE arg = va_arg(arg_list, LIST_VALUE_TYPE);
+        addToList(list, arg);
+    }
 }
 
 void removeValueFromList(LinkedList *list, LIST_VALUE_TYPE value)
@@ -60,6 +78,8 @@ void removeValueFromList(LinkedList *list, LIST_VALUE_TYPE value)
         Element *tmp = list->first;
         list->first = list->first->next;
         list->length--;
+        if (list->last == tmp)
+            list->last = NULL;
         free(tmp);
         return;
     }
@@ -82,6 +102,10 @@ void removeNext(LinkedList *list, Element *element)
     Element *tmp = element->next;
     element->next = tmp->next;
     list->length--;
+    if (tmp == list->last)
+    {
+        list->last = element;
+    }
     free(tmp);
 }
 

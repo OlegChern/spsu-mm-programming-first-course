@@ -4,7 +4,7 @@
 /* ==== ==== implementation-dependent ==== ==== */
 
 #ifndef LIST_VALUE_TYPE
-#define LIST_VALUE_TYPE int
+#define LIST_VALUE_TYPE unsigned int
 #endif
 
 int equal(LIST_VALUE_TYPE, LIST_VALUE_TYPE);
@@ -23,7 +23,7 @@ typedef struct
 {
     Element *first;
     int length;
-    // Element *last;
+    Element *last;
 } LinkedList;
 
 Element *buildElement(LIST_VALUE_TYPE);
@@ -31,6 +31,8 @@ Element *buildElement(LIST_VALUE_TYPE);
 LinkedList *buildLinkedList();
 
 void addToList(LinkedList *, LIST_VALUE_TYPE);
+
+void addAllToList(LinkedList *, int, ...);
 
 /// Removes first occurance
 void removeValueFromList(LinkedList *, LIST_VALUE_TYPE);
