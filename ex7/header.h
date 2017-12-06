@@ -12,7 +12,7 @@
 struct list;
 struct hash_t;
 
-void list_AddToEnd (int, int, struct list*);
+int list_AddToEnd (int, int, struct list*);
 
 void list_ValueRemove (int, struct list*);
 
