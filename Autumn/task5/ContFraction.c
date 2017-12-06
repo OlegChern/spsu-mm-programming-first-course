@@ -1,17 +1,24 @@
 #include<stdio.h>
 #include<math.h>
+#include<ctype.h>
 
 int input()
 {
     printf("Please enter a number. NB: Don't input random symbols\n");
     int n;
+    char ch;
     while (1)
     {
-        if ((scanf("%d", &n) == 1) && (n > 0) && ((int) sqrt(n) != sqrt(n)))
+        int res = scanf("%d%c", &n, &ch);
+        if ((res == 2) && (n > 0) && ((int) sqrt(n) != sqrt(n)) && isspace(ch))
         {
+            if (ch != '\n')
+            {
+                while (getchar() != '\n');
+            }
             return n;
         }
-        else
+        else if ((res != 2) || !isspace(ch))
         {
             while(getchar() != '\n');
         }
@@ -36,7 +43,6 @@ int input()
   that is why p1 = (sqrt(n) + r) / (n - r * r). From that a2 = (int) sqrt(p1)
   repeat this process till d == 1 or r == a0 (that is how we find period of a continued fraction)
 */
-
 
 int main()
 {
