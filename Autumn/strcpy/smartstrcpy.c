@@ -9,7 +9,7 @@ char *dumbstrcpy(char *dst, const char *src)
     {
         dst[index] = src[index];
         index++;
-    } while (src[index] != '\0');
+    } while (src[index - 1] != '\0');
     return dst;
 }
 
@@ -40,25 +40,54 @@ char *smartstrcpy(char *dst, const char *src)
     // Copy items that can't be handled
     // by the main loop due to data shape mismatch
     for (int i = 0; i < len_not_32; i++)
-    {
         *(dst++) = *(src++);
-    }
 
-    int *src_current = (int*) src;
-    int *dst_current = (int*) dst;
+    int *int_dst = (int *) dst;
+    int *int_src = (int *) src;
 
     // The main loop:
     for (int i = 0; i < len_32; i++)
     {
-        *(dst++) = *(src++);
-        *(dst++) = *(src++);
-        *(dst++) = *(src++);
-        *(dst++) = *(src++);
+        *(int_dst++) = *(int_src++);
+        *(int_dst++) = *(int_src++);
+        *(int_dst++) = *(int_src++);
+        *(int_dst++) = *(int_src++);
 
-        *(dst++) = *(src++);
-        *(dst++) = *(src++);
-        *(dst++) = *(src++);
-        *(dst++) = *(src++);
+        *(int_dst++) = *(int_src++);
+        *(int_dst++) = *(int_src++);
+        *(int_dst++) = *(int_src++);
+        *(int_dst++) = *(int_src++);
     }
     return initial_dst;
+}
+
+char *smartstrcpy2(char *dst, const char *src)
+{
+    char *initial_dst = dst;
+    int len = strlen(src) + 1;
+    int len_4 = len / 4;
+    int len_not_4 = len % 4;
+
+    for (int i = 0; i < len_not_4; i++)
+        *(dst++) = *(src++);
+
+    int *int_dst = (int *) dst;
+    int *int_src = (int *) src;
+
+    for (int i = 0; i < len_4; i++)
+    {
+        *(int_dst++) = *(int_src++);
+    }
+    return initial_dst;
+}
+
+char *strclear(char *str)
+{
+    int index = 0;
+    while (str[index] != '\0')
+    {
+        str[index] = 0;
+        index++;
+    }
+    return str;
 }
