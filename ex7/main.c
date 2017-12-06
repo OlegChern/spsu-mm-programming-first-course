@@ -12,7 +12,6 @@ struct hash_t
 {
     struct list* arr_lst;
     int size;
-    int counter;
 };
 
 
@@ -26,7 +25,6 @@ int main() {
     struct hash_t* table;
 
     table->size = sz;
-    table->counter = 0;
     table->arr_lst = malloc(sizeof(struct list)*sz);
 
     int input = -1;
@@ -79,8 +77,10 @@ int main() {
     return 0;
 }
 
-void list_AddToEnd (int add_value, int add_key, struct list* list)
+int list_AddToEnd (int add_value, int add_key, struct list* list)
 {
+    int counter = 0;
+
     struct list* l = list;
 
     while (l->next != NULL)
@@ -90,6 +90,7 @@ void list_AddToEnd (int add_value, int add_key, struct list* list)
             l->value = add_value;
             return;
         }
+        counter++;
         l = l->next;
     }
 
@@ -100,6 +101,8 @@ void list_AddToEnd (int add_value, int add_key, struct list* list)
     l->next->value = 0;
     l->next->key = 0;
     l->next->next = NULL;
+
+    return counter+1;
 }
 
 void list_ValueRemove (int remove_key, struct list* l)
@@ -201,10 +204,11 @@ void hash_Add (struct hash_t* table, int key, int value)
 {
     struct list* list = (table->arr_lst + hash_func(key,table));
 
-    table->counter++;
-    list_AddToEnd(value, key, list);
+    int counter;
 
-    if (table->counter == table->size + 2)
+    counter = list_AddToEnd(value, key, list);
+
+    if (counter == (table->size + 2)/2)
     {
         hash_Resize(table);
     }
@@ -228,7 +232,6 @@ void hash_Remove (struct hash_t* table, int key)
 {
     struct list* list = table->arr_lst + hash_func(key,table);
 
-    table->counter--;
     while (list != NULL)
     {
         if (list->key == key)
@@ -255,7 +258,6 @@ void hash_Delete(struct hash_t* table)
     {
         list_Delete((table->arr_lst + i)->next);
     }
-    table->counter = 0;
     free(table->arr_lst);
 }
 
