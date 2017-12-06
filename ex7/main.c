@@ -22,7 +22,7 @@ int main() {
     printf("%s", "Please, enter the size of the hash-table you want to create: ");
     scanf("%d", &sz);
 
-    struct hash_t* table;
+    struct hash_t* table = malloc(sizeof(struct hash_t));
 
     table->size = sz;
     table->arr_lst = malloc(sizeof(struct list)*sz);
@@ -73,6 +73,8 @@ int main() {
         }
 
     }
+
+    free(table);
 
     return 0;
 }
