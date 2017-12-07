@@ -5,14 +5,13 @@ int input()
 {
     int x;
 
-    while(1)
+    while (1)
     {
-        if ((scanf("%d", &x) != 1) || ((int)sqrt(x)*(int)sqrt(x) == x))
+        if ((scanf("%d", &x) != 1) || ((int) sqrt(x) * (int) sqrt(x) == x))
         {
             printf("%s", "INPUT ERROR! Please, try again: ");
-            while(getchar() != '\n');
-        }
-        else
+            while (getchar() != '\n');
+        } else
         {
             return x;
         }
@@ -30,14 +29,14 @@ int continuedFraction(int ideal, double n, int t)
     do
     {
         num = (n + delta);
-        den = (t - delta*delta)/den;
+        den = (t - delta * delta) / den;
 
-        k = (int) (num/den);
-        delta = den*k - delta;
+        k = (int) (num / den);
+        delta = den * k - delta;
 
         printf("%d ", k);
         i++;
-    }while ((num/den != (n + ideal)));
+    } while ((num / den != (n + ideal)));
 
     return i;
 }
@@ -54,7 +53,7 @@ int main()
     printf("The square root of the entered number is %f\n", sqrt(t));
 
 
-    printf("\n%s%d", "Period = ", continuedFraction((int) sqrt(t), sqrt(t),(int) t));
+    printf("\n%s%d", "Period = ", continuedFraction((int) sqrt(t), sqrt(t), (int) t));
 
 
     return 0;

@@ -4,55 +4,62 @@ struct list
 {
     int value;
     int key;
-    struct list* next;
+    struct list *next;
 };
 
 
 struct hash_t
 {
-    struct list* arr_lst;
+    struct list *arr_lst;
     int size;
 };
 
 
-int main() {
+int main()
+{
 
     int sz;
 
     printf("%s", "Please, enter the size of the hash-table you want to create: ");
     scanf("%d", &sz);
 
-    struct hash_t* table = malloc(sizeof(struct hash_t));
+    struct hash_t *table = malloc(sizeof(struct hash_t));
 
     table->size = sz;
-    table->arr_lst = malloc(sizeof(struct list)*sz);
+    table->arr_lst = malloc(sizeof(struct list) * sz);
 
     int input = -1;
 
     while (input != 0)
     {
-        printf("%s", "Please, choose an option: 1 - add an element, 2 - remove an element, 3 - search for an element, 4 - print the table, 0 - delete the table\n");
+        printf("%s",
+               "Please, choose an option: 1 - add an element, 2 - remove an element, 3 - search for an element, 4 - print the table, 0 - delete the table\n");
         scanf("%d", &input);
 
-        switch(input) {
+        switch (input)
+        {
             case 0:
-                hash_Delete(table);
+                hashDelete(table);
                 break;
-            case 1: {
+            case 1:
+            {
                 int key, value;
                 printf("%s\n", "Enter the key and the value: ");
                 scanf("%d %d", &key, &value);
-                hash_Add(table, key, value);
+                hashAdd(table, key, value);
                 break;
             }
-            case 4: {
-                hash_Print(table);
+            case 4:
+            {
+                hashPrint(table);
                 break;
             }
-            case 2: {
+            case 2:
+            {
                 int key;
+                printf("%s\n", "Enter the key of the element you want to delete: ");
                 scanf("%d", &key);
-                hash_Remove(table, key);
+                hashRemove(table, key);
                 break;
             }
             case 3:
@@ -60,11 +67,10 @@ int main() {
                 int key, value;
                 printf("%s\n", "Enter the key: ");
                 scanf("%d", &key);
-                if(hash_Search(table,key,&value))
+                if (hashSearch(table, key, &value))
                 {
-                    printf("%s%d\n","The value is ", value);
-                }
-                else
+                    printf("%s%d\n", "The value is ", value);
+                } else
                 {
                     printf("%s", "There is no match for this key\n");
                 }
@@ -79,18 +85,18 @@ int main() {
     return 0;
 }
 
-int list_AddToEnd (int add_value, int add_key, struct list* list)
+int listAddToEnd(int add_value, int add_key, struct list *list)
 {
     int counter = 0;
 
-    struct list* l = list;
+    struct list *l = list;
 
     while (l->next != NULL)
     {
         if (l->key == add_key)
         {
             l->value = add_value;
-            return;
+            return 0;
         }
         counter++;
         l = l->next;
@@ -104,16 +110,16 @@ int list_AddToEnd (int add_value, int add_key, struct list* list)
     l->next->key = 0;
     l->next->next = NULL;
 
-    return counter+1;
+    return counter + 1;
 }
 
-void list_ValueRemove (int remove_key, struct list* l)
+void listValueRemove(int remove_key, struct list *l)
 {
     if (l->key == remove_key)
     {
         l->key = l->next->key;
         l->value = l->next->value;
-        struct list* temp = l->next;
+        struct list *temp = l->next;
         l->next = l->next->next;
         free(temp);
         return;
@@ -126,14 +132,14 @@ void list_ValueRemove (int remove_key, struct list* l)
 
     if (l->next->key == remove_key)
     {
-        struct list* temp;
+        struct list *temp;
         temp = l->next->next;
         free(l->next);
         l->next = temp;
     }
 }
 
-bool list_Search (int search_key, struct list* l, int *num)
+bool listSearch(int search_key, struct list *l, int *num)
 {
     while (l->next != NULL)
     {
@@ -147,53 +153,53 @@ bool list_Search (int search_key, struct list* l, int *num)
     return false;
 }
 
-void list_Print (struct list* l)
+void listPrint(struct list *l)
 {
-    while(l->next != NULL)
+    while (l->next != NULL)
     {
         printf("(%d , %d) ", l->key, l->value);
         l = l->next;
     }
 }
 
-void list_Delete(struct list* list)
+void listDelete(struct list *list)
 {
     if (list == NULL) return;
 
-    list_Delete(list->next);
+    listDelete(list->next);
     free(list);
 
 }
 
 
-int hash_func (int key, struct hash_t* table)
+int hashFunc(int key, struct hash_t *table)
 {
     return key % table->size;
 }
 
-void hash_Resize(struct hash_t* table)
+void hashResize(struct hash_t *table)
 {
-    struct list* new_lists = malloc(sizeof(struct list)*table->size);
+    struct list *new_lists = malloc(sizeof(struct list) * table->size);
     for (int i = 0; i < table->size; i++)
     {
-        struct list* l = table->arr_lst + i;
+        struct list *l = table->arr_lst + i;
         while (l->next != NULL)
         {
-            list_AddToEnd(l->value, l->key, new_lists + hash_func(l->key, table));
+            listAddToEnd(l->value, l->key, new_lists + hashFunc(l->key, table));
             l = l->next;
         }
     }
 
-    hash_Delete(table);
+    hashDelete(table);
     table->size *= 2;
-    table->arr_lst = malloc(sizeof(struct list)*table->size);
+    table->arr_lst = malloc(sizeof(struct list) * table->size);
 
     for (int j = 0; j < table->size / 2; j++)
     {
-        struct list* l = new_lists + j;
+        struct list *l = new_lists + j;
         while (l->next != NULL)
         {
-            list_AddToEnd(l->value, l->key, table->arr_lst + hash_func(l->key, table));
+            listAddToEnd(l->value, l->key, table->arr_lst + hashFunc(l->key, table));
             l = l->next;
         }
     }
@@ -202,63 +208,64 @@ void hash_Resize(struct hash_t* table)
     printf("%s", "The table has been resized (size is doubled)\n");
 }
 
-void hash_Add (struct hash_t* table, int key, int value)
+void hashAdd(struct hash_t *table, int key, int value)
 {
-    struct list* list = (table->arr_lst + hash_func(key,table));
+    struct list *list = (table->arr_lst + hashFunc(key, table));
 
     int counter;
 
-    counter = list_AddToEnd(value, key, list);
+    counter = listAddToEnd(value, key, list);
 
-    if (counter == (table->size + 2)/2)
+    if (counter == (table->size + 2) / 2)
     {
-        hash_Resize(table);
+        hashResize(table);
     }
 }
 
-bool hash_Search (struct hash_t* table, int key, int* num)
+bool hashSearch(struct hash_t *table, int key, int *num)
 {
-    struct list *list = table->arr_lst + hash_func(key, table);
+    struct list *list = table->arr_lst + hashFunc(key, table);
 
-    if (list_Search(key, list, num))
+    if (listSearch(key, list, num))
     {
         return true;
-    }
-    else
+    } else
     {
         return false;
     }
 }
 
-void hash_Remove (struct hash_t* table, int key)
+void hashRemove(struct hash_t *table, int key)
 {
-    struct list* list = table->arr_lst + hash_func(key,table);
+    struct list *list = table->arr_lst + hashFunc(key, table);
 
     while (list != NULL)
     {
         if (list->key == key)
         {
-            list_ValueRemove(key, list);
+            listValueRemove(key, list);
+            printf("%s\n", "Element has been deleted");
             return;
         }
         list = list->next;
     }
+    printf("%s\n", "Element has not been found");
 }
 
-void hash_Print (struct hash_t* table)
+void hashPrint(struct hash_t *table)
 {
     for (int i = 0; i < table->size; i++)
     {
-        list_Print(table->arr_lst + i);
+        listPrint(table->arr_lst + i);
         printf("\n");
     }
 }
 
-void hash_Delete(struct hash_t* table)
+void hashDelete(struct hash_t *table)
 {
     for (int i = 0; i < table->size; i++)
     {
-        list_Delete((table->arr_lst + i)->next);
+        listDelete((table->arr_lst + i)->next);
     }
     free(table->arr_lst);
 }

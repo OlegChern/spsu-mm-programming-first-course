@@ -12,28 +12,28 @@
 struct list;
 struct hash_t;
 
-int list_AddToEnd (int, int, struct list*);
+int listAddToEnd(int, int, struct list *);
 
-void list_ValueRemove (int, struct list*);
+void listValueRemove(int, struct list *);
 
-bool list_Search (int, struct list*, int*);
+bool listSearch(int, struct list *, int *);
 
-void list_Print (struct list*);
+void listPrint(struct list *);
 
-void list_Delete (struct list*);
+void listDelete(struct list *);
 
-void hash_Delete (struct hash_t*);
+void hashDelete(struct hash_t *);
 
-void hash_Add(struct hash_t*, int, int);
+void hashAdd(struct hash_t *, int, int);
 
-int hash_func (int, struct hash_t*);
+int hashFunc(int, struct hash_t *);
 
-void hash_Resize (struct hash_t*);
+void hashResize(struct hash_t *);
 
-bool hash_Search (struct hash_t*, int, int*);
+bool hashSearch(struct hash_t *, int, int *);
 
-void hash_Remove (struct hash_t*, int);
+void hashRemove(struct hash_t *, int);
 
-void hash_Print (struct hash_t*);
+void hashPrint(struct hash_t *);
 
 #endif //EX7_HEADER_H

@@ -17,21 +17,19 @@ bool isPrime(long long x)
 }
 
 
-int main() {
+int main()
+{
 
     printf("%s", "Mersenne primes: ");
 
     for (int i = 2; i <= n; i++)
     {
-        long long temp = (long long)(pow(2,i) - 1);
+        long long temp = (long long) (pow(2, i) - 1);
         if (isPrime(temp))
         {
             printf("%llu ", temp);
         }
     }
-
-
-
 
     return 0;
 }

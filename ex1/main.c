@@ -11,7 +11,7 @@ void binary(unsigned long long int num, int k, int max) //recursively prints the
     else
     {
         k++;
-        binary(num/2, k, max);
+        binary(num / 2, k, max);
         if ((max - k) % 8 == 0)
         {
             printf(" ");

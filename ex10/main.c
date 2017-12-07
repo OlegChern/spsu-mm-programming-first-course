@@ -7,14 +7,13 @@ int input()
 {
     int x;
 
-    while(1)
+    while (1)
     {
         if ((scanf("%d", &x) != 1) || (x <= 0))
         {
             printf("%s ", "INPUT ERROR! Please, try again: ");
-            while(getchar() != '\n');
-        }
-        else
+            while (getchar() != '\n');
+        } else
         {
             return x;
         }
@@ -33,7 +32,7 @@ int main()
 
     if (amount == 2)
     {
-        printf("%s","There is only 1 variant to present 1 penny (obviously)");
+        printf("%s", "There is only 1 variant to present 1 penny (obviously)");
 
         return 0;
     }
@@ -41,7 +40,7 @@ int main()
 
     // That's where a two-dimensional array is initialized
 
-    long int** vars = calloc((size_t) amount, sizeof(*vars));
+    long int **vars = calloc((size_t) amount, sizeof(*vars));
 
     for (int i = 0; i < amount; i++)
     {
@@ -59,12 +58,12 @@ int main()
         for (int i = 0; i < amount; i++)
             for (int k = 0; k <= i; k += coins[j])
             {
-                vars[i][j] += vars[i - k][j-1];
+                vars[i][j] += vars[i - k][j - 1];
             }
 
-    printf("There are %ld variants to present %d pence", vars[amount-1][7], amount - 1);
+    printf("There are %ld variants to present %d pence", vars[amount - 1][7], amount - 1);
 
-    for(int i = 0; i < amount; i++)
+    for (int i = 0; i < amount; i++)
     {
         free(vars[i]);
     }
