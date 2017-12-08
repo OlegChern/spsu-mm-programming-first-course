@@ -1,28 +1,14 @@
-#include <malloc.h>
-
 #include "util.h"
 
-int init()
-{
-    EMPTY_ELEMENT_ZEROS = buildElement(0);
-    EMPTY_ELEMENT_ZEROS->next = EMPTY_ELEMENT_ZEROS;
+_Static_assert(sizeof(unsigned int) == 4,
+               "Code relies on unsigned int being exactly 4 bytes.");
 
-    EMPTY_ELEMENT_ONES = buildElement(INT_MAX);
-    EMPTY_ELEMENT_ONES->next = EMPTY_ELEMENT_ONES;
-    return 1;
-}
+_Static_assert(sizeof(unsigned long long int) > sizeof(unsigned int),
+               "Code relies on unsigned long long int being strictly greater than unsigned int.");
+
+const unsigned long long int INT_MOD = 1ull << 32;
 
 int xor(int first, int second)
 {
     return (first || second) && !(first && second);
-}
-
-int logicEqual(int first, int second)
-{
-    return !xor(first, second);
-}
-
-void finish()
-{
-    free(EMPTY_ELEMENT_ZEROS);
 }

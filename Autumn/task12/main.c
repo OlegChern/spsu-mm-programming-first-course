@@ -1,29 +1,25 @@
-#include <stdio.h>
+#include "unsignedBignum.h"
 
-#include "endlessInteger.h"
-#include "util.h"
-
-int main()
+int main(void)
 {
-    if (init())
-    {
-        printf("Initialization error.\n");
-        return 1;
-    }
-
-    EndlessInteger *a = buildEndlessInteger(0xFFFFFFFF);
-    EndlessInteger *b = buildEndlessInteger(0x1);
-
-    addEndlessInteger(a, b);
-    printf("structure: ");
-    printList(a);
-    printf("\nas integer: ");
-    printEndlessInteger(a);
-    printf("\nas hex endless ineger: ");
-    printHexEndlessInteger(a);
-    printf("\nis positive: %d\n", endlessIntegerIsPositive(a));
-
-    freeEndlessInteger(a);
-    finish();
+    UBN *ubn = buildUBN(1);
+    leftShiftUBN(ubn, 2);
+    rightShiftUBN(ubn, 1);
+    printHexUBN(ubn);
     return 0;
 }
+
+/*
+int main()
+{
+    UBN *ubn = buildUBN(3);
+    const unsigned int power = 5000;
+
+    powerUBN(ubn, power);
+    printHexUBN(ubn);
+    printf("\n");
+
+    freeUBN(ubn);
+    return 0;
+}
+*/

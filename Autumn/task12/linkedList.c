@@ -3,7 +3,6 @@
 #include <stdarg.h>
 
 #include "linkedList.h"
-#include "util.h"
 
 /* ==== ==== implementation-dependent ==== ==== */
 
@@ -12,9 +11,9 @@ int equal(LIST_VALUE_TYPE first, LIST_VALUE_TYPE second)
     return first == second;
 }
 
-void printListElement(LIST_VALUE_TYPE value)
+void printListElement(LIST_VALUE_TYPE value, char *format)
 {
-    printf("%d", value);
+    printf(format, value);
 }
 
 /* ==== ==== implementation-independent ==== ==== */
@@ -24,6 +23,7 @@ Element *buildElement(LIST_VALUE_TYPE value)
     Element *result = malloc(sizeof(Element));
     result->value = value;
     result->next = NULL;
+    result->previous = NULL;
     return result;
 }
 
@@ -36,36 +36,64 @@ LinkedList *buildLinkedList()
     return result;
 }
 
-void addToList(LinkedList *list, LIST_VALUE_TYPE value)
+int listIsValid(LinkedList *list)
 {
-    if (list == NULL)
-        return;
-    if (xor(list->first == NULL,  list->last == NULL))
+    // Check that values stored in list
+    // do not contradict each other.
+    // It is unclear whether it is possible
+    // to simplify this condition or not.
+    return list != NULL
+           && (list->first == NULL && list->last == NULL && list->length == 0
+               || list->first != NULL && list->last != NULL && list->length != 0
+           );
+}
+
+// Intentianally hidden from outer scope
+// by not being included into linkedList.h
+void unsafeAddElementToList(LinkedList *list, Element *element)
+{
+    if (list->length == 0)
     {
-        printf("Error: list is likely corrupted.");
-        return;
-    }
-    Element *newElement = buildElement(value);
-    if (list->first == NULL)
-    {
-        list->first = newElement;
-        list->last = newElement;
+        list->first = element;
+        list->last = element;
         list->length = 1;
         return;
     }
-    list->last->next = newElement;
+    list->last->next = element;
+    element->previous = list->last;
     list->length++;
-    list->last = newElement;
+    list->last = element;
 }
 
-void addAllToList(LinkedList *list, int count, ...)
+void addElementToList(LinkedList *list, Element *element)
+{
+    if (!listIsValid(list))
+    {
+        printf("Error: linked list is likely corrupted.");
+        return;
+    }
+    unsafeAddElementToList(list, element);
+}
+
+void addValueToList(LinkedList *list, LIST_VALUE_TYPE value)
+{
+    if (!listIsValid(list))
+    {
+        printf("Error: linked list is likely corrupted.");
+        return;
+    }
+    Element *newElement = buildElement(value);
+    unsafeAddElementToList(list, newElement);
+}
+
+void addAllValuesToList(LinkedList *list, int count, ...)
 {
     va_list arg_list;
     va_start(arg_list, count);
     for (int i = 0; i < count; i++)
     {
         LIST_VALUE_TYPE arg = va_arg(arg_list, LIST_VALUE_TYPE);
-        addToList(list, arg);
+        addValueToList(list, arg);
     }
 }
 
@@ -77,6 +105,8 @@ void removeValueFromList(LinkedList *list, LIST_VALUE_TYPE value)
     {
         Element *tmp = list->first;
         list->first = list->first->next;
+        if (list->first != NULL)
+            list->first->previous = NULL;
         list->length--;
         if (list->last == tmp)
             list->last = NULL;
@@ -88,39 +118,90 @@ void removeValueFromList(LinkedList *list, LIST_VALUE_TYPE value)
     {
         if (equal(current->next->value, value))
         {
-            removeNext(list, current);
+            removeFromList(list, current);
             return;
         }
         current = current->next;
     }
 }
 
-void removeNext(LinkedList *list, Element *element)
+void removeFromList(LinkedList *list, Element *element)
 {
-    if (element->next == NULL)
+    if (element == NULL)
         return;
-    Element *tmp = element->next;
-    element->next = tmp->next;
+
+    if (element->next != NULL)
+        element->next->previous = element->previous;
+
+    if (element->previous != NULL)
+        element->previous->next = element->next;
+
     list->length--;
-    if (tmp == list->last)
-    {
-        list->last = element;
-    }
-    free(tmp);
+
+    if (list->first == element)
+        list->first = element->next;
+
+    if (list->last == element)
+        list->last = element->previous;
+
+    free(element);
 }
 
-void printList(LinkedList *list)
+Element *popFirst(LinkedList *list)
+{
+    if (list == NULL || list->length == 0)
+        return NULL;
+
+    Element *first = list->first;
+    list->length--;
+
+    if (list->length == 0)
+    {
+        list->first = NULL;
+        list->last = NULL;
+        return first;
+    }
+
+    first->next->previous = NULL;
+    list->first = first->next;
+    first->next = NULL;
+    return first;
+}
+
+Element *popLast(LinkedList *list)
+{
+    if (list == NULL || list->length == 0)
+        return NULL;
+
+    Element *last = list->last;
+    list->length--;
+
+    if (list->length == 0)
+    {
+        list->last = NULL;
+        list->first = NULL;
+        return last;
+    }
+
+    last->previous->next = NULL;
+    list->last = last->previous;
+    last->previous = NULL;
+    return last;
+}
+
+void printList(LinkedList *list, char *format)
 {
     if (list == NULL)
     {
         printf("NULL");
         return;
     }
+
     printf("[");
     Element *current = list->first;
     while (current != NULL)
     {
-        printListElement(current->value);
+        printListElement(current->value, format);
         if (current->next != NULL)
             printf(", ");
         current = current->next;

@@ -3,19 +3,13 @@
 #ifndef TASK12_UTIL_H
 #define TASK12_UTIL_H
 
-_Static_assert(sizeof(int) == 4, "Code relies on int being exactly 4 bytes");
+#define nameof(variable) #variable
 
-#define INT_MAX 0xFFFFFFFF
+#define HEX_FORMAT_FILL "%08X"
+#define HEX_FORMAT_FREE "%X"
 
-int init();
+const unsigned long long int INT_MOD;
 
 int xor(int, int);
 
-int logicEqual(int, int);
-
-Element *EMPTY_ELEMENT_ZEROS;
-Element *EMPTY_ELEMENT_ONES;
-
-void finish();
-
-#endif //TASK12_UTIL_H
+#endif // TASK12_UTIL_H

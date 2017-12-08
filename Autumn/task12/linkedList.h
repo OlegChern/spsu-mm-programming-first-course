@@ -9,7 +9,7 @@
 
 int equal(LIST_VALUE_TYPE, LIST_VALUE_TYPE);
 
-void printListElement(LIST_VALUE_TYPE);
+void printListElement(LIST_VALUE_TYPE, char *);
 
 /* ==== ==== implementation-independent ==== ==== */
 
@@ -17,12 +17,13 @@ typedef struct Element
 {
     LIST_VALUE_TYPE value;
     struct Element *next;
+    struct Element *previous;
 } Element;
 
 typedef struct
 {
     Element *first;
-    int length;
+    unsigned int length;
     Element *last;
 } LinkedList;
 
@@ -30,16 +31,24 @@ Element *buildElement(LIST_VALUE_TYPE);
 
 LinkedList *buildLinkedList();
 
-void addToList(LinkedList *, LIST_VALUE_TYPE);
+int listIsValid(LinkedList *list);
 
-void addAllToList(LinkedList *, int, ...);
+void addElementToList(LinkedList *, Element *);
+
+void addValueToList(LinkedList *, LIST_VALUE_TYPE);
+
+void addAllValuesToList(LinkedList *, int, ...);
 
 /// Removes first occurance
 void removeValueFromList(LinkedList *, LIST_VALUE_TYPE);
 
-void removeNext(LinkedList *, Element *);
+void removeFromList(LinkedList *, Element *);
 
-void printList(LinkedList *);
+Element *popFirst(LinkedList *);
+
+Element *popLast(LinkedList *);
+
+void printList(LinkedList *, char *);
 
 /// Frees the pointer
 void freeList(LinkedList *);
