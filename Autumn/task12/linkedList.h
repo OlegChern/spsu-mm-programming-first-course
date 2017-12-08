@@ -33,16 +33,28 @@ LinkedList *buildLinkedList();
 
 int listIsValid(LinkedList *list);
 
-void addElementToList(LinkedList *, Element *);
+void pushElementToEnd(LinkedList *, Element *);
 
-void addValueToList(LinkedList *, LIST_VALUE_TYPE);
+void pushValueToEnd(LinkedList *, LIST_VALUE_TYPE);
 
-void addAllValuesToList(LinkedList *, int, ...);
+void pushElementToStart(LinkedList *, Element *);
+
+void pushValueToStart(LinkedList *, Element*);
+
+void pushAllValuesToEnd(LinkedList *, int, ...);
+
+void pushListToEnd(LinkedList*, LinkedList *);
+
+void pushListToStart(LinkedList *, LinkedList *);
+
+LinkedList *splitListEnd(LinkedList *, unsigned int);
+
+LinkedList *splitListStart(LinkedList *, unsigned int);
 
 /// Removes first occurance
 void removeValueFromList(LinkedList *, LIST_VALUE_TYPE);
 
-void removeFromList(LinkedList *, Element *);
+void removeElementFromList(LinkedList *, Element *);
 
 Element *popFirst(LinkedList *);
 

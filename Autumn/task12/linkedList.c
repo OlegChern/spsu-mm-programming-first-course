@@ -48,8 +48,7 @@ int listIsValid(LinkedList *list)
            );
 }
 
-// Intentianally hidden from outer scope
-// by not being included into linkedList.h
+// private
 void unsafeAddElementToList(LinkedList *list, Element *element)
 {
     if (list->length == 0)
@@ -65,7 +64,7 @@ void unsafeAddElementToList(LinkedList *list, Element *element)
     list->last = element;
 }
 
-void addElementToList(LinkedList *list, Element *element)
+void pushElementToEnd(LinkedList *list, Element *element)
 {
     if (!listIsValid(list))
     {
@@ -75,7 +74,7 @@ void addElementToList(LinkedList *list, Element *element)
     unsafeAddElementToList(list, element);
 }
 
-void addValueToList(LinkedList *list, LIST_VALUE_TYPE value)
+void pushValueToEnd(LinkedList *list, LIST_VALUE_TYPE value)
 {
     if (!listIsValid(list))
     {
@@ -86,15 +85,135 @@ void addValueToList(LinkedList *list, LIST_VALUE_TYPE value)
     unsafeAddElementToList(list, newElement);
 }
 
-void addAllValuesToList(LinkedList *list, int count, ...)
+void pushElementToStart(LinkedList *list, Element *element)
+{
+    printf("pushElementToStart is not yet implemented.");
+}
+
+void pushValueToStart(LinkedList *list, Element *element)
+{
+    printf("pushValueToStart is not yet implemented.");
+}
+
+void pushAllValuesToEnd(LinkedList *list, int count, ...)
 {
     va_list arg_list;
     va_start(arg_list, count);
     for (int i = 0; i < count; i++)
     {
         LIST_VALUE_TYPE arg = va_arg(arg_list, LIST_VALUE_TYPE);
-        addValueToList(list, arg);
+        pushValueToEnd(list, arg);
     }
+}
+
+void pushListToEnd(LinkedList *list, LinkedList *addedList)
+{
+    // TODO
+}
+
+void pushListToStart(LinkedList *list, LinkedList *addedList)
+{
+    if (list == NULL || addedList == NULL || addedList->length == 0)
+        return;
+
+    if (list->length == 0)
+    {
+        list->last = addedList->last;
+    }
+    else
+    {
+        addedList->last->next = list->first;
+        list->first->previous = addedList->last;
+    }
+
+    list->first = addedList->first;
+    list->length += addedList->length;
+
+    addedList->first = NULL;
+    addedList->last = NULL;
+    addedList->length = 0;
+}
+
+LinkedList *splitListEnd(LinkedList *list, unsigned int ammount)
+{
+    if (!listIsValid(list) || ammount == 0)
+        return NULL;
+
+    LinkedList *result = buildLinkedList();
+
+    if (list->length <= ammount)
+    {
+        result->first = list->first;
+        result->last = list->last;
+        result->length = list->length;
+
+        list->first = NULL;
+        list->last = NULL;
+        list->length = 0;
+        return result;
+    }
+
+    Element *element = list->last;
+    int elementsSelected = 1;
+
+    while (elementsSelected < ammount)
+    {
+        element = element->previous;
+        elementsSelected++;
+    }
+
+    result->last = list->last;
+    result->first = element;
+    result->length = ammount;
+
+    list->last = element->previous;
+    list->length -= ammount;
+
+    element->previous->next = NULL;
+    element->previous = NULL;
+
+    return result;
+}
+
+LinkedList *splitListStart(LinkedList *list, unsigned int ammount)
+{
+    if (!listIsValid(list) || ammount == 0)
+        return NULL;
+
+    LinkedList *result = buildLinkedList();
+
+    if (list->length <= ammount)
+    {
+        result->first = list->first;
+        result->last = list->last;
+        result->length = list->length;
+
+        list->first = NULL;
+        list->last = NULL;
+        list->length = 0;
+        return result;
+    }
+
+    Element *element = list->first;
+    int elementsSelected = 1;
+
+    while (elementsSelected < ammount)
+    {
+        element = element->next;
+        elementsSelected++;
+    }
+
+    result->first = list->first;
+    result->last = element;
+    result->length = ammount;
+
+    list->first = element->next;
+    list->length -= ammount;
+
+    element->next->previous = NULL;
+    element->next = NULL;
+
+    return result;
 }
 
 void removeValueFromList(LinkedList *list, LIST_VALUE_TYPE value)
@@ -118,14 +237,14 @@ void removeValueFromList(LinkedList *list, LIST_VALUE_TYPE value)
     {
         if (equal(current->next->value, value))
         {
-            removeFromList(list, current);
+            removeElementFromList(list, current);
             return;
         }
         current = current->next;
     }
 }
 
-void removeFromList(LinkedList *list, Element *element)
+void removeElementFromList(LinkedList *list, Element *element)
 {
     if (element == NULL)
         return;

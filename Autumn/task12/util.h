@@ -3,8 +3,6 @@
 #ifndef TASK12_UTIL_H
 #define TASK12_UTIL_H
 
-#define nameof(variable) #variable
-
 #define HEX_FORMAT_FILL "%08X"
 #define HEX_FORMAT_FREE "%X"
 

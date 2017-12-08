@@ -18,6 +18,9 @@
  * and
  * 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
  * represent zero.
+ *
+ * Such exotic values usually appear after substraction
+ * and are eliminating by applying simplifyUBN()
  */
 
 /// Beautiful name matters
@@ -30,11 +33,15 @@ UBN *cloneUBN(UBN *);
 
 void freeUBN(UBN *ubn);
 
-/// printList() can be used
-/// for debugging purposes
+// printList() can be used
+// for debugging purposes
+/// Truncates leading zeros
 void printHexUBN(UBN *);
 
 int isZeroUBN(UBN *);
+
+/// Remove leading zeros
+void simplifyUBN(UBN *);
 
 // Note:
 // following methods save their results
@@ -42,6 +49,11 @@ int isZeroUBN(UBN *);
 
 /// Can safely accept two pointers to one UBN
 void addUBN(UBN *, UBN *);
+
+/// first argument is assumed to be valid
+/// second argument is assumed to be valid
+/// and smaller than the first one
+void substractUBN(UBN *, UBN *);
 
 void leftShiftUBN(UBN *, unsigned int);
 
