@@ -5,129 +5,47 @@
 
 char inputString(char* s);
 
-void numC2(int rest, int *var, int c2)
+void numCoin(int rest, long long *var, int *coin, int index)
 {
-	(*var) += (rest / c2 + 1);
-}
-
-void numC5(int rest, int *var, int c5)
-{
-	if (rest < c5)
+	if (index == 2)
 	{
-		numC2(rest, var, 2);
+		for (int i = 0; i <= (rest / coin[index]); i++)
+		{
+			(*var) += (rest - i * coin[index]) / coin[index - 1] + 1;
+		}
+		return;
+	}
+	if (index == 1)
+	{
+		(*var) += (rest / coin[index] + 1);
+		return;
+	}
+	if (index == 0)
+	{
+		(*var)++;
+		return;
+	}
+	if (rest < coin[index])
+	{
+		numCoin(rest, var, coin, index - 1);
 		return;
 	}
 	int k = 0;
-	k = rest / c5;
+	k = rest / coin[index];
 	int i = 0;
 	do
 	{
-		numC2(rest % c5 + i * c5, var, 2);
+		numCoin(rest % coin[index] + i * coin[index], var, coin, index - 1);
 		k--;
 		i++;
-	} while (k != 0);
-	numC2(rest % c5 + i * c5, var, 2);
-}
-
-void numC10(int rest, int *var, int c10)
-{
-	if (rest < c10)
-	{
-		numC5(rest, var, 5);
-		return;
-	}
-	int k = 0;
-	k = rest / c10;
-	int i = 0;
-	do
-	{
-		numC5(rest % c10 + i * c10, var, 5);
-		k--;
-		i++;
-	} while (k != 0);
-	numC5(rest % c10 + i * c10, var, 5);
-}
-
-void numC20(int rest, int *var, int c20)
-{
-	if (rest < c20)
-	{
-		numC10(rest, var, 10);
-		return;
-	}
-	int k = 0;
-	k = rest / c20;
-	int i = 0;
-	do
-	{
-		numC10(rest % c20 + i * c20, var, 10);
-		k--;
-		i++;
-	} while (k != 0);
-	numC10(rest % c20 + i * c20, var, 10);
-}
-
-void numC50(int rest, int *var, int c50)
-{
-	if (rest < c50)
-	{
-		numC20(rest, var, 20);
-		return;
-	}
-	int k = 0;
-	k = rest / c50;
-	int i = 0;
-	do
-	{
-		numC20(rest % c50 + i * c50, var, 20);
-		k--;
-		i++;
-	} while (k != 0);
-	numC20(rest % c50 + i * c50, var, 20);
-}
-
-void numC100(int rest, int *var, int c100)
-{
-	if (rest < c100)
-	{
-		numC50(rest, var, 50);
-		return;
-	}
-	int k = 0;
-	k = rest / c100;
-	int i = 0;
-	do
-	{
-		numC50(rest % c100 + i * c100, var, 50);
-		k--;
-		i++;
-	} while (k != 0);
-	numC50(rest % c100 + i * c100, var, 50);
-}
-
-void numC200(int rest, int *var, int c200)
-{
-	if (rest < c200)
-	{
-		numC100(rest, var, 100);
-		return;
-	}
-	int k = 0;
-	k = rest / c200;
-	int i = 0;
-	do
-	{
-		numC100(rest % c200 + i * c200, var, 100);
-		k--;
-		i++;
-	} while (k != 0);
-	numC100(rest % c200 + i * c200, var, 100);
+	} while (k > 0);
+	numCoin(rest % coin[index] + i * coin[index], var, coin, index - 1);
 }
 
 int main()
 {
-	int c1 = 1, c2 = 2, c5 = 5, c10 = 10, c20 = 20, c50 = 50, c100 = 100, c200 = 200;
-	int var;
+	int coin[8] = { 1, 2, 5, 10, 20, 50, 100, 200 };
+	long long var;
 	var = 0;
 	int N;
 	N = 0;
@@ -150,58 +68,58 @@ int main()
 		}
 	}
 
-	if (N < c200)
+	if (N < coin[7])
 	{
-		if (N < c100)
+		if (N < coin[6])
 		{
-			if (N < c50)
+			if (N < coin[5])
 			{
-				if (N < c20)
+				if (N < coin[4])
 				{
-					if (N < c10)
+					if (N < coin[3])
 					{
-						if (N < c5)
+						if (N < coin[2])
 						{
-							if (N < c2)
+							if (N < coin[1])
 							{
 								var = 1;
 							}
 							else
 							{
-								numC2(N, &var, c2);
+								numCoin(N, &var, coin, 1);
 							}
 						}
 						else
 						{
-							numC5(N, &var, c5);
+							numCoin(N, &var, coin, 2);
 						}
 					}
 					else
 					{
-						numC10(N, &var, c10);
+						numCoin(N, &var, coin, 3);
 					}
 				}
 				else
 				{
-					numC20(N, &var, c20);
+					numCoin(N, &var, coin, 4);
 				}
 			}
 			else
 			{
-				numC50(N, &var, c50);
+				numCoin(N, &var, coin, 5);
 			}
 		}
 		else
 		{
-			numC100(N, &var, c100);
+			numCoin(N, &var, coin, 6);
 		}
 	}
 	else
 	{
-		numC200(N, &var, c200);
+		numCoin(N, &var, coin, 7);
 	}
 
-	printf("All variations: %d", var);
+	printf("All variations: %lld", var);
 
 	_getch();
 
