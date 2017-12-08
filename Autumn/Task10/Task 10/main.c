@@ -67,56 +67,13 @@ int main()
 			k = 1;
 		}
 	}
-
-	if (N < coin[7])
+	for (int i = 0; i < 8; i++)
 	{
-		if (N < coin[6])
+		if (N >= coin[7 - i])
 		{
-			if (N < coin[5])
-			{
-				if (N < coin[4])
-				{
-					if (N < coin[3])
-					{
-						if (N < coin[2])
-						{
-							if (N < coin[1])
-							{
-								var = 1;
-							}
-							else
-							{
-								numCoin(N, &var, coin, 1);
-							}
-						}
-						else
-						{
-							numCoin(N, &var, coin, 2);
-						}
-					}
-					else
-					{
-						numCoin(N, &var, coin, 3);
-					}
-				}
-				else
-				{
-					numCoin(N, &var, coin, 4);
-				}
-			}
-			else
-			{
-				numCoin(N, &var, coin, 5);
-			}
+			numCoin(N, &var, coin, 7 - i);
+			break;
 		}
-		else
-		{
-			numCoin(N, &var, coin, 6);
-		}
-	}
-	else
-	{
-		numCoin(N, &var, coin, 7);
 	}
 
 	printf("All variations: %lld", var);
