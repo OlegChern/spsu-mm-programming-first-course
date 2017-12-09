@@ -4,6 +4,7 @@
 int input()
 {
     int x;
+    int err;
 
     while (1)
     {
@@ -11,9 +12,21 @@ int input()
         {
             printf("%s", "INPUT ERROR! Please, try again: ");
             while (getchar() != '\n');
-        } else
+            getchar();
+        }
+        else
         {
-            return x;
+            err = getchar();
+            while (err == ' ')
+            {
+                err = getchar();
+            }
+
+            if (err == '\n')
+                return x;
+
+            printf("%s", "INPUT ERROR! Please, try again: ");
+            while (getchar() != '\n');
         }
     }
 }
