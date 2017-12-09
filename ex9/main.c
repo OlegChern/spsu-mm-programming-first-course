@@ -147,7 +147,7 @@ unsigned int *searchForMem(size_t size, char *start)
 
 void initialize()
 {
-    mem = malloc(mem_size);
+    mem = calloc(mem_size, 1);
 }
 
 void *myMalloc(size_t size)
