@@ -1,66 +1,68 @@
 #include <stdio.h>
 #include <time.h>
+#include <malloc.h>
 
 #include "util.h"
 
 #define COIN_TYPES 8
 #define COIN_MAX 200
-const int ammounts[COIN_TYPES] = {1, 2, 5, 10, 20, 50, 100, COIN_MAX};
 
-unsigned long long int getOptionsRecursion(
-        unsigned long long int currentSum, unsigned int currentCoinIndex, unsigned int limit)
+const int amounts[COIN_TYPES] = {1, 2, 5, 10, 20, 50, 100, COIN_MAX};
+
+unsigned long long int **buildMemoizationStructure(unsigned int length)
 {
-    if (currentSum == limit)
-        return 1ull;
-
-    if (currentCoinIndex == 0)
+    unsigned long long int **result = (unsigned long long int **) malloc(sizeof(unsigned long long int *) * length);
+    for (int i = 0; i < length; i++)
     {
-        return 1;
-        /*
-        Following would allow to support cases with ammounts[0] != 1:
-        if ((limit - currentSum) % ammounts[0] == 0)
-            return 1;
-        else
-            return 0;
-        */
-    }
-
-    unsigned long long int result = 0ull;
-    unsigned long long int newSum;
-
-    for (int currentCoinsAdded = 0;
-         (newSum = currentSum + currentCoinsAdded * ammounts[currentCoinIndex]) <= limit;
-         currentCoinsAdded++)
-    {
-        result += getOptionsRecursion(newSum, currentCoinIndex - 1, limit);
+        result[i] = calloc(COIN_TYPES, sizeof(unsigned long long int));
     }
     return result;
 }
 
-/// Same recursive approach as getOptionsRecursion
-/// but adapted for applying dynamic programming approach
-/// @param currentCoinIndex index of coin currently being collected
-///     coins of greated index can't be used.
-/// @param sum total ammount left to collect using coins mentioned
-unsigned long long int getOptionsOptimizedRecursion(unsigned int sum, unsigned int currentCoinIndex)
+void freeMemoizationStructure(unsigned long long int **structure, unsigned int length)
 {
-    if (sum == 0)
-        return 1ull;
+    for (int i = 0; i < length; i++)
+    {
+        free(structure[i]);
+    }
+    free(structure);
+}
 
-    if (currentCoinIndex == 0)
-        // same as in getOptionsRecursion
+/// not to be called out of getOptionsDynamicFull
+unsigned long long int getOptionsDynamicRecursion(
+        unsigned long long int **mem, unsigned int sum, unsigned int currentCoinIndex)
+{
+    if (mem[sum][currentCoinIndex])
+        return mem[sum][currentCoinIndex];
+
+    if (sum == 0)
         return 1;
 
-    unsigned long long int result = 0ull;
-    signed int newSum;
+    if (currentCoinIndex == 0)
+        return 1;
 
+    unsigned long long int result = 0;
+    signed long long int newSum;
     for (unsigned int currentCoinsAdded = 0;
-         (newSum = sum - currentCoinsAdded * ammounts[currentCoinIndex]) >= 0;
+         (newSum = (signed long long int) sum - currentCoinsAdded * amounts[currentCoinIndex]) >= 0;
          currentCoinsAdded++)
     {
-        // newSum has been checked to be positive, so it can safely be casted
-        result += getOptionsOptimizedRecursion((unsigned int) newSum, currentCoinIndex - 1);
+        result += getOptionsDynamicRecursion(mem, (unsigned int) newSum, currentCoinIndex - 1);
     }
+    mem[sum][currentCoinIndex] = result;
+    return result;
+}
+
+unsigned long long int getOptionsDynamic(unsigned int sum)
+{
+    unsigned long long int **mem = buildMemoizationStructure(sum + 1);
+
+    if (mem == NULL)
+        return 0;
+
+    unsigned long long int result = getOptionsDynamicRecursion(mem, sum, COIN_TYPES - 1);
+
+    freeMemoizationStructure(mem, sum);
     return result;
 }
 
@@ -82,16 +84,11 @@ int main()
                     "|  * 200 pence (2 pounds)                                                |\n"
                     "#---------------------------- END OF USAGE ------------------------------#\n\n"
     );
-    unsigned int ammount = (unsigned int) readInput();
+    unsigned int sum = (unsigned int) readInput();
 
     clock_t start = clock();
-    printf("There are %llu ways to present %d pence. ", getOptionsOptimizedRecursion(ammount, COIN_TYPES - 1), ammount);
+    printf("There are %llu ways to present %d pence. ", getOptionsDynamic(sum), sum);
     clock_t end = clock();
-    printf("(%ld ticks)\n", (end - start));
-
-    start = clock();
-    printf("There are %llu ways to present %d pence. ", getOptionsRecursion(0ull, COIN_TYPES - 1, ammount), ammount);
-    end = clock();
     printf("(%ld ticks)\n", (end - start));
 
     return 0;
