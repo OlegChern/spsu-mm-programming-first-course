@@ -1,11 +1,48 @@
 #include <stdio.h>
+#include <time.h>
+
 #include "util.h"
 
 #define COIN_TYPES 8
+#define COIN_MAX 200
+const int ammounts[COIN_TYPES] = {1, 2, 5, 10, 20, 50, 100, COIN_MAX};
 
-const int ammounts[COIN_TYPES] = {1, 2, 5, 10, 20, 50, 100, 200};
+unsigned long long int ***buildMemoizationStructure()
+{
 
-unsigned long long int getOptions(unsigned long long int currentSum, int currentCoinIndex, int limit)
+}
+
+void freeMemoizationStructure(unsigned long long int ***structure)
+{
+
+}
+
+/**
+ * This task can be solved using dynamic programming approach:
+ * Any ammount of coins can be reached by adding i-th coin
+ * to (total_sum - value_of_i-th_coin).
+ * Hence, if store last COIN_MAX values
+ * number_of_optins[n] = sum([number_of_options[i] for i in [n - j for j in ammounts]])
+ * (python style)
+ *
+ * Further optimisation is possible here.
+ * We would normally store an array of 200 values
+ * and move all of them backwards on every iteration.
+ * That operation is costly, so we'd rather change
+ * currently observed element by getting index % COIN_MAX
+ */
+unsigned long long int getOptionsDynamic(unsigned int limit)
+{
+    unsigned long long int ***mem = buildMemoizationStructure();
+    /**
+     * mem[i][j][k]
+     * stores getOptionsRecursion(i, j, k)
+     */
+    freeMemoizationStructure(mem);
+}
+
+unsigned long long int getOptionsRecursion(
+        unsigned long long int currentSum, unsigned int currentCoinIndex, unsigned int limit)
 {
     if (currentSum == limit)
         return 1ull;
@@ -29,7 +66,34 @@ unsigned long long int getOptions(unsigned long long int currentSum, int current
          (newSum = currentSum + currentCoinsAdded * ammounts[currentCoinIndex]) <= limit;
          currentCoinsAdded++)
     {
-        result += getOptions(newSum, currentCoinIndex - 1, limit);
+        result += getOptionsRecursion(newSum, currentCoinIndex - 1, limit);
+    }
+    return result;
+}
+
+/// Same recursive approach as getOptionsRecursion
+/// but adapted for applying dynamic programming approach
+/// @param currentCoinIndex index of coin currently being collected
+///     coins of greated index can't be used.
+/// @param sum total ammount left to collect using coins mentioned
+unsigned long long int getOptionsOptimizedRecursion(unsigned int sum, unsigned int currentCoinIndex)
+{
+    if (sum == 0)
+        return 1ull;
+
+    if (currentCoinIndex == 0)
+        // same as in getOptionsRecursion
+        return 1;
+
+    unsigned long long int result = 0ull;
+    signed int newSum;
+
+    for (unsigned int currentCoinsAdded = 0;
+         (newSum = sum - currentCoinsAdded * ammounts[currentCoinIndex]) >= 0;
+         currentCoinsAdded++)
+    {
+        // newSum has been checked to be positive, so it can safely be casted
+        result += getOptionsOptimizedRecursion((unsigned int) newSum, currentCoinIndex - 1);
     }
     return result;
 }
@@ -39,23 +103,30 @@ int main()
     // introduction by Bashkirov Alexandr
     printf(
             "#---------------------------- BEGIN OF USAGE ----------------------------#\n"
-            "| Program gets an amount of money in pence and prints a number of ways   |\n"
-            "| in which you can take it by using just an any amount of any English    |\n"
-            "| coins:                                                                 |\n"
-            "|  *   1 pence                                                           |\n"
-            "|  *   2 pence                                                           |\n"
-            "|  *   5 pence                                                           |\n"
-            "|  *  10 pence                                                           |\n"
-            "|  *  20 pence                                                           |\n"
-            "|  *  50 pence                                                           |\n"
-            "|  * 100 pence (1 pound)                                                 |\n"
-            "|  * 200 pence (2 pounds)                                                |\n"
-            "#---------------------------- END OF USAGE ------------------------------#\n\n"
+                    "| Program gets an amount of money in pence and prints a number of ways   |\n"
+                    "| in which you can take it by using just an any amount of any English    |\n"
+                    "| coins:                                                                 |\n"
+                    "|  *   1 pence                                                           |\n"
+                    "|  *   2 pence                                                           |\n"
+                    "|  *   5 pence                                                           |\n"
+                    "|  *  10 pence                                                           |\n"
+                    "|  *  20 pence                                                           |\n"
+                    "|  *  50 pence                                                           |\n"
+                    "|  * 100 pence (1 pound)                                                 |\n"
+                    "|  * 200 pence (2 pounds)                                                |\n"
+                    "#---------------------------- END OF USAGE ------------------------------#\n\n"
     );
-    int ammount = readInput();
-    // Now, we have following equation:
-    // ammount = 1*x1 + 2*x2 + 5*x3 + 10*x4 + 20*x5 + 50*x6 + 100*x7 + 200*x8
-    // for some non-negative integers x1..x8
-    printf("There are %llu ways to present %d pence.", getOptions(0ull, COIN_TYPES - 1, ammount), ammount);
+    unsigned int ammount = (unsigned int) readInput();
+
+    clock_t start = clock();
+    printf("There are %llu ways to present %d pence. ", getOptionsOptimizedRecursion(ammount, COIN_TYPES - 1), ammount);
+    clock_t end = clock();
+    printf("(%ld ticks)\n", (end - start));
+
+    start = clock();
+    printf("There are %llu ways to present %d pence. ", getOptionsRecursion(0ull, COIN_TYPES - 1, ammount), ammount);
+    end = clock();
+    printf("(%ld ticks)\n", (end - start));
+
     return 0;
 }
