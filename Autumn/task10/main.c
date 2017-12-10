@@ -7,40 +7,6 @@
 #define COIN_MAX 200
 const int ammounts[COIN_TYPES] = {1, 2, 5, 10, 20, 50, 100, COIN_MAX};
 
-unsigned long long int ***buildMemoizationStructure()
-{
-
-}
-
-void freeMemoizationStructure(unsigned long long int ***structure)
-{
-
-}
-
-/**
- * This task can be solved using dynamic programming approach:
- * Any ammount of coins can be reached by adding i-th coin
- * to (total_sum - value_of_i-th_coin).
- * Hence, if store last COIN_MAX values
- * number_of_optins[n] = sum([number_of_options[i] for i in [n - j for j in ammounts]])
- * (python style)
- *
- * Further optimisation is possible here.
- * We would normally store an array of 200 values
- * and move all of them backwards on every iteration.
- * That operation is costly, so we'd rather change
- * currently observed element by getting index % COIN_MAX
- */
-unsigned long long int getOptionsDynamic(unsigned int limit)
-{
-    unsigned long long int ***mem = buildMemoizationStructure();
-    /**
-     * mem[i][j][k]
-     * stores getOptionsRecursion(i, j, k)
-     */
-    freeMemoizationStructure(mem);
-}
-
 unsigned long long int getOptionsRecursion(
         unsigned long long int currentSum, unsigned int currentCoinIndex, unsigned int limit)
 {
