@@ -25,8 +25,7 @@ int main()
 
     struct hash_t *table = malloc(sizeof(struct hash_t));
 
-    table->size = sz;
-    table->arr_lst = malloc(sizeof(struct list) * sz);
+    initialize(sz, table);
 
     int input = -1;
 
@@ -83,6 +82,19 @@ int main()
     free(table);
 
     return 0;
+}
+
+struct hash_t* initialize(int size, struct hash_t* table)
+{
+    table->size = size;
+    table->arr_lst = malloc(sizeof(struct list) * size);
+
+    for (int i = 0; i < size; i++)
+    {
+        table->arr_lst[i].next = NULL;
+        table->arr_lst[i].value = 0;
+        table->arr_lst[i].key = 0;
+    }
 }
 
 int listAddToEnd(int add_value, int add_key, struct list *list)
@@ -179,6 +191,8 @@ int hashFunc(int key, struct hash_t *table)
 
 void hashResize(struct hash_t *table)
 {
+    int new_size = table->size*2;
+
     struct list *new_lists = malloc(sizeof(struct list) * table->size);
     for (int i = 0; i < table->size; i++)
     {
@@ -191,8 +205,8 @@ void hashResize(struct hash_t *table)
     }
 
     hashDelete(table);
-    table->size *= 2;
-    table->arr_lst = malloc(sizeof(struct list) * table->size);
+
+    initialize(new_size, table);
 
     for (int j = 0; j < table->size / 2; j++)
     {

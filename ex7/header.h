@@ -12,6 +12,8 @@
 struct list;
 struct hash_t;
 
+struct hash_t* initialize(int size, struct hash_t*);
+
 int listAddToEnd(int, int, struct list *);
 
 void listValueRemove(int, struct list *);
