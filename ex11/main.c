@@ -20,7 +20,7 @@ unsigned int digitalRoot(unsigned int num)
 
 int main()
 {
-    unsigned int *MDRS = calloc(1, sizeof(unsigned int) * final + 1);
+    unsigned int *MDRS = calloc(sizeof(unsigned int), final + 1);
 
     unsigned int result = 0;
 

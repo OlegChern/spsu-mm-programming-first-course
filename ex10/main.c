@@ -13,7 +13,8 @@ int input()
         {
             printf("%s ", "INPUT ERROR! Please, try again: ");
             while (getchar() != '\n');
-        } else
+        }
+        else
         {
             return x;
         }

@@ -12,7 +12,8 @@ double input(int k)
         {
             printf("%s%d%s%d%s", "INPUT ERROR! Received ", k, " numbers, ", 3 - k, " more are(is) required: ");
             while (getchar() != '\n');
-        } else
+        }
+        else
         {
             return x;
         }
@@ -29,7 +30,8 @@ bool isTriangle(double *a, double *b, double *c) // finding out if it's possible
     if ((*a + *b > *c) && (*a + *c > *b) && (*c + *b > *a))
     {
         return true;
-    } else
+    }
+    else
     {
         return false;
     }
@@ -75,7 +77,8 @@ int main()
         dms(&q);
         dms(&w);
         dms(&e);
-    } else
+    }
+    else
     {
         printf("%s", "It is impossible to build such a triangle");
     }
