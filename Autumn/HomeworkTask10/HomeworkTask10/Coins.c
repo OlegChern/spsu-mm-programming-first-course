@@ -5,41 +5,68 @@ int main()
 	printf("This program counts ways to make change.\n");
 	printf("Coins: 1, 2, 5, 10, 20, 50 pennies.\n");
 	printf("       1, 2 pounds.\n\n");
-	printf("Enter amount of money (in pennies, only number): ");
+	printf("Enter amount of money (in pennies, only one number): ");
 
-	int coins[] = { 1, 2, 5, 10, 20, 50, 100, 200 };
 	int amount;
 
+	// init coins array
+	int* coins = (int*)malloc(8 * sizeof(int));
+	coins[0] = 1;
+	coins[1] = 2;
+	coins[2] = 5;
+	coins[3] = 10;
+	coins[4] = 20;
+	coins[5] = 50;
+	coins[6] = 100;
+	coins[7] = 200;
+
+	// read int
 	while (!getInt(&amount))
 	{
 		printf("Please enter again: ");
 	}
 
-	int a = count(amount, coins);
-	printf("%d", a);
+	// init memoization
+	int* memoization = (int*)malloc((amount + 1) * sizeof(int));
+
+	memoization[0] = 1;
+	for (int i = 1; i < amount + 1; i++)
+	{
+		memoization[i] = -1;
+	}
+
+	// count
+	int a = count(amount, coins, memoization);
+
+	// print
+	if (a != 1)
+	{
+		printf("There are %d ways to make change.", a);
+	}
+	else
+	{
+		printf("There is 1 way to make change.");
+	}
 
 	return 0;
 }
 
-int count(int n, int arr[])
+int count(int n, int* coins, int* memoization)
 {
-	if (n < 0)
+	if (memoization[n] != -1)
 	{
-		return 0;
-	}
-	else if (n == 0)
-	{
-		return 1;
+		return memoization[n];
 	}
 
 	int sum = 0, i = 0;
 
-	while (n >= arr[i])
+	while (n >= coins[i])
 	{
-		sum += count(n - arr[i], arr);
+		sum += count(n - coins[i], coins, memoization);
 		i++;
 	}
 
+	memoization[n] = sum;
 	return sum;
 }
 
@@ -61,7 +88,7 @@ int getInt(int *target)
 		{
 			current = getchar();
 
-			if (current == '\n') // if end of the line
+			if (current == '\n' || current == ' ')
 			{
 				if (length > 0)
 				{

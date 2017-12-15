@@ -59,7 +59,6 @@ UBYTE	roundUBYTE(float f);
 int		gauss3x3(int, int, float**, PIXEL**);
 int		sobel(int, int, char[3][3], PIXEL**);
 int		grayscale(int, int, PIXEL**);
-int		average3x3(int, int, PIXEL**);
 
 int		compare(const char*, const char*);
 void	closeFiles(int, ...);

@@ -19,13 +19,9 @@ int main()
 
 	while (TRUE)
 	{
-		printf("Enter first number: ");
+		printf("Enter three numbers: ");
 		getFloat(&a);
-
-		printf("Enter second number: ");
 		getFloat(&b);
-
-		printf("Enter third number: ");
 		getFloat(&c);
 
 		printf("\n");
@@ -94,7 +90,7 @@ void getFloat(float *target)
 		{
 			current = getchar();
 
-			if (current == '\n') // if end of the line
+			if (current == '\n' || current == ' ')
 			{
 				source[length] = '\0';
 				(*target) = (float)atof(source);

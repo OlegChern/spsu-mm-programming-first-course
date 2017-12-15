@@ -1,14 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define FALSE 0
-#define TRUE 1
-#define CHUNK 4
+#define		FALSE 0
+#define		TRUE 1
+#define		CHUNK 4
 
-int check_pyth_triple(long, long, long);
-int check_prime(int, int, int);
-int gcd(int, int);
-void getInt(int*);
+int			check_pyth_triple(long, long, long);
+int			check_prime(int, int, int);
+int			gcd(int, int);
+void		getInt(int*);
 
 int main()
 {
@@ -18,13 +18,9 @@ int main()
 
 	while (TRUE) 
 	{
-		printf("Enter first number: ");
+		printf("Enter three numbers: ");
 		getInt(&a);
-
-		printf("Enter second number: ");
 		getInt(&b);
-
-		printf("Enter third number: ");
 		getInt(&c);
 
 		printf("\n");
@@ -118,7 +114,7 @@ void getInt(int *target)
 		{
 			current = getchar();
 
-			if (current == '\n') // if end of the line
+			if (current == '\n' || current == ' ')
 			{
 				source[length] = '\0';
 				(*target) = atoi(source);

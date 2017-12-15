@@ -7,5 +7,5 @@
 #define TRUE 1
 #define CHUNK 8
 
-int count(int, int[]);
+int count(int, int*, int*);
 int getInt(int*);

@@ -24,6 +24,9 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
+	char openedCount = 2;
+	char done = TRUE;
+
 	FILE *sourceFile;
 	FILE *targetFile;
 
@@ -43,8 +46,7 @@ int main(int argc, char **argv)
 	if (targetFile == NULL)
 	{
 		printf("Wrong target path!\n");
-
-		closeFiles(1, sourceFile);
+		openedCount--;
 
 		return 0;
 	}
@@ -53,8 +55,7 @@ int main(int argc, char **argv)
 	if (bmFileHeader.bfType != 0x4D42)
 	{
 		printf("Wrong file header type!\n");
-
-		closeFiles(2, sourceFile, targetFile);
+		openedCount--;
 
 		return 0;
 	}
@@ -63,8 +64,7 @@ int main(int argc, char **argv)
 	if (bmInfoHeader.biSize != 0x28)
 	{
 		printf("Wrong info header size!\n");
-
-		closeFiles(2, sourceFile, targetFile);
+		openedCount--;
 
 		return 0;
 	}
@@ -76,8 +76,7 @@ int main(int argc, char **argv)
 	if (!image)
 	{
 		printf("Not enough memory!\n");
-
-		closeFiles(2, sourceFile, targetFile);
+		openedCount--;
 
 		return 0;
 	}
@@ -93,7 +92,22 @@ int main(int argc, char **argv)
 	if (!createImage(width, height, newImage))
 	{
 		free(image);
-		closeFiles(2, sourceFile, targetFile);
+		openedCount--;
+	}
+
+	openedCount = openedCount < 0 ? 0 : openedCount;
+	switch (openedCount)
+	{
+		case 1:
+		{
+			closeFiles(1, sourceFile);
+			break;
+		}
+		case 0:
+		{
+			closeFiles(2, sourceFile, targetFile);
+			break;
+		}
 	}
 
 	// padding
@@ -137,9 +151,7 @@ int main(int argc, char **argv)
 
 		if (!gauss3x3(width, height, kernel, newImage))
 		{
-			free(image);
-			closeImage(width, newImage);
-			closeFiles(2, sourceFile, targetFile);
+			done = FALSE;
 		}
 
 		for (char i = 0; i < 3; i++)
@@ -162,9 +174,7 @@ int main(int argc, char **argv)
 
 		if (!sobel(width, height, maskx, newImage))
 		{
-			free(image);
-			closeImage(width, newImage);
-			closeFiles(2, sourceFile, targetFile);
+			done = FALSE;
 		}
 	}
 	else if (compare(argv[2], "SobelY"))
@@ -180,67 +190,84 @@ int main(int argc, char **argv)
 
 		if (!sobel(width, height, masky, newImage))
 		{
-			free(image);
-			closeImage(width, newImage);
-			closeFiles(2, sourceFile, targetFile);
+			done = FALSE;
 		}
 	}
 	else if (compare(argv[2], "GrayScale"))
 	{
 		printf("Applying GrayScale filter.\n");
-
 		grayscale(width, height, newImage);
 	}
 	else if (compare(argv[2], "Average"))
 	{
 		printf("Applying Average3x3 filter.\n");
 
-		average3x3(width, height, newImage);
+		float **average = (float**)malloc(sizeof(float*) * 3);
+		for (char i = 0; i < 3; i++)
+		{
+			average[i] = (float*)malloc(sizeof(float) * 3);
+			for (char j = 0; j < 3; j++)
+			{
+				average[i][j] = 1.0f / 9.0f;
+			}
+		}
+
+		if (!gauss3x3(width, height, average, newImage))
+		{
+			done = FALSE;
+		}
+
+		for (char i = 0; i < 3; i++)
+		{
+			free(average[i]);
+		}
+
+		free(average);
 	}
 	else
 	{
-		printf("Available filters:\n");
+		printf("Wrong filter name! Available filters:\n");
 		printf("- Gauss\n");
 		printf("- SobelX\n");
 		printf("- SobelY\n");
 		printf("- GrayScale\n");
 		printf("- Average\n");
 
-		free(image);
-		closeImage(width, newImage);
-		closeFiles(2, sourceFile, targetFile);
-
-		return 0;
+		done = FALSE;
 	}
 
-	// write new image to file
-	fseek(targetFile, bmFileHeader.bfOffBits, SEEK_SET);
-	for (int y = 0; y < height; y++)
+	// if there is no errors
+	if (done)
 	{
-		for (int x = 0; x < width; x++)
+		// write new image to file
+		fseek(targetFile, bmFileHeader.bfOffBits, SEEK_SET);
+		for (int y = 0; y < height; y++)
 		{
-			UBYTE b = newImage[x][y].blue;
-			UBYTE g = newImage[x][y].green;
-			UBYTE r = newImage[x][y].red;
-
-			fwrite((UBYTE*)&b, 1, 1, targetFile);
-			fwrite((UBYTE*)&g, 1, 1, targetFile);
-			fwrite((UBYTE*)&r, 1, 1, targetFile);
-
-			if (pixelSize == 4) // if 32bit image
+			for (int x = 0; x < width; x++)
 			{
-				UBYTE a = 0; // just delete alpha channel
-				fwrite((UBYTE*)&a, 1, 1, targetFile);
+				UBYTE b = newImage[x][y].blue;
+				UBYTE g = newImage[x][y].green;
+				UBYTE r = newImage[x][y].red;
+
+				fwrite((UBYTE*)&b, 1, 1, targetFile);
+				fwrite((UBYTE*)&g, 1, 1, targetFile);
+				fwrite((UBYTE*)&r, 1, 1, targetFile);
+
+				if (pixelSize == 4) // if 32bit image
+				{
+					UBYTE a = 0; // just delete alpha channel
+					fwrite((UBYTE*)&a, 1, 1, targetFile);
+				}
 			}
+			fwrite((char*)pad, padSize, 1, targetFile);
 		}
-		fwrite((char*)pad, padSize, 1, targetFile);
+
+		printf("Done!\n");
 	}
 
 	free(image);
 	closeImage(width, newImage);
 	closeFiles(2, sourceFile, targetFile);
-
-	printf("Done!\n");
 
 	return 0;
 }
@@ -311,8 +338,8 @@ UBYTE clampToUBYTE(short value)
 
 UBYTE roundUBYTE(float f)
 {
-	UBYTE rounded =
-		f - (float)((int)f) >= 0.5f ? (int)f + 1 :
+	UBYTE rounded = f - (float)((int)f) >= 0.5f ? 
+		(int)f + 1 :
 		(int)f;
 
 	return rounded;
@@ -399,29 +426,6 @@ int grayscale(int width, int height, PIXEL **newImage)
 		{
 			UBYTE grayscale = pixelGrayscaled(newImage[x][y]);
 			newImage[x][y] = *(pixelNewSame(grayscale));
-		}
-	}
-
-	return 1;
-}
-
-int average3x3(int width, int height, PIXEL **newImage)
-{
-	for (int x = 1; x < width - 1; x++)
-	{
-		for (int y = 1; y < height - 1; y++)
-		{
-			USHORT r = 0, g = 0, b = 0; // USHORT used, because 255*9 > 255
-			for (int i = -1; i <= 1; i++)
-			{
-				for (int j = -1; j <= 1; j++)
-				{
-					r += newImage[x + i][y + j].red;
-					g += newImage[x + i][y + j].green;
-					b += newImage[x + i][y + j].blue;
-				}
-			}
-			newImage[x][y] = *(pixelNew(r / 9, g / 9, b / 9));
 		}
 	}
 

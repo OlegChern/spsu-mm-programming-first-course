@@ -25,13 +25,13 @@ typedef struct
 } HashTable;
 
 // add new key and value
-void					add(HashTable*, char*, int);
+void					addKey(HashTable*, char*, int);
 
 // find pointer to value with given key, returns 0 if key wasn't found
 int						findValue(int*, HashTable*, char*);
 
 // remove key and value
-void					remove(HashTable*, char*);
+void					removeKey(HashTable*, char*);
 
 void					printTable(HashTable*);
 

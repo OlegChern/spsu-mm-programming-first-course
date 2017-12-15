@@ -7,24 +7,24 @@ int main()
 	printf("Collision resolution: separate chaining with list head cells.\n");
 
 	HashTable *table = newHashTable();
-	add(table, "WADX", 1248);
-	add(table, "EDSF", 1250);
-	add(table, "ZXC", 1252);
-	add(table, "ASDX", 1248);
-	add(table, "ZXCV", 1250);
-	add(table, "WASD", 1254);
-	add(table, "WASD", 1256);
-	add(table, "ASDF", 1254);
-	add(table, "ZXCV", 1256);
-	add(table, "ASDFDS", 1258);
-	add(table, "ASDFWD", 1258);
+	addKey(table, "WADX", 1248);
+	addKey(table, "EDSF", 1250);
+	addKey(table, "ZXC", 1252);
+	addKey(table, "ASDX", 1248);
+	addKey(table, "ZXCV", 1250);
+	addKey(table, "WASD", 1254);
+	addKey(table, "WASD", 1256);
+	addKey(table, "ASDF", 1254);
+	addKey(table, "ZXCV", 1256);
+	addKey(table, "ASDFDS", 1258);
+	addKey(table, "ASDFWD", 1258);
 
 	printTable(table);
 
 	printf("Removing elements with keys \"ASDFDS\" and \"ASDFWD\"\n");
 
-	remove(table, "ASDFDS");
-	remove(table, "ASDFWD");
+	removeKey(table, "ASDFDS");
+	removeKey(table, "ASDFWD");
 
 	printTable(table);
 
@@ -48,7 +48,7 @@ int main()
 
 
 // add new key and value
-void add(HashTable *table, char* key, int value)
+void addKey(HashTable *table, char* key, int value)
 {
 	HashTableChain *chain = table->chains[hash(table, key)];
 
@@ -71,7 +71,7 @@ int findValue(int *buffer, HashTable *table, char* key)
 {
 	HashTableChain *chain = table->chains[hash(table, key)];
 
-	HashTableElement *element = findElement(chain, key);
+	HashTableElement *element = findElementInChain(chain, key);
 	if (element != NULL)
 	{
 		*buffer = element->value;
@@ -83,11 +83,11 @@ int findValue(int *buffer, HashTable *table, char* key)
 }
 
 // remove key and value
-void remove(HashTable *table, char* key)
+void removeKey(HashTable *table, char* key)
 {
 	HashTableChain *chain = table->chains[hash(table, key)];
 
-	int index = findElementIndex(chain, key);
+	int index = findElementIndexInChain(chain, key);
 	if (index >= 0) // was found
 	{
 		for (int i = index; i < chain->elementCount - 1; i++)

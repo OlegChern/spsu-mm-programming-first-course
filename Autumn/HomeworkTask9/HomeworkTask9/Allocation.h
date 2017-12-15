@@ -7,6 +7,7 @@
 
 typedef unsigned char INDICES;
 
+#pragma pack(1)
 typedef struct
 {
 	char		isFree;
@@ -15,13 +16,13 @@ typedef struct
 
 typedef struct
 {
-	CHUNK**		chunks;
+	CHUNK		**chunks;
 	size_t		size;
 } CHUNKLIST;
 
 typedef struct
 {
-	CHUNKLIST**	lists;
+	CHUNKLIST	**lists;
 	size_t		availableSize;
 } MEMORY;
 
@@ -30,6 +31,7 @@ typedef struct
 	float		position[3];
 	float		rotation[4];
 } TRANSFORM;								// struct for example
+#pragma pack()
 
 void			intExample();
 void			structExample();
