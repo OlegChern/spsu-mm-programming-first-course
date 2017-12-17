@@ -1,47 +1,40 @@
 #pragma once
 
+#include <stdlib.h>
+#include <stdio.h>
+
 #define TRUE			1
 #define FALSE			0
-#define MAXLISTCOUNT	16
-#define MAXCHUNKCOUNT	16
 
-typedef unsigned char INDICES;
+#define MEMORYSIZE		1024 // count of int
+
+typedef char			BOOL;
+typedef int				WORD;
+typedef unsigned int	UINT;
 
 #pragma pack(1)
+
 typedef struct
 {
-	char		isFree;
-	INDICES		listIndex;
+	BOOL		isFree;
+	UINT		wordCount;		// size of chunk in sizeof(WORD)
+	//UINT		fieldIndex;
 } CHUNK;
 
 typedef struct
 {
-	CHUNK		**chunks;
-	size_t		size;
-} CHUNKLIST;
-
-typedef struct
-{
-	CHUNKLIST	**lists;
-	size_t		availableSize;
+	WORD		*info;
+	CHUNK		*chunks;
+	UINT		availableCount;
 } MEMORY;
 
-typedef struct
-{
-	float		position[3];
-	float		rotation[4];
-} TRANSFORM;								// struct for example
 #pragma pack()
 
-void			intExample();
-void			structExample();
+void*			myMalloc	(UINT);
+void			myFree		(void*);
+void*			myRealloc	(void*, UINT);
 
-void*			myMalloc(size_t);
-void			myFree(void*);
-void*			myRealloc(void*, size_t);
-
-void			init();						// initialize 
-void			close();					// free all allocated memory
-CHUNK*			findFreeChunk(CHUNKLIST*);
+void			init();		// initialize 
+void			close();	// free all allocated memory
 
 MEMORY			memory;

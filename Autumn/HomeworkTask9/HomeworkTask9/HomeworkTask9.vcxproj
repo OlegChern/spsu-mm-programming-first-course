@@ -149,9 +149,11 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
       <DisableLanguageExtensions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DisableLanguageExtensions>
     </ClCompile>
+    <ClCompile Include="Examples.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Allocation.h" />
+    <ClInclude Include="Examples.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,74 +1,50 @@
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "Allocation.h"
 
-int main()
+void* myMalloc(UINT size)
 {
-	init();
-
-	intExample();
-	structExample();
-
-	close();
-	return 0;
-}
-
-void intExample()
-{
-	int *a = (int*)myMalloc(sizeof(int));
-	*a = 4;
-
-	a = myRealloc(a, sizeof(int) * 2);
-	*a = 6;
-
-	myFree(a);
-}
-
-void structExample()
-{
-	TRANSFORM *transform = (TRANSFORM*)myMalloc(sizeof(TRANSFORM));
-
-	transform->position[0] = 1.0f;
-	transform->position[1] = 0.5f;
-	transform->position[2] = -1.5f;
-
-	transform->rotation[0] = 0.5f;
-	transform->rotation[1] = -0.1f;
-	transform->rotation[2] = 0.2f;
-	transform->rotation[3] = 1.0f;
-
-	myFree(transform);
-}
-
-void* myMalloc(size_t size)
-{
-	if (memory.availableSize < size) // check available memory to allocate
+	if (memory.availableCount < size) // check available memory to allocate
 	{
 		printf("Not enough memory!");
 		return NULL;
 	}
 
-	for (int i = 0; i < MAXLISTCOUNT; i++)
+	UINT wordCount = size % sizeof(WORD) == 0 ?
+		size / sizeof(WORD) :
+		size / sizeof(WORD) + 1;
+
+	for (UINT i = 0; i < MEMORYSIZE - wordCount; i++)
 	{
-		size_t chunkSize = memory.lists[i]->size;
+		BOOL next = FALSE;
+		UINT j = i;
 
-		if (chunkSize > size)
+		while (j < wordCount) // check free memory
 		{
-			CHUNK* chunk = findFreeChunk(memory.lists[i]);
-			if (chunk != NULL)
+			if (memory.chunks[j].isFree)
 			{
-				chunk->isFree = FALSE;
-				memory.availableSize -= chunkSize;
-
-				return (void*)(chunk + 1); // return pointer to data (just shift by sizeof(CHUNK))
+				j++;
 			}
 			else
 			{
-				printf("Not enough memory!");
-				return NULL;
+				next = TRUE;
+				break;
 			}
 		}
+
+		if (next)
+		{
+			continue;
+		}
+
+		memory.availableCount -= wordCount;
+
+		memory.chunks[i].wordCount = wordCount;
+
+		for (UINT k = i; k < i + wordCount; k++)
+		{
+			memory.chunks[k].isFree = FALSE;
+		}
+
+		return (void*)(&memory.info[i]);
 	}
 
 	return NULL;
@@ -76,106 +52,75 @@ void* myMalloc(size_t size)
 
 void myFree(void* ptr)
 {
-	CHUNK* chunk = ptr;
-	chunk--; // shift to chunk data
+	WORD *infoPtr = (WORD*)ptr;
+	WORD *infoStart = memory.info;
 
-	chunk->isFree = TRUE;
+	UINT index = infoPtr - infoStart; // / sizeof(WORD);
 
-	size_t chunkSize = memory.lists[chunk->listIndex]->size;
-	memory.availableSize += chunkSize;
+	UINT count = memory.chunks[index].wordCount;
+
+	for (UINT i = index; i < count; i++)
+	{
+		memory.chunks[index].isFree = TRUE;
+	}
 }
 
-void* myRealloc(void* ptr, size_t newSize)
+void* myRealloc(void* ptr, UINT newSize)
 {
-	CHUNK* chunk = (CHUNK*)ptr;
-	chunk--; // shift to chunk data, ptr is pointer to data area
+	WORD *infoStart = memory.info;
 
-	if (chunk->isFree)
+	WORD *oldInfoPtr = (WORD*)ptr;
+	UINT oldIndex = oldInfoPtr - infoStart; // / sizeof(WORD);
+
+	if (memory.chunks[oldIndex].isFree)
 	{
 		printf("Wasn't allocated!");
 		return NULL;
 	}
+	
+	UINT newCount = newSize % sizeof(WORD) == 0 ?
+		newSize / sizeof(WORD) :
+		newSize / sizeof(WORD) + 1;
 
-	size_t data = sizeof(char) + sizeof(INDICES); // beginning of data area
-	size_t size = memory.lists[chunk->listIndex]->size; // size of source chunk with variables
+	UINT oldCount = memory.chunks[oldIndex].wordCount;
 
-	if (newSize < size)
-	{
-		printf("New size must be larger!");
-		return NULL;
-	}
-
-	if (memory.availableSize < newSize) // check available memory to allocate
+	if (memory.availableCount < newCount) // check available memory to allocate
 	{
 		printf("Not enough memory!");
 		return NULL;
 	}
 
-	char* charChunk = (char*)ptr;
-	char* newCharChunk = (char*)myMalloc(newSize);
+	WORD *newInfoPtr = (WORD*)myMalloc(newSize);
+	UINT newIndex = newInfoPtr - infoStart; // / sizeof(WORD);
 
-	for (size_t i = 0; i < size - data; i++) 	// writing data from source, ONLY data
+	UINT count = newCount > oldCount ? oldCount : newCount; // what info must be copied
+
+	for (UINT i = 0; i < count; i++)
 	{
-		newCharChunk[i] = charChunk[i];
+		newInfoPtr[i] = oldInfoPtr[i]; // copy info
 	}
 
-	memory.availableSize -= newSize - size;
+	memory.availableCount += newCount - oldCount;
 
-	return (void*)newCharChunk;
-}
-
-CHUNK* findFreeChunk(CHUNKLIST* list)
-{
-	for (int i = 0; i < MAXCHUNKCOUNT; i++)
-	{
-		if (list->chunks[i]->isFree)
-		{
-			return list->chunks[i];
-		}
-	}
-
-	return NULL;
+	return (void*)newInfoPtr;
 }
 
 void init()
 {
-	memory.availableSize = 0;
-	memory.lists = (CHUNKLIST**)malloc(MAXLISTCOUNT * sizeof(CHUNKLIST*));
+	memory.availableCount = sizeof(WORD) * MEMORYSIZE;
 
-	for (int i = 0; i < MAXLISTCOUNT; i++)
+	memory.info = (WORD*)malloc(sizeof(WORD) * MEMORYSIZE);
+
+	memory.chunks = (CHUNK*)malloc(sizeof(CHUNK) * MEMORYSIZE);
+
+	for (int i = 0; i < MEMORYSIZE; i++)
 	{
-		memory.lists[i] = (CHUNKLIST*)malloc(sizeof(CHUNKLIST));
-
-		size_t size = (1 << i) * sizeof(int); // chunk size is (power of 2) * sizeof(int)
-
-		memory.lists[i]->size = size;
-		memory.lists[i]->chunks = (CHUNK**)malloc(MAXCHUNKCOUNT * sizeof(CHUNK*));
-
-		for (int j = 0; j < MAXCHUNKCOUNT; j++)
-		{
-			memory.lists[i]->chunks[j] = (CHUNK*)malloc(sizeof(CHUNK) + size);
-
-			memory.lists[i]->chunks[j]->isFree = TRUE;
-			memory.lists[i]->chunks[j]->listIndex = i;
-
-			memory.availableSize += size;
-		}
+		memory.chunks[i].isFree = TRUE;
 	}
-
-	printf("Allocation initialization completed.\n");
 }
 
 void close()
 {
-	for (int i = 0; i < MAXLISTCOUNT; i++)
-	{
-		for (int j = 0; j < MAXCHUNKCOUNT; j++)
-		{
-			free(memory.lists[i]->chunks[j]);
-		}
-
-		free(memory.lists[i]);
-	}
-
-	free(memory.lists);
+	free(memory.chunks);
+	free(memory.info);
 }
