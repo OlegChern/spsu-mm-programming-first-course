@@ -3,53 +3,45 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define BASE			1024 * 1024
-#define SIMPLEMULTIP	1				// when we can use simple multiplication
+#define BASE			16
+#define SIMPLEMULTIP	4				// when we can use simple multiplication
 
 #define MAX(a, b) ( ( (a) > (b) ) ? (a) : (b) )
 
-typedef int				WORD;
+typedef int 			WORD;
 typedef unsigned int	UINT;
-
-typedef struct ArbitraryPrecisionNumberPart
-{
-	WORD		value;
-	UINT		index;
-} APNPart;
 
 typedef struct ArbitraryPrecisionNumber
 {
 	UINT		count;			// count of parts
-	APNPart		**parts;
-} APNumber;
+	WORD		*values;
+} APN;
 
+void			printHex(APN*);
 
-void printHex	(APNumber*);
+APN				*APNPower(APN*, UINT);
 
-APNumber		*sum(APNumber*, APNumber*);
-APNumber		*subtract(APNumber*, APNumber*);
+APN				*APNSum(APN*, APN*);
+APN				*APNSubtract(APN*, APN*);
+
 				// simple multiplication
-APNumber		*multiplySimply(APNumber*, APNumber*);
+APN				*APNMultiply(APN*, APN*);
+
 				// karatsuba multiplication
-APNumber		*karatsubaMultiply(APNumber*, APNumber*);
+APN				*APNKaratsubaMultiply(APN*, APN*);
+
 				// take care of carry
-void			normalize(APNumber*);
+void			APNNormalize(APN*);
 
-APNumber		*createNumber(UINT);
+				// constructors
+APN				*APNCreateWithValue(WORD);
+APN				*APNCreateWithCount(UINT);
+
 				// creates a copy of source from one index to another
-APNumber		*copyNumber(APNumber*, UINT, UINT);
+APN				*copyNumber(APN*, UINT, UINT);
 
-APNPart			*createPart(UINT);
-APNPart			*createPartWithValue(UINT, UINT);
-
-				// add part to end
-void			addPart(APNumber*, APNPart*);
-				// add new part to end
-void			addNewPart(APNumber*);
-				// add new part with value to end 
-APNPart			*addNewPartWithValue(APNumber*, UINT);
-				// replace part with index or add new one to number
-void			addNewPartWithIndex(APNumber*, UINT);
+				// free memory
+void			APNFree(APN*);
 
 				// resize
-void			resizeNumber(APNumber*, UINT);
+void			resizeNumber(APN*, UINT);
