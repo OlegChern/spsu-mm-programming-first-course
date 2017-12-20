@@ -19,16 +19,14 @@ int main()
 
 	while (TRUE)
 	{
-		printf("Enter three numbers: ");
+		printf("Enter three real numbers: ");
 		getFloat(&a);
 		getFloat(&b);
 		getFloat(&c);
 
-		printf("\n");
-
-		if (a == 0 || b == 0 || c == 0)
+		if (a <= 0 || b <= 0 || c <= 0)
 		{
-			printf("Please enter numbers again:\n");
+			printf("Entered data must be positive real numbers.\n\n");
 			continue;
 		}
 		else if (a + b < c || c + a < b || b + c < a)
@@ -77,6 +75,7 @@ void getFloat(float *target)
 	while (TRUE)
 	{
 		int current;
+		char sign = 1;
 		size_t length = 0, size = CHUNK;
 
 		char *source = (char*)malloc(sizeof(char) * size);
@@ -90,10 +89,15 @@ void getFloat(float *target)
 		{
 			current = getchar();
 
+			if (current == '-' && length == 0)
+			{
+				sign = -1;
+			}
+
 			if (current == '\n' || current == ' ')
 			{
 				source[length] = '\0';
-				(*target) = (float)atof(source);
+				(*target) = (float)sign * (float)atof(source);
 				free(source);
 
 				return;

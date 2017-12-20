@@ -52,18 +52,19 @@ void addKey(HashTable *table, char* key, int value)
 {
 	HashTableChain *chain = table->chains[hash(table, key)];
 
-	if (chain->elementCount + 1 >= MAXCHAINSIZE)
-	{
-		rebalance(table);
-		chain = table->chains[hash(table, key)]; // calculate hash with new table
-	}
-
 	HashTableElement *element = (HashTableElement*)malloc(sizeof(HashTableElement));
 	element->value = value;
 	element->key = key;
 
-	chain->elements[chain->elementCount++] = element;
+	// first add
+	chain->elements[chain->elementCount] = element;
+	chain->elementCount++;
 
+	// then check
+	if (chain->elementCount >= MAXCHAINSIZE)
+	{
+		rebalance(table);
+	}
 }
 
 // find pointer to value with given key, returns 0 if key wasn't found
@@ -148,13 +149,13 @@ HashTable *newHashTable()
 
 	for (int i = 0; i < DEFAULTTABLESIZE; i++)
 	{
-		table->chains[i] = addEmptyChain(table);
+		table->chains[i] = createEmptyChain();
 	}
 
 	return table;
 }
 
-HashTableChain *addEmptyChain(HashTable *table)
+HashTableChain *createEmptyChain()
 {
 	HashTableChain *chain = (HashTableChain*)malloc(sizeof(HashTableChain));
 
@@ -201,26 +202,33 @@ void rebalance(HashTable *table)
 	int prevCount = table->chainCount;
 	table->chainCount = (int)(prevCount * 3 / 2);
 
-	// creating temp array of pointer for changing indices
+	// creating temp array of pointers for changing indices
 	HashTableChain **temp = (HashTableChain**)malloc(sizeof(HashTableChain*) * table->chainCount);
 	for (int i = 0; i < table->chainCount; i++)
 	{
-		temp[i] = addEmptyChain(table);
+		temp[i] = createEmptyChain();
 	}
 
 	for (int i = 0; i < prevCount; i++)
 	{
 		HashTableChain *sourceChain = table->chains[i];
 
-		if (sourceChain->elementCount > 0)
+		for (int j = 0; j < sourceChain->elementCount; j++)
 		{
-			int hashKey = hash(table, sourceChain->elements[0]->key);
-			temp[hashKey] = sourceChain;
+			int hashKey = hash(table, sourceChain->elements[j]->key);
+			temp[hashKey]->elements[temp[hashKey]->elementCount] = sourceChain->elements[j];
+			temp[hashKey]->elementCount++;
 		}
+
+		// free table->chains[i] because they will be replaced by temp[i]
+		free(sourceChain);
 	}
 
 	for (int i = 0; i < table->chainCount; i++)
 	{
 		table->chains[i] = temp[i];
 	}
+
+	// free only array of pointers but not themselves
+	free(temp);
 }

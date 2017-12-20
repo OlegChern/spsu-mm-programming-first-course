@@ -23,11 +23,9 @@ int main()
 		getInt(&b);
 		getInt(&c);
 
-		printf("\n");
-
-		if (a == 0 || b == 0 || c == 0)
+		if (a <= 0 || b <= 0 || c <= 0)
 		{
-			printf("Please enter numbers again:\n");
+			printf("Entered data must be positive numbers.\n\n");
 			continue;
 		}
 		else
@@ -101,6 +99,7 @@ void getInt(int *target)
 	while (TRUE)
 	{
 		int current;
+		char sign = 1;
 		size_t length = 0, size = CHUNK;
 
 		char *source = (char*)malloc(sizeof(char) * size);
@@ -114,10 +113,15 @@ void getInt(int *target)
 		{
 			current = getchar();
 
+			if (current == '-' && length == 0)
+			{
+				sign = -1;
+			}
+
 			if (current == '\n' || current == ' ')
 			{
 				source[length] = '\0';
-				(*target) = atoi(source);
+				(*target) = sign * atoi(source);
 				free(source);
 
 				return;

@@ -19,11 +19,18 @@ int main()
 		printf("Enter number: ");
 		x = getInt();
 
+		if (x <= 0)
+		{
+			printf("Entered data must be a positive integer!\n");
+			continue;
+		}
+
 		int sqrtX = (int)sqrtf((float)x);
 
 		if (x == sqrtX * sqrtX)
 		{
-			printf("Number mustn't be square of integer!\n");
+			printf("Number mustn't be a square of integer!\n");
+			continue;
 		}
 		else
 		{
@@ -64,7 +71,20 @@ void continuedFraction(int x)
 		}
 		else
 		{
-			printf("%d", ai);
+			if (ai != a0 + numer)
+			{
+				printf("%d, ", ai);
+
+				ai = a0 + numer;
+				period++;
+
+				printf("%d", ai);
+			}
+			else
+			{
+				printf("%d", ai);
+			}
+
 			break;
 		}
 	} 
@@ -77,6 +97,7 @@ int getInt()
 	while (TRUE)
 	{
 		int current;
+		char sign = 1;
 		size_t length = 0, size = CHUNK;
 
 		char *source = (char*)malloc(sizeof(char) * size);
@@ -90,10 +111,15 @@ int getInt()
 		{
 			current = getchar();
 
+			if (current == '-' && length == 0)
+			{
+				sign = -1;
+			}
+
 			if (current == '\n' || current == ' ')
 			{
 				source[length] = '\0';
-				int result = atoi(source);
+				int result = sign * atoi(source);
 				free(source);
 
 				return result;

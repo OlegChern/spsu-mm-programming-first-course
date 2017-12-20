@@ -19,7 +19,7 @@ WORD findSumMDRS()
 	WORD *MDRS = (WORD*)malloc(sizeof(WORD) * 1000000);
 	WORD sum = 0;
 
-	for (WORD n = 2; n <= 10; n++)
+	for (WORD n = 2; n < 10; n++)
 	{
 		MDRS[n] = n;
 		sum += n;

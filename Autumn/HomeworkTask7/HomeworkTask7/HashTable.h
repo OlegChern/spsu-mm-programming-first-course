@@ -41,7 +41,7 @@ int						hash(HashTable*, char*);
 // create new hash table
 HashTable				*newHashTable();
 
-HashTableChain			*addEmptyChain(HashTable*);
+HashTableChain			*createEmptyChain();
 
 // find address of element with given hashKey, returns NULL if key wasn't found
 HashTableElement		*findElementInChain(HashTableChain*, char*);
