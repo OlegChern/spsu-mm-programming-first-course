@@ -17,54 +17,233 @@ int main()
 
 void printHex(APN *number)
 {
-	printf("%d\n\n", number->count);
+	printf("Amount of digits: %d\n\n", number->amount);
 
-	for (int i = number->count - 1; i >= 0; i--)
+	for (int i = number->amount - 1; i >= 0; i--)
 	{
-		printf("%d\n", number->values[i]);
+		// as BASE == 16, just transform 10->A, 11->B etc
+
+		WORD value = number->values[i];
+
+		if (value >= 10)
+		{
+			value -= 10;
+			value += 'A';
+		}
+		else
+		{
+			value += '0';
+		}
+
+		printf("%c", value);
 	}
+
+	printf("\n\n");
 }
 
 APN *APNPower(APN *number, UINT pow)
 {
-	if (pow == 0)
+	switch (pow)
 	{
-		return APNCreateWithValue(1);
+		case 2:
+		{
+			APN *power = APNMultiply(number, number);
+
+			return power;
+			break;
+		}	
+		case 1:
+		{
+			return number;
+			break;
+		}
+		case 0:
+		{
+			return APNCreateWithValue(1);
+			break;
+		}
+		default:
+		{
+			if (pow % 2 == 0)
+			{
+				APN *temp = APNPower(number, pow / 2);
+				APN *power = APNMultiply(temp, temp);
+
+				APNFree(temp);
+
+				//printf("Power: %d\n", pow);
+				//printHex(power);
+
+				return power;
+			}
+			else
+			{
+				APN *temp = APNPower(number, pow - 1);
+				APN *power = APNMultiply(number, temp);
+
+				APNFree(temp);
+
+				//printf("Power: %d\n", pow);
+				//printHex(power);
+
+				return power;
+			}
+			break;
+		}
 	}
 
-	if (pow % 2 == 0)
-	{
-		APN *temp = APNPower(number, pow / 2);
-		APN *power = APNMultiply(temp, temp);
+	return NULL;
+}
 
-		APNFree(temp);
-		return power;
+APN *APNMultiply(APN *a, APN *b)
+{
+	UINT amount = a->amount + b->amount;
+
+	/*if (amount > SIMPLEMULTIP)
+	{
+		return APNKaratsubaMultiply(a, b);
+	}*/
+
+	APN	*result = APNCreateWithAmount(amount);
+
+
+	for (UINT i = 0; i < a->amount; i++)
+	{
+		for (UINT j = 0; j < b->amount; j++)
+		{
+			result->values[i + j] += a->values[i] * b->values[j];
+		}
 	}
-	else
-	{
-		APN *temp = APNPower(number, pow - 1);
-		APN *power = APNMultiply(number, temp);
 
-		APNFree(temp);
-		return power;
+	APNNormalize(result);
+
+	return result;
+}
+
+void APNNormalize(APN *number)
+{
+	WORD carry = 0;
+
+	for (UINT i = 0; i < number->amount; i++)
+	{
+		number->values[i] += carry;
+
+		carry = number->values[i] / BASE;
+		number->values[i] %= BASE;
+	}
+
+	if (carry != 0)
+	{
+		number->values = (WORD*)realloc(number->values, sizeof(WORD) * (number->amount + 1));
+		number->values[number->amount] = carry;
+		number->amount++;
+	}
+	else 
+	{
+		UINT newAmount = number->amount;
+
+		// check zero at the beginning of APN
+		for (UINT i = number->amount - 1; i >= 0; i--)
+		{
+			if (number->values[i] == 0)
+			{
+				newAmount--;
+			}
+			else
+			{
+				break;
+			}
+		}
+		
+		if (newAmount != number->amount)
+		{
+			//number->parts = (APNPart**)realloc(number->parts, sizeof(APNPart*) * newAmount);
+			number->values = (WORD*)realloc(number->values, sizeof(WORD) * newAmount);
+			
+			for (UINT i = number->amount; i < newAmount; i++)
+			{
+				number->values[i] = 0;
+			}
+
+			number->amount = newAmount;
+		}
+	}
+}
+
+APN *APNCreateWithValue(WORD value)
+{
+	APN *number = (APN*)malloc(sizeof(APN));
+
+	number->values = (WORD*)malloc(sizeof(WORD));
+	number->values[0] = value;
+
+	number->amount = 1;
+
+	APNNormalize(number);
+
+	return number;
+}
+
+APN *APNCreateWithAmount(UINT amount)
+{
+	APN *number = (APN*)malloc(sizeof(APN));
+
+	number->amount = amount;
+	number->values = (WORD*)malloc(sizeof(WORD) * amount);
+
+	for (UINT i = 0; i < amount; i++)
+	{
+		number->values[i] = 0;
+	}
+
+	return number;
+}
+
+void APNFree(APN *number)
+{
+	free(number);
+}
+
+APN *APNCopy(APN* source, UINT from, UINT to)
+{
+	APN *number = APNCreateWithAmount(to - from);
+
+	for (UINT i = 0, j = from; j < to; i++, j++)
+	{
+		number->values[i] = source->values[j];
+	}
+
+	return number;
+}
+
+void APNResize(APN *number, UINT newAmount)
+{
+	UINT amount = number->amount;
+
+	number->values = (WORD*)realloc(number->values, sizeof(WORD) * newAmount);
+	number->amount = newAmount;
+
+	for (UINT i = amount; i < newAmount; i++)
+	{
+		number->values[i] = 0;
 	}
 }
 
 APN *APNSum(APN *a, APN *b)
 {
-	UINT count = MAX(a->count, b->count) + 1; // a->count + b->count;
-	APN	*result = APNCreateWithCount(count);
+	UINT amount = MAX(a->amount, b->amount) + 1; // a->amount + b->amount;
+	APN	*result = APNCreateWithAmount(amount);
 
-	for (UINT i = 0; i < count; i++)
+	for (UINT i = 0; i < amount; i++)
 	{
 		UINT sum = 0;
 
-		if (i < a->count)
+		if (i < a->amount)
 		{
 			sum += a->values[i]; 
 		}
 
-		if (i < b->count)
+		if (i < b->amount)
 		{
 			sum += b->values[i];
 		}
@@ -79,19 +258,19 @@ APN *APNSum(APN *a, APN *b)
 
 APN *APNSubtract(APN *a, APN *b)
 {
-	UINT count = MAX(a->count, b->count) + 1; // a->count + b->count;
-	APN	*result = APNCreateWithCount(count);
+	UINT amount = MAX(a->amount, b->amount) + 1; // a->amount + b->amount;
+	APN	*result = APNCreateWithAmount(amount);
 
-	for (UINT i = 0; i < count; i++)
+	for (UINT i = 0; i < amount; i++)
 	{
 		UINT sub = 0;
 
-		if (i < a->count)
+		if (i < a->amount)
 		{
 			sub += a->values[i];
 		}
 
-		if (i < b->count)
+		if (i < b->amount)
 		{
 			sub -= b->values[i];
 		}
@@ -104,53 +283,24 @@ APN *APNSubtract(APN *a, APN *b)
 	return result;
 }
 
-APN *APNMultiply(APN *a, APN *b)
+/*APN *APNKaratsubaMultiply(APN *a, APN *b)
 {
-	UINT count = a->count + b->count;
 
-	/*if (count > SIMPLEMULTIP)
-	{
-		return APNKaratsubaMultiply(a, b);
-	}*/
+	// DELETE OR FINISH
 
-	APN	*result = APNCreateWithCount(count);
+	UINT amount = a->amount + b->amount; // MAX(aAmount, bAmount);
 
-	for (UINT i = 0; i < count; i++)
-	{
-		UINT compos;
-
-		if (i < a->count && i < b->count)
-		{
-			compos = a->values[i] * b->values[i];
-		}
-		else
-		{
-			compos = 0;
-		}
-
-		result->values[i] = compos;
-	}
-
-	APNNormalize(result);
-
-	return result;
-}
-
-APN *APNKaratsubaMultiply(APN *a, APN *b)
-{
-	UINT count = a->count + b->count; // MAX(aCount, bCount);
-
-	if (count <= SIMPLEMULTIP)
+	if (amount <= SIMPLEMULTIP)
 	{
 		return APNMultiply(a, b);
 	}
 
-	UINT k = count / 2;
+	UINT k = amount / 2;
 
-	APN	*aLeft	= copyNumber(a, k, a->count);
+	APN	*aLeft	= copyNumber(a, k, a->amount);
 	APN	*aRight	= copyNumber(a, 0, k);
 
-	APN	*bLeft	= copyNumber(b, k, b->count);
+	APN	*bLeft	= copyNumber(b, k, b->amount);
 	APN	*bRight	= copyNumber(b, 0, k);
 
 	APN	*sumA = APNSum(aLeft, aRight);
@@ -161,110 +311,10 @@ APN *APNKaratsubaMultiply(APN *a, APN *b)
 	APN	*m2 = APNKaratsubaMultiply(sumA, sumB);
 
 
-	APN	*result = APNCreateWithCount(count);
-	// m0 * base^count + (m2 - m0 - m1) * base^k + m1
+	APN	*result = APNCreateWithAmount(amount);
+	// m0 * base^amount + (m2 - m0 - m1) * base^k + m1
 
 	APNNormalize(result);
 
 	return result;
-}
-
-void APNNormalize(APN *number)
-{
-	WORD carry = 0;
-
-	for (UINT i = 0; i < number->count; i++)
-	{
-		number->values[i] += carry;
-
-		carry = number->values[i] / BASE;
-		number->values[i] %= BASE;
-	}
-
-	if (carry != 0)
-	{
-		number->values = (WORD*)realloc(number->values, sizeof(WORD) * (number->count + 1));
-		number->values[number->count] = carry;
-		number->count++;
-	}
-	else 
-	{
-		UINT newCount = number->count;
-
-		for (UINT i = number->count - 1; i >= 0; i--)
-		{
-			if (number->values[i] == 0)
-			{
-				newCount--;
-			}
-			else
-			{
-				break;
-			}
-		}
-		
-		if (newCount != number->count)
-		{
-			//number->parts = (APNPart**)realloc(number->parts, sizeof(APNPart*) * newCount);
-			number->values = (WORD*)realloc(number->values, sizeof(WORD) * newCount);
-			number->count = newCount;
-		}
-	}
-}
-
-APN *APNCreateWithValue(WORD value)
-{
-	APN *number = (APN*)malloc(sizeof(APN));
-
-	number->values = (WORD*)malloc(sizeof(WORD));
-	number->values[0] = value;
-
-	number->count = 1;
-
-	return number;
-}
-
-APN *APNCreateWithCount(UINT count)
-{
-	APN *number = (APN*)malloc(sizeof(APN));
-
-	number->count = count;
-	number->values = (WORD*)malloc(sizeof(WORD) * count);
-
-	for (UINT i = 0; i < count; i++)
-	{
-		number->values[i] = 0;
-	}
-
-	return number;
-}
-
-void APNFree(APN *number)
-{
-	free(number);
-}
-
-APN *copyNumber(APN* source, UINT from, UINT to)
-{
-	APN *number = APNCreateWithCount(to - from);
-
-	for (UINT i = 0, j = from; j < to; i++, j++)
-	{
-		number->values[i] = source->values[j];
-	}
-
-	return number;
-}
-
-void resizeNumber(APN *number, UINT newCount)
-{
-	UINT count = number->count;
-
-	number->values = (WORD*)realloc(number->values, sizeof(WORD) * newCount);
-	number->count = newCount;
-
-	for (UINT i = count; i < newCount; i++)
-	{
-		number->values[i] = 0;
-	}
-}
+}*/

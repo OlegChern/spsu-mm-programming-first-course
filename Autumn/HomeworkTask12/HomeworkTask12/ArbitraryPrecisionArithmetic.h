@@ -3,17 +3,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define BASE			16
-#define SIMPLEMULTIP	4				// when we can use simple multiplication
+#define BASE			16		// 16 because then we must print hex
+//#define SIMPLEMULTIP	4		// when we can use simple multiplication
+
+#define TRUE			1	
 
 #define MAX(a, b) ( ( (a) > (b) ) ? (a) : (b) )
 
-typedef int 			WORD;
+typedef int 			WORD;	// for values, must contain at least number (BASE ^ 2)
 typedef unsigned int	UINT;
 
 typedef struct ArbitraryPrecisionNumber
 {
-	UINT		count;			// count of parts
+	UINT		amount;			// amount of parts
 	WORD		*values;
 } APN;
 
@@ -27,21 +29,19 @@ APN				*APNSubtract(APN*, APN*);
 				// simple multiplication
 APN				*APNMultiply(APN*, APN*);
 
-				// karatsuba multiplication
-APN				*APNKaratsubaMultiply(APN*, APN*);
-
 				// take care of carry
 void			APNNormalize(APN*);
 
 				// constructors
 APN				*APNCreateWithValue(WORD);
-APN				*APNCreateWithCount(UINT);
+APN				*APNCreateWithAmount(UINT);
 
-				// creates a copy of source from one index to another
-APN				*copyNumber(APN*, UINT, UINT);
 
 				// free memory
 void			APNFree(APN*);
 
+				// creates a copy of source from one index to another
+APN				*APNCopy(APN*, UINT, UINT);
+
 				// resize
-void			resizeNumber(APN*, UINT);
+void			APNResize(APN*, UINT);
