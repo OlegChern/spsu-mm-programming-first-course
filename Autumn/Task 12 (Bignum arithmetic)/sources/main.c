@@ -13,16 +13,12 @@ int main()
     );
 
     // you can try even 3 ^ 50000 and it still will work fast
-<<<<<<< HEAD
     BigInt *result = power(bigint(3), 5000, 1);
     char *repr = bigintToHex(result);
     printf("%s\n", repr);
 
     bigintFree(&result);
     free(repr);
-=======
-    printf("%s\n", bigintToHex(power(bigint(3), 5000, 1)));
->>>>>>> bashkirov-aleksandr
 
     return 0;
 }
