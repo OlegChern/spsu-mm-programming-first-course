@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "../headers/bigint.h"
 
 
@@ -12,7 +13,12 @@ int main()
     );
 
     // you can try even 3 ^ 50000 and it still will work fast
-    printf("%s\n", bigintToHex(power(bigint(3), 50000, 1)));
+    BigInt *result = power(bigint(3), 5000, 1);
+    char *repr = bigintToHex(result);
+    printf("%s\n", repr);
+
+    bigintFree(&result);
+    free(repr);
 
     return 0;
 }

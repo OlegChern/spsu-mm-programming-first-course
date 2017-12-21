@@ -2,9 +2,9 @@
 
 SOURCES_DIR = sources
 OBJECTS_DIR = objects
-EXE_NAME = bigint
+EXE_NAME = filter
 
-all: objects_dir main bigint errors
+all: objects_dir main filters bmp bgr_map
 	gcc $(OBJECTS_DIR)/*.o -o $(EXE_NAME) -lm
 
 clean:
@@ -17,8 +17,11 @@ objects_dir:
 main: $(SOURCES_DIR)/main.c
 	gcc -c $(SOURCES_DIR)/$@.c -o $(OBJECTS_DIR)/$@.o
 
-bigint: $(SOURCES_DIR)/bigint.c
+filters: $(SOURCES_DIR)/filters.c
 	gcc -c $(SOURCES_DIR)/$@.c -o $(OBJECTS_DIR)/$@.o
 
-errors: $(SOURCES_DIR)/errors.c
+bmp: $(SOURCES_DIR)/bmp.c
+	gcc -c $(SOURCES_DIR)/$@.c -o $(OBJECTS_DIR)/$@.o
+
+bgr_map: $(SOURCES_DIR)/bgr_map.c
 	gcc -c $(SOURCES_DIR)/$@.c -o $(OBJECTS_DIR)/$@.o

@@ -15,7 +15,7 @@
 /* Helper-function. Initialize BigInt pointer without stating his fields */
 void bigintPointerInit(BigInt **num)
 {
-    if ((*num = malloc(sizeof(*num))) == NULL)
+    if ((*num = malloc(sizeof(**num))) == NULL)
         die(NOT_ENOUGH_MEMORY);
 }
 
@@ -252,12 +252,12 @@ BigInt *positivesDif(BigInt *a, BigInt *b, char doArgsFree)
 /* Calculates a sum of two BigInts */
 BigInt *sum(BigInt *a, BigInt *b, char doArgsFree)
 {
-
     if (a->isNegative == b->isNegative)
     {
+        char sign = a->isNegative;
         BigInt *res = positivesSum(a, b, doArgsFree);
+        res->isNegative = sign;
 
-        res->isNegative = a->isNegative;
         return res;
     }
 
@@ -287,14 +287,12 @@ BigInt *sbt(BigInt *a, BigInt *b, char doArgsFree)
     /* sbt(a, b) = sum(a, -b)
      * so we must just choose sign of b and call sum
      * but to do it safely we have to clone var b */
-    BigInt *tmp;
-    bigintInit(&tmp, b->length);
-    tmp->digits = b->digits;
+    BigInt *tmp = bigintClone(b);
     tmp->isNegative = !b->isNegative;
 
     BigInt *r = sum(a, tmp, 0);
-    free(tmp);
 
+    bigintFree(&tmp);
     freeArgs(a, b, doArgsFree);
 
     return r;
@@ -303,28 +301,37 @@ BigInt *sbt(BigInt *a, BigInt *b, char doArgsFree)
 /* Shifts BigInt. If param shift is positive the shift is left else the shift is right */
 BigInt *shift(BigInt *a, int shift, char doArgsFree)
 {
+    BigInt *res;
+
     // we do not want to have leading zeros so if the number is 0 we return just 0
     if (a->length == 1 && a->digits[0] == 0)
-        return bigint(0);
+    {
+        res = bigint(0);
+        goto end;
+    }
 
     if (a->length + shift <= 0)
-        return bigint(0);
+    {
+        res = bigint(0);
+        goto end;
+    }
 
-    BigInt *r;
-    bigintInit(&r, a->length + shift);
+    bigintInit(&res, a->length + shift);
 
     if (shift >= 0)
     {
-        memset(r->digits, 0, shift * sizeof(digit));
-        memcpy(r->digits + shift, a->digits, a->length * sizeof(digit));
+        memset(res->digits, 0, shift * sizeof(digit));
+        memcpy(res->digits + shift, a->digits, a->length * sizeof(digit));
     }
     else
-        memcpy(r->digits, a->digits - shift, a->length + shift); // here shift is negative
+        memcpy(res->digits, a->digits - shift, a->length + shift); // here shift is negative
+
+    end:
 
     if (doArgsFree)
         bigintFree(&a);
 
-    return r;
+    return res;
 }
 
 /* Calculates product of two BigInts by Karatsuba algorithm */
@@ -403,9 +410,7 @@ BigInt *powRec(BigInt *a, int n)
         return bigint(1);
 
     if (n == 1)
-    {
         return bigintClone(a);
-    }
 
     if (n % 2 == 0)
     {
@@ -413,12 +418,7 @@ BigInt *powRec(BigInt *a, int n)
         return prd(t, t, 3);
     }
     else
-    {
-
-        BigInt *tmp = powRec(a, n - 1);
-
-        return prd(tmp, a, 1);
-    }
+        return prd(powRec(a, n - 1), a, 1);
 }
 
 /* BigInt pow function. Wrapper for the powRec function. */
