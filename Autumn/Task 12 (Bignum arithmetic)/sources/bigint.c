@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <memory.h>
+#include <string.h>
 #include "../headers/bigint.h"
 #include "../headers/errors.h"
 
@@ -15,7 +15,7 @@
 /* Helper-function. Initialize BigInt pointer without stating his fields */
 void bigintPointerInit(BigInt **num)
 {
-    if ((*num = malloc(sizeof(*num))) == NULL)
+    if ((*num = malloc(sizeof(**num))) == NULL)
         die(NOT_ENOUGH_MEMORY);
 }
 
@@ -252,12 +252,12 @@ BigInt *positivesDif(BigInt *a, BigInt *b, char doArgsFree)
 /* Calculates a sum of two BigInts */
 BigInt *sum(BigInt *a, BigInt *b, char doArgsFree)
 {
-
     if (a->isNegative == b->isNegative)
     {
+        char tmp = a->isNegative;
         BigInt *res = positivesSum(a, b, doArgsFree);
 
-        res->isNegative = a->isNegative;
+        res->isNegative = tmp;
         return res;
     }
 
@@ -343,6 +343,10 @@ BigInt *prd(BigInt *a, BigInt *b, char doArgsFree)
     {
         unsigned long long tmp = 1ULL * getDigit(a, 0) * getDigit(b, 0);
 
+//        digit aDigit = getDigit(a, 0);
+//        digit bDigit = getDigit(b, 0);
+//        unsigned long long tmp = 1ULL * aDigit *bDigit;
+
         bigintInit(&res, tmp > MAX_DIGIT_VALUE ? 2 : 1);
         setDigit(res, 0, (digit) tmp);
         if (tmp > MAX_DIGIT_VALUE)
@@ -378,14 +382,19 @@ BigInt *prd(BigInt *a, BigInt *b, char doArgsFree)
     BigInt *c2 = prd(a1, b1, 0);
 
     // (a1 + a2) * (b1 + b2) - c2 - c0
-    BigInt *c1 = sbt(sbt(prd(sum(a1, a2, 0), sum(b1, b2, 0), 3), c2, 1), c0, 1);
+    BigInt *t1 = sum(a1, a2, 0);
+    BigInt *t2 = sum(b1, b2, 0);
+    BigInt *c1 = prd(t1, t2, 3);
+    c1 = sbt(c1, c2, 1);
+    c1 = sbt(c1, c0, 1);
 
     // res = c2 * len ^ 2 + c1 * len + c0
     // c times len equal to shift(c, len)
     c1 = shift(c1, (int) len, 1);
     c2 = shift(c2, (int) (len * 2), 1);
 
-    res = sum(c2, sum(c1, c0, 3), 3);
+    BigInt *s = sum(c1, c0, 3);
+    res = sum(c2, s, 3);
     res->isNegative = (char) (a->isNegative == b->isNegative ? 0 : 1);
 
     bigintFree(&a1), bigintFree(&a2), bigintFree(&b1), bigintFree(&b2);
