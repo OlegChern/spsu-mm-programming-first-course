@@ -2,7 +2,7 @@
 
 SOURCES_DIR = sources
 OBJECTS_DIR = objects
-EXE_NAME = biginum
+EXE_NAME = bignum
 
 all: objects_dir main bigint errors
 	gcc $(OBJECTS_DIR)/*.o -o $(EXE_NAME)
