@@ -1,12 +1,18 @@
 #include <stdio.h>
+#include "../headers/bigint.h"
 
-int main() {
 
-    unsigned int a = (unsigned int) -6, b = 7;
-    unsigned int c = b - a;
-    unsigned int d = (unsigned int) -b;
+int main()
+{
+    printf(
+            "#---------------------------- BEGIN OF USAGE ----------------------------#\n"
+            "|     Program prints hex representation of 3 ^ 5000 by using algorithms  |\n"
+            "| of long arithmetic.                                                    |\n"
+            "#---------------------------- END OF USAGE ------------------------------#\n\n"
+    );
 
-    printf("%d", 2 < 1);
+    // you can try even 3 ^ 50000 and it still will work fast
+    printf("%s\n", bigintToHex(power(bigint(3), 50000, 1)));
 
     return 0;
 }
