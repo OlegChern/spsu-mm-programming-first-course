@@ -36,5 +36,10 @@ int main()
     printf("In IEEE754 with double precision: %s\n", tmp = get_bin_repr_of_ieee754(-prod, DOUBLE));
     free(tmp);
 
+    free(name);
+    free(surname);
+    free(patronymic);
+
     return 0;
 }
+

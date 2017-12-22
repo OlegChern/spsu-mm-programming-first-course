@@ -5,7 +5,8 @@
 #include "../headers/bit_funcs.h"
 #include "../headers/str_funcs.h"
 
-#define max(a,b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a > _b ? _a : _b; })
+#define min(a,b) ({ __typeof__ (a) _a = (a); __typeof__ (b) _b = (b); _a < _b ? _a : _b; })
+
 
 char* get_bin_repr_of_int(int n, enum ARCH ARCH_TYPE)
 {
@@ -58,11 +59,16 @@ char* get_bin_repr_of_ieee754(double n, enum PRECISION PRECISION)
     memset(buf, '0', len);
     buf[len] = '\0';
 
+    if (n == 0.0)
+        return buf;
+
     /* counting of offset and non-shifted mantissa */
 
-    char* before_pt = malloc(len + 1);
+    char before_pt[len + 1];
+    memset(before_pt, '0', len);
     before_pt[len] = '\0';
-    char* after_pt = malloc(len + 1);
+    char after_pt[len + 1];
+    memset(after_pt, '0', len);
     after_pt[len] = '\0';
 
     int sign = (n > 0) ? 1 : (n < 0 ? -1 : 0);
@@ -72,12 +78,13 @@ char* get_bin_repr_of_ieee754(double n, enum PRECISION PRECISION)
 
     double fract_part = n - int_part;
 
-    int before_pt_len = 0;
+    int before_shift = 0;
     for (int i = 0; int_part > 0; i++, int_part /= 2)
     {
         before_pt[i] = (char) (int_part % 2 ? '1' : '0');
-        before_pt_len++;
+        before_shift++;
     }
+    before_pt[before_shift] = '\0';
     str_rev(before_pt);
 
     fract_part *= 2;
@@ -88,17 +95,17 @@ char* get_bin_repr_of_ieee754(double n, enum PRECISION PRECISION)
         fract_part = modf(fract_part, &lost) * 2;
     }
 
-    int after_pt_len = 0;
-    while (after_pt[after_pt_len] == '0')
-        after_pt_len++;
+    int after_shift = 0;
+    while (after_pt[after_shift] == '0')
+        after_shift++;
 
-    int shift = (before_pt_len == 0 ? -(after_pt_len + 1) : before_pt_len - 1);
+    int shift = (before_shift == 0 ? -(after_shift + 1) : before_shift - 1);
     int offset = shift + (PRECISION == SINGLE ? 127 : 1023);
 
-    int offset_len = PRECISION == SINGLE ? 8 : 11;
+    size_t offset_len = PRECISION == SINGLE ? 8 : 11;
     char offset_bin[offset_len];
-    memset(offset_bin, '0', (size_t) offset_len);
-    for (int i = offset_len - 1; offset > 0; i--, offset /= 2)
+    memset(offset_bin, '0', offset_len);
+    for (int i = (int) (offset_len - 1); offset > 0; i--, offset /= 2)
         offset_bin[i] = (char) (offset % 2 ? '1' : '0');
 
     /* preparing of result */
@@ -110,26 +117,28 @@ char* get_bin_repr_of_ieee754(double n, enum PRECISION PRECISION)
 
     if (shift >= 0)
     {
-        if (before_pt_len > 1)
-            strncpy(buf + 1 + offset_len, before_pt + 1, (size_t) before_pt_len - 1);
+        if (before_shift > 1)
+            strncpy(buf + 1 + offset_len, before_pt + 1, min(shift, len - 1 - offset_len));
 
-        strncpy(
-                buf + 1 + offset_len + max(before_pt_len - 1, 0),
-                after_pt,
-                (size_t) (len - (1 + offset_len + max(before_pt_len - 1, 0)))
-        );
+        if (len > 1 + offset_len + shift)
+            strncpy(
+                    buf + 1 + offset_len + shift,
+                    after_pt,
+                    (size_t) (len - (1 + offset_len + shift))
+            );
     }
     else
     {
+        shift = abs(shift);
+
         strncpy(
                 buf + 1 + offset_len,
-                after_pt + after_pt_len + 1,
-                (size_t) (len - 1 - offset_len)
+                after_pt + shift,
+                (size_t) (min(len - 1 - offset_len, len - shift))
         );
     }
 
-    free(before_pt);
-    free(after_pt);
-
     return buf;
 }
+
+

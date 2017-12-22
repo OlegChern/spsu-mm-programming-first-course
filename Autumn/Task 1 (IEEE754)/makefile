@@ -8,7 +8,7 @@ all: main str_funcs bit_funcs
 	gcc $(OBJECTS_DIR)/*.o -o $(EXE_NAME) -lm
 
 clean:
-	rm -rf $(EXE_NAME).exe $(OBJECTS_DIR)
+	rm -rf $(EXE_NAME) $(OBJECTS_DIR)
 
 objects_dir:
 	mkdir -p $(OBJECTS_DIR)

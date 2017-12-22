@@ -27,7 +27,7 @@ void str_rev(char *s)
     }
 }
 
-int getline(char **line, size_t *n, FILE *stream)
+int get_line(char **line, size_t *n, FILE *stream)
 {
     if (line == NULL)
         return -1;
@@ -89,7 +89,7 @@ char* read_line(char *invite, char *input_format, int (*check)(char *s), FILE *s
                 printf("Wrong input. requires format: %s. Try again:\n", input_format);
         }
 
-        len = getline(&buf, &buf_sz, stream);
+        len = get_line(&buf, &buf_sz, stream);
         if (len > 0 && buf[len - 1] == '\n')
             buf[len - 1] = '\0';
 
