@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #define MAX_BOUND 1000000 // exclusive
 
@@ -27,8 +28,11 @@ int main()
         "#---------------------------- END OF USAGE ------------------------------#\n\n"
     );
 
-    int digitalRoot[MAX_BOUND];
-    int mdrs[MAX_BOUND];
+    int *digitalRoot = calloc(MAX_BOUND, sizeof(*digitalRoot));
+    int *mdrs = calloc(MAX_BOUND, sizeof(*mdrs));
+
+    if (!digitalRoot || !mdrs)
+        exit(1);
 
     // Bases of dynamic programming
     for (int i = 0; i < 10; ++i)
@@ -50,6 +54,9 @@ int main()
         result += mdrs[i];
 
     printf("The requested sum is: %d.\n", result);
+
+    free(digitalRoot);
+    free(mdrs);
 
     return 0;
 }
