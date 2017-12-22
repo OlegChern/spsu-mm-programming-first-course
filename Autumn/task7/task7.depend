@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1513800336 source:c:\users\Олеся\desktop\task7\main.c
+	<stdio.h>
+	<stdlib.h>
+	"hash.h"
+
+1513800353 source:c:\users\Олеся\desktop\task7\list.c
+
+1513800831 c:\users\Олеся\desktop\task7\hash.h
+
