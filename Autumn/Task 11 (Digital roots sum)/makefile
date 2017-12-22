@@ -5,13 +5,13 @@ OBJECTS_DIR = objects
 EXE_NAME = digital_roots
 
 all: objects_dir main
-	gcc $(OBJECTS_DIR)/*.o -o $(EXE_NAME) -lm -Wl,--stack,16776256
+	gcc $(OBJECTS_DIR)/*.o -o $(EXE_NAME) -lm -O2
 
 clean:
-	rm -rf $(EXE_NAME).exe $(OBJECTS_DIR)
+	rm -rf $(EXE_NAME) $(OBJECTS_DIR)
 
 objects_dir:
 	mkdir -p $(OBJECTS_DIR)
 		
 main: $(SOURCES_DIR)/main.c
-	gcc -c $(SOURCES_DIR)/$@.c -o $(OBJECTS_DIR)/$@.o
+	gcc -c $(SOURCES_DIR)/$@.c -o $(OBJECTS_DIR)/$@.o -O2
