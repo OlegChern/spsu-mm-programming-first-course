@@ -1,17 +1,9 @@
 #include <malloc.h>
 #include <stdio.h>
-#include <mem.h>
+#include <string.h>
+
 #include "fileIO.h"
 
-/// @private
-void swap(char **a, char **b)
-{
-    char *tmp = *a;
-    *a = *b;
-    *b = tmp;
-}
-
-// TODO: test on small buffer sizes
 /// @private
 /// @param buf buffer as part of string to be analyzed
 /// @param length max number of characters to be processed
@@ -26,6 +18,20 @@ unsigned int getStringLengthDelta(const char *buf, unsigned int length)
     }
 }
 
+/// @private
+void saveLine(HashTable *table, char **currentLine, unsigned int *currentLineLength)
+{
+    (*currentLineLength)++;
+    realloc(*currentLine, *currentLineLength);
+    (*currentLine)[*currentLineLength - 1] = '\0';
+    if (incElementAt(table, *currentLine) == 0)
+    {
+        free(*currentLine);
+    }
+    *currentLine = NULL;
+    *currentLineLength = 0;
+}
+
 int fillTable(HashTable *table, char *path)
 {
     FILE *fileStreamIn = fopen(path, "r");
@@ -35,15 +41,9 @@ int fillTable(HashTable *table, char *path)
         return 1;
     }
 
-    char *prevBuf = (char *) malloc(sizeof(char) * BUFFER_SIZE);
     char *buf = (char *) malloc(sizeof(char) * BUFFER_SIZE);
-    if (prevBuf == NULL || buf == NULL)
-    {
-        perror("malloc");
-        return 1;
-    }
 
-    int result = 0;
+    unsigned int result = 0;
     char *currentLine = NULL;
     unsigned int currentLineLength = 0;
     do
@@ -52,44 +52,69 @@ int fillTable(HashTable *table, char *path)
         unsigned int offset = 0;
         do
         {
-            unsigned int lengthDelta = getStringLengthDelta(buf, BUFFER_SIZE - offset);
-            if (lengthDelta != 0)
+            unsigned int lengthDelta = getStringLengthDelta(buf + offset, result - offset);
+            if (lengthDelta == 0)
             {
+                if (currentLine !=  NULL)
+                {
+                    saveLine(table, &currentLine, &currentLineLength);
+                } // Ignore empty lines?
+            }
+            else
+            {
+                currentLineLength += lengthDelta;
+
                 if (currentLine == NULL)
                 {
-                    currentLine = malloc(sizeof(char) * lengthDelta);
-                    currentLineLength = lengthDelta;
+                    currentLine = (char *) malloc(sizeof(char) * lengthDelta);
                 }
                 else
                 {
-                    currentLineLength += lengthDelta;
                     realloc(currentLine, currentLineLength);
                 }
-                // TODO: debug this
-                memcpy(currentLine + currentLineLength - lengthDelta, buf + offset, sizeof(char) * lengthDelta);
-                if ()
-            }
-            else if (currentLine != NULL)
-            {
-                currentLineLength++;
-                realloc(currentLine, currentLineLength);
-                currentLine[currentLineLength - 1] = '\0';
-                if (incElementAt(table, currentLine) == 0)
-                {
-                    free(currentLine);
-                }
-                currentLine = NULL;
-                currentLineLength = 0;
-            }
 
-            offset += lengthDelta;
+
+                memcpy(currentLine + currentLineLength - lengthDelta, buf + offset, sizeof(char) * lengthDelta);
+                if (offset + lengthDelta < result)
+                {
+                    saveLine(table, &currentLine, &currentLineLength);
+                }
+            }
+            offset += lengthDelta + 1;
         }
-        while (condition);
+        while (offset < result);
     }
     while (result == BUFFER_SIZE);
 
+    // Last line might have not been saved,
+    // in case it is not terminated with '\n'
+    if (currentLine != NULL)
+    {
+        saveLine(table, &currentLine, &currentLineLength);
+    }
+
     fclose(fileStreamIn);
-    free(prevBuf);
     free(buf);
+    return 0;
+}
+
+int saveText(HashTable *table, StringArray *array, const char *path)
+{
+    // FILE *fileStreamOut = fopen(path, "w");
+    FILE *fileStreamOut = stdout;
+    if (fileStreamOut == NULL)
+    {
+        perror("fopen");
+        return 1;
+    }
+    for (unsigned int i = 0; i < array->length; i++)
+    {
+        unsigned int entries = getValue(table, array->data[i]);
+        for (unsigned int j = 0; j < entries; j++)
+        {
+            fprintf(fileStreamOut, "%s\n", array->data[i]);
+        }
+    }
+    fclose(fileStreamOut);
     return 0;
 }

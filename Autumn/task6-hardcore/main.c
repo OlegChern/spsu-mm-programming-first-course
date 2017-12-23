@@ -1,29 +1,19 @@
 #include <stdio.h>
 #include <time.h>
-#include <mem.h>
-// #include <stdlib.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "hashTable.h"
 #include "fileIO.h"
 
-int getStringLengthDelta1(const char *buf, unsigned int length)
+int mstrcmp(const void *a, const void *b)
 {
-    unsigned int result = 0;
-    while (1)
-    {
-        if (result >= length || buf[result] == '\n')
-            return result;
-        result++;
-    }
+    char *astr = *(char **) a;
+    char *bstr = *(char **) b;
+    return strcmp(astr, bstr);
 }
 
-int main(void)
-{
-    char *s = "Hello\nworld\n";
-    printf("%d\n", getStringLengthDelta1(s + 5 + 1, strlen(s)));
-}
-
-/*int main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     if (argc != 2)
     {
@@ -35,15 +25,15 @@ int main(void)
 
     HashTable *table = buildHashTable();
 
-    fillTable(table, argv[1]);
-
-    printHashTableRaw(table);
+    if (fillTable(table, argv[1]))
+        return 1;
 
     StringArray *array = getKeys(table);
 
-    // qsort();
+    qsort(array->data, array->length, sizeof(char *), &mstrcmp);
 
-    // save
+    if (saveText(table, array, argv[0]))
+        return 1;
 
     freeStringArray(array);
     freeHashTable(table);
@@ -53,4 +43,3 @@ int main(void)
 
     return 0;
 }
-*/

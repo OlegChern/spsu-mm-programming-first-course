@@ -7,4 +7,6 @@
 
 int fillTable(HashTable *, char *);
 
+int saveText(HashTable *, StringArray *, const char *);
+
 #endif /* TASK6_HARDCORE_FILEIO_H */

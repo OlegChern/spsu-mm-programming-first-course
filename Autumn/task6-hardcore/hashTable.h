@@ -17,7 +17,7 @@ typedef struct
     int length;
 } HashTable;
 
-unsigned int hash(const HASHTABLE_KEY_TYPE);
+unsigned int hash(HASHTABLE_KEY_TYPE);
 
 HashTable *buildHashTable();
 

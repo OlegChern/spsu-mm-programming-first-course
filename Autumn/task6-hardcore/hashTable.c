@@ -3,13 +3,24 @@
 #include <string.h>
 
 #include "hashTable.h"
-#include "linkedList.h"
-#include "pair.h"
 
-unsigned int hash(const HASHTABLE_KEY_TYPE key)
+unsigned int hash(char *str)
 {
-    if (*key == 0)
+    unsigned long hash = 5381;
+    int c;
+
+    while ((c = *str++) != '\0')
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+    return hash;
+}
+/*unsigned int hash(const HASHTABLE_KEY_TYPE key)
+{
+    // We assume key is a valid C string
+
+    if (key == NULL || *key == '\0')
         return 0;
+
     unsigned int result = (unsigned int) key[0];
     for (unsigned int i = 1; key[i] != '\0'; i++)
     {
@@ -30,7 +41,7 @@ unsigned int hash(const HASHTABLE_KEY_TYPE key)
         }
     }
     return result;
-}
+}*/
 
 HashTable *buildHashTable()
 {
