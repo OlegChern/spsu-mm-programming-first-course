@@ -22,7 +22,7 @@ unsigned int getStringLengthDelta(const char *buf, unsigned int length)
 void saveLine(HashTable *table, char **currentLine, unsigned int *currentLineLength)
 {
     (*currentLineLength)++;
-    realloc(*currentLine, *currentLineLength);
+    *currentLine = realloc(*currentLine, *currentLineLength);
     (*currentLine)[*currentLineLength - 1] = '\0';
     if (incElementAt(table, *currentLine) == 0)
     {
@@ -58,7 +58,9 @@ int fillTable(HashTable *table, char *path)
                 if (currentLine !=  NULL)
                 {
                     saveLine(table, &currentLine, &currentLineLength);
-                } // Ignore empty lines?
+                }
+                // Empty lines are ignored.
+                // If necessary, they can  be handled right here.
             }
             else
             {
@@ -70,7 +72,7 @@ int fillTable(HashTable *table, char *path)
                 }
                 else
                 {
-                    realloc(currentLine, currentLineLength);
+                    currentLine = realloc(currentLine, currentLineLength);
                 }
 
 
@@ -118,3 +120,4 @@ int saveText(HashTable *table, StringArray *array, const char *path)
     fclose(fileStreamOut);
     return 0;
 }
+
