@@ -8,8 +8,9 @@ int main()
 {
     printf(
             "#---------------------------- BEGIN OF USAGE ----------------------------#\n"
-            "| Program prints sum of maximal by factorizations digital roots of       |\n"
-            "| numbers from 2 to 999999 (inclusive).                                  |\n"
+            "| The program uses an external memory manager written personally by me   |\n"
+            "| instead of standard one. For the demonstration of its work here is     |\n"
+            "| used my another program \"Task 12 (Bignum arithmetics)\".                |\n"
             "#---------------------------- END OF USAGE ------------------------------#\n\n"
     );
 
