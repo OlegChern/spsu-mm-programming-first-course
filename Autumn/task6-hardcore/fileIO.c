@@ -21,9 +21,7 @@ unsigned int getStringLengthDelta(const char *buf, unsigned int length)
 /// @private
 void saveLine(HashTable *table, char **currentLine, unsigned int *currentLineLength)
 {
-    (*currentLineLength)++;
-    *currentLine = realloc(*currentLine, *currentLineLength);
-    (*currentLine)[*currentLineLength - 1] = '\0';
+    (*currentLine)[*currentLineLength] = '\0';
     if (incElementAt(table, *currentLine) == 0)
     {
         free(*currentLine);
@@ -68,14 +66,12 @@ int fillTable(HashTable *table, char *path)
 
                 if (currentLine == NULL)
                 {
-                    currentLine = (char *) malloc(sizeof(char) * lengthDelta);
+                    currentLine = (char *) malloc(sizeof(char) * (currentLineLength + 1));
                 }
                 else
                 {
-                    currentLine = realloc(currentLine, currentLineLength);
+                    currentLine = (char *) realloc(currentLine, sizeof(char) * (currentLineLength + 1));
                 }
-
-
                 memcpy(currentLine + currentLineLength - lengthDelta, buf + offset, sizeof(char) * lengthDelta);
                 if (offset + lengthDelta < result)
                 {
@@ -102,8 +98,8 @@ int fillTable(HashTable *table, char *path)
 
 int saveText(HashTable *table, StringArray *array, const char *path)
 {
-    // FILE *fileStreamOut = fopen(path, "w");
-    FILE *fileStreamOut = stdout;
+    FILE *fileStreamOut = fopen("C:\\Users\\kiril\\Desktop\\resources\\result.txt", "w");
+    // FILE *fileStreamOut = stdout;
     if (fileStreamOut == NULL)
     {
         perror("fopen");
@@ -120,4 +116,3 @@ int saveText(HashTable *table, StringArray *array, const char *path)
     fclose(fileStreamOut);
     return 0;
 }
-

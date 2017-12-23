@@ -3,7 +3,7 @@
 
 #include "hashTable.h"
 
-#define BUFFER_SIZE 256
+#define BUFFER_SIZE 8192
 
 int fillTable(HashTable *, char *);
 

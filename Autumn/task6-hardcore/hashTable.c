@@ -14,34 +14,6 @@ unsigned int hash(char *str)
 
     return hash;
 }
-/*unsigned int hash(const HASHTABLE_KEY_TYPE key)
-{
-    // We assume key is a valid C string
-
-    if (key == NULL || *key == '\0')
-        return 0;
-
-    unsigned int result = (unsigned int) key[0];
-    for (unsigned int i = 1; key[i] != '\0'; i++)
-    {
-        switch (i & 0x3)
-        {
-        case 0:
-            result &= key[i];
-            break;
-        case 1:
-            result += key[i];
-            break;
-        case 2:
-            result ^= key[i];
-            break;
-        default:
-            result *= key[i];
-            break;
-        }
-    }
-    return result;
-}*/
 
 HashTable *buildHashTable()
 {
@@ -121,6 +93,7 @@ int incElementAt(HashTable *table, HASHTABLE_KEY_TYPE key)
 
 void extendHashTable(HashTable *table)
 {
+    fprintf(stderr, "Called extendHashTable!\n");
     int newLength = table->length + BASE_BINS;
     LinkedList *newBins = malloc(sizeof(LinkedList) * newLength);
     for (int i = 0; i < newLength; i++)

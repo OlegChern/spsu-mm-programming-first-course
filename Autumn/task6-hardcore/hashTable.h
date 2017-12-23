@@ -34,8 +34,6 @@ void extendHashTable(HashTable *);
 
 void addToHashTable(HashTable *, HASHTABLE_KEY_TYPE, HASHTABLE_VALUE_TYPE);
 
-// void removeFromHashTable(HashTable *, HASHTABLE_KEY_TYPE);
-
 HASHTABLE_VALUE_TYPE getValue(HashTable *, HASHTABLE_KEY_TYPE);
 
 void printHashTable(HashTable *);
