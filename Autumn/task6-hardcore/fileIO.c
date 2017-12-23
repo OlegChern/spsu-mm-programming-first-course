@@ -67,14 +67,22 @@ int fillTable(HashTable *table, char *path)
                 }
                 // TODO: debug this
                 memcpy(currentLine + currentLineLength - lengthDelta, buf + offset, sizeof(char) * lengthDelta);
+                if ()
             }
             else if (currentLine != NULL)
             {
                 currentLineLength++;
                 realloc(currentLine, currentLineLength);
                 currentLine[currentLineLength - 1] = '\0';
-                incElementAt(table, currentLine);
+                if (incElementAt(table, currentLine) == 0)
+                {
+                    free(currentLine);
+                }
+                currentLine = NULL;
+                currentLineLength = 0;
             }
+
+            offset += lengthDelta;
         }
         while (condition);
     }

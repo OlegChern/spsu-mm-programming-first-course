@@ -90,17 +90,19 @@ int incElementAt(HashTable *table, HASHTABLE_KEY_TYPE key)
 {
     unsigned int bin = hash(key) % table->length;
     Element *current = table->bins[bin].first;
+    int result = 0;
     while (1)
     {
         if (current == NULL)
         {
             pushValueToEnd(table->bins + bin, *buildPair(key, 0));
             current = table->bins[bin].last;
+            result = 1;
         }
         if (strcmp(current->value.key, key) == 0)
         {
             current->value.value++;
-            break;
+            return result;
         }
         current = current->next;
     }
