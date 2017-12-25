@@ -7,6 +7,8 @@
 #include <memory.h>
 #include "../headers/memory_manager.h"
 
+#define min(a, b) (((a) > (b)) ? (b) : (a))
+
 /* States how many free blocks can be isolated from each other at the same time.
  * In other words shows the maximum fragmentation of the memory system.
  * 10000000 by the default. So the list of free blocks will take ~ 150 Mb. */
@@ -214,8 +216,20 @@ void myFree(void *ptr)
 
 void *myRealloc(void *ptr, size_t size)
 {
+    size_t p = findInTaken(ptr);
+    if (p == takenListSize)
+    {
+        terminate();
+        exit(1);
+    }
+
+    void* res = myMalloc(size);
+
+    if (res)
+        memmove(res, ptr, min(size, takenList[p].size));
+
     myFree(ptr);
-    return myMalloc(size);
+    return res;
 }
 
 void printFree()

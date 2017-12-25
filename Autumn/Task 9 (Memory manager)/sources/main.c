@@ -27,6 +27,33 @@ int main()
     bigintFree(&result);
     myFree(repr);
 
+    /* Uncomment to check a simple example of a myRealloc() work. */
+    /*int *a = myMalloc(5 * sizeof(int));
+    for (int i = 0; i < 5; ++i)
+        a[i] = i;
+
+    printf("Array a:\n");
+    for (int i = 0; i < 5; ++i)
+        printf("a[%d] = %d\n", i, a[i]);
+    printf("\n");
+
+    myRealloc(a, 6);
+    a[5] = 5;
+
+    printf("Array a after realloc on one byte more:\n");
+    for (int i = 0; i < 6; ++i)
+        printf("a[%d] = %d\n", i, a[i]);
+    printf("\n");
+
+    myRealloc(a, 4);
+    a[5] = 6;
+
+    printf("Array a after realloc on two bytes less:\n");
+    for (int i = 0; i < 4; ++i)
+        printf("a[%d] = %d\n", i, a[i]);
+
+    myFree(a);*/
+
     terminate();
 
     return 0;
