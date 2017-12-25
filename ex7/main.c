@@ -69,7 +69,8 @@ int main()
                 if (hashSearch(table, key, &value))
                 {
                     printf("%s%d\n", "The value is ", value);
-                } else
+                }
+                else
                 {
                     printf("%s", "There is no match for this key\n");
                 }
@@ -84,7 +85,7 @@ int main()
     return 0;
 }
 
-struct hash_t* initialize(int size, struct hash_t* table)
+struct hash_t *initialize(int size, struct hash_t *table)
 {
     table->size = size;
     table->arr_lst = malloc(sizeof(struct list) * size);
@@ -191,7 +192,7 @@ int hashFunc(int key, struct hash_t *table)
 
 void hashResize(struct hash_t *table)
 {
-    int new_size = table->size*2;
+    int new_size = table->size * 2;
 
     struct list *new_lists = malloc(sizeof(struct list) * table->size);
     memcpy(new_lists, table->arr_lst, sizeof(struct list) * table->size);
@@ -235,7 +236,8 @@ bool hashSearch(struct hash_t *table, int key, int *num)
     if (listSearch(key, list, num))
     {
         return true;
-    } else
+    }
+    else
     {
         return false;
     }

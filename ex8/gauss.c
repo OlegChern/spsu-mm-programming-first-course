@@ -12,7 +12,6 @@ const int gauss_matrix3x3[3][3] = {{1, 2, 1},
                                    {1, 2, 1}};
 
 
-
 void filterGauss(int width, int height, struct RGBTRIPLE **rgb_arr, struct RGBTRIPLE **new_arr, int option)
 {
     for (int i = 1; i < height - option; i++)
