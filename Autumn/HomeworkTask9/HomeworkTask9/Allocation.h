@@ -6,9 +6,11 @@
 #define TRUE			1
 #define FALSE			0
 
-#define MEMORYSIZE		1024 // count of int
+#define MEMORYSIZE		1024			// count of WORDs
 
 typedef char			BOOL;
+typedef unsigned short	USHORT;
+
 typedef int				WORD;
 typedef unsigned int	UINT;
 
@@ -16,9 +18,8 @@ typedef unsigned int	UINT;
 
 typedef struct
 {
-	BOOL		isFree;
-	UINT		wordCount;		// size of chunk in sizeof(WORD)
-	//UINT		fieldIndex;
+	USHORT		isFree		: 1;		// sizeof(CHUNK) = 2
+	USHORT		wordCount	: 15;		// size of chunk in sizeof(WORD)
 } CHUNK;
 
 typedef struct
