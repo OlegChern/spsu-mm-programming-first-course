@@ -98,7 +98,8 @@ int fillTable(HashTable *table, char *path)
 
 int saveText(HashTable *table, StringArray *array, const char *path)
 {
-    FILE *fileStreamOut = fopen("C:\\Users\\kiril\\Desktop\\resources\\result.txt", "w");
+    // FILE *fileStreamOut = fopen("C:\\Users\\kiril\\Desktop\\resources\\result.txt", "w");
+    FILE *fileStreamOut = fopen(path, "w");
     // FILE *fileStreamOut = stdout;
     if (fileStreamOut == NULL)
     {
