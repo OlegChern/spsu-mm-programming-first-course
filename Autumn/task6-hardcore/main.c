@@ -8,9 +8,7 @@
 
 int mstrcmp(const void *a, const void *b)
 {
-    char *astr = *(char **) a;
-    char *bstr = *(char **) b;
-    return strcmp(astr, bstr);
+    return strcmp(*(char **) a, *(char **) b);
 }
 
 int main(int argc, char **argv)
