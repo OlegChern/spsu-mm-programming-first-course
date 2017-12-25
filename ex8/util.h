@@ -69,13 +69,9 @@ void filterMedian(int, int, struct RGBTRIPLE **, struct RGBTRIPLE **);
 void applyMedianToPixels(struct RGBTRIPLE **, struct RGBTRIPLE **, int, int);
 
 
-void filterGauss3x3(int, int, struct RGBTRIPLE **, struct RGBTRIPLE **);
+void filterGauss(int, int, struct RGBTRIPLE **, struct RGBTRIPLE **, int);
 
-void applyGaussToPixels3x3(struct RGBTRIPLE **, struct RGBTRIPLE **, int, int);
-
-void filterGauss5x5(int, int, struct RGBTRIPLE **, struct RGBTRIPLE **);
-
-void applyGaussToPixels5x5(struct RGBTRIPLE **, struct RGBTRIPLE **, int, int);
+void applyGaussToPixels(struct RGBTRIPLE **, struct RGBTRIPLE **, int, int, int);
 
 
 void filterSobelX(int, int, struct RGBTRIPLE **, struct RGBTRIPLE **);

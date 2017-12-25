@@ -25,11 +25,11 @@ void applyFilter(char *filter, struct RGBTRIPLE **old_arr, struct RGBTRIPLE **ne
     }
     if (!strcmp(filter, "gauss3"))
     {
-        filterGauss3x3(width, height, old_arr, new_arr);
+        filterGauss(width, height, old_arr, new_arr, 3);
     }
     if (!strcmp(filter, "gauss5"))
     {
-        filterGauss5x5(width, height, old_arr, new_arr);
+        filterGauss(width, height, old_arr, new_arr, 5);
     }
     if (!strcmp(filter, "sobelX"))
     {

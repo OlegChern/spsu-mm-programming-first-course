@@ -12,58 +12,42 @@ const int gauss_matrix3x3[3][3] = {{1, 2, 1},
                                    {1, 2, 1}};
 
 
-void filterGauss5x5(int width, int height, struct RGBTRIPLE **rgb_arr, struct RGBTRIPLE **new_arr)
+
+void filterGauss(int width, int height, struct RGBTRIPLE **rgb_arr, struct RGBTRIPLE **new_arr, int option)
 {
-    for (int i = 1; i < height - 5; i++)
-        for (int j = 1; j < width - 5; j++)
+    for (int i = 1; i < height - option; i++)
+        for (int j = 1; j < width - option; j++)
         {
-            applyGaussToPixels5x5(rgb_arr, new_arr, j, i);
+            applyGaussToPixels(rgb_arr, new_arr, j, i, option);
         }
 }
 
-
-void applyGaussToPixels5x5(struct RGBTRIPLE **arr, struct RGBTRIPLE **new_arr, int idx, int idy)
+void applyGaussToPixels(struct RGBTRIPLE **arr, struct RGBTRIPLE **new_arr, int idx, int idy, int option)
 {
     int sum_g = 0, sum_b = 0, sum_r = 0;
-    int div = 256;
+    int div = option < 4 ? 16 : 256;
 
-    for (int i = 0; i < 25; i++)
+    if (option < 5)
     {
-        struct RGBTRIPLE *temp_rgb = &arr[idy - 1 + i / 5][idx - 1 + i % 5];
+        for (int i = 0; i < option * option; i++)
+        {
+            struct RGBTRIPLE *temp_rgb = &arr[idy - 1 + i / option][idx - 1 + i % option];
 
-        sum_b += temp_rgb->rgbBlue * gauss_matrix5x5[i / 5][i % 5];
-        sum_g += temp_rgb->rgbGreen * gauss_matrix5x5[i / 5][i % 5];
-        sum_r += temp_rgb->rgbRed * gauss_matrix5x5[i / 5][i % 5];
+            sum_b += temp_rgb->rgbBlue * gauss_matrix3x3[i / option][i % option];
+            sum_g += temp_rgb->rgbGreen * gauss_matrix3x3[i / option][i % option];
+            sum_r += temp_rgb->rgbRed * gauss_matrix3x3[i / option][i % option];
+        }
     }
-
-    new_arr[idy][idx].rgbRed = (unsigned char) (sum_r / div);
-    new_arr[idy][idx].rgbBlue = (unsigned char) (sum_b / div);
-    new_arr[idy][idx].rgbGreen = (unsigned char) (sum_g / div);
-}
-
-
-void filterGauss3x3(int width, int height, struct RGBTRIPLE **rgb_arr, struct RGBTRIPLE **new_arr)
-{
-    for (int i = 1; i < height - 3; i++)
-        for (int j = 1; j < width - 3; j++)
-        {
-            applyGaussToPixels3x3(rgb_arr, new_arr, j, i);
-        }
-}
-
-
-void applyGaussToPixels3x3(struct RGBTRIPLE **arr, struct RGBTRIPLE **new_arr, int idx, int idy)
-{
-    int sum_g = 0, sum_b = 0, sum_r = 0;
-    int div = 16;
-
-    for (int i = 0; i < 9; i++)
+    else
     {
-        struct RGBTRIPLE *temp_rgb = &arr[idy - 1 + i / 3][idx - 1 + i % 3];
+        for (int i = 0; i < option * option; i++)
+        {
+            struct RGBTRIPLE *temp_rgb = &arr[idy - 1 + i / option][idx - 1 + i % option];
 
-        sum_b += temp_rgb->rgbBlue * gauss_matrix3x3[i / 3][i % 3];
-        sum_g += temp_rgb->rgbGreen * gauss_matrix3x3[i / 3][i % 3];
-        sum_r += temp_rgb->rgbRed * gauss_matrix3x3[i / 3][i % 3];
+            sum_b += temp_rgb->rgbBlue * gauss_matrix5x5[i / option][i % option];
+            sum_g += temp_rgb->rgbGreen * gauss_matrix5x5[i / option][i % option];
+            sum_r += temp_rgb->rgbRed * gauss_matrix5x5[i / option][i % option];
+        }
     }
 
     new_arr[idy][idx].rgbRed = (unsigned char) (sum_r / div);

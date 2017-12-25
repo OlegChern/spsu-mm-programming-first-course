@@ -194,17 +194,9 @@ void hashResize(struct hash_t *table)
     int new_size = table->size*2;
 
     struct list *new_lists = malloc(sizeof(struct list) * table->size);
-    for (int i = 0; i < table->size; i++)
-    {
-        struct list *l = table->arr_lst + i;
-        while (l->next != NULL)
-        {
-            listAddToEnd(l->value, l->key, new_lists + hashFunc(l->key, table));
-            l = l->next;
-        }
-    }
+    memcpy(new_lists, table->arr_lst, sizeof(struct list) * table->size);
 
-    hashDelete(table);
+    free(table->arr_lst);
 
     initialize(new_size, table);
 

@@ -6,9 +6,9 @@ const int sobelx_matrix[3][3] = {{1,  2,  1},
                                  {-1, -2, -1}};
 
 
-const int sobely_matrix[3][3] = {{1,  2,  1},
-                                 {0,  0,  0},
-                                 {-1, -2, -1}};
+const int sobely_matrix[3][3] = {{-1, 0, 1},
+                                 {-2, 0, 2},
+                                 {-1, 0, 1}};
 
 
 void filterSobelX(int width, int height, struct RGBTRIPLE **rgb_arr, struct RGBTRIPLE **new_arr)
