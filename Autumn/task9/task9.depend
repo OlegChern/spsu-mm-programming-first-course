@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1514293625 source:c:\users\Олеся\desktop\task9\memorymanager.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
