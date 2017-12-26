@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1514267129 source:c:\users\Олеся\desktop\task12\main.c
+	<stdio.h>
+	<malloc.h>
+	"long.h"
+
+1514267457 c:\users\Олеся\desktop\task12\long.h
+
+1514267358 source:c:\users\Олеся\desktop\task12\long.c
+	<stdio.h>
+	<malloc.h>
+	"long.h"
+
