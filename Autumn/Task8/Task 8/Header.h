@@ -35,13 +35,9 @@ int writeBMP(FILE * Output, int* fMemory, int *row, int *column);
 
 void filterArrayRGB(int *fMemory, RGB **valuePixels, int row, int column, char* filter);
 
-void median(RGB** valuePixels, int row, int column);
-
-void gauss_3x3(RGB** valuePixels, int row, int column);
-
 unsigned char color(int value);
 
-void sobel(RGB** valuePixels, int row, int column, int n);
-
 void gray(RGB** valuePixels, int row, int column);
+
+void filt(RGB** valuePixels, int row, int column, const int array[2][9]);
 

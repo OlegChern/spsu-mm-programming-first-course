@@ -3,6 +3,14 @@
 #include "string.h"
 #include "Header.h"
 
+const int median3x3[2][9] = {{1, 1, 1, 1, 1, 1, 1, 1, 1},
+							 {9, 9, 9, 9, 9, 9, 9, 9, 9}};
+const int gauss3x3[2][9] = {{1, 2, 1, 2, 4, 2, 1, 2, 1},
+							{16, 16, 16, 16, 16, 16, 16, 16, 16}};
+const int sobel_x[2][9] = {{-1, 0, 1, -2, 0, 2, -1, 0, 1},
+						   {1, 1, 1, 1, 1, 1, 1, 1, 1}};
+const int sobel_y[2][9] = {{-1, -2, -1, 0, 0, 0, 1, 2, 1},
+						   {1, 1, 1, 1, 1, 1, 1, 1, 1}};
 
 int* readBMP(FILE * fInput,int *bitCount, int *row, int *column) // Функция читает файл и в случае ошибки возвращает указатель NULL, иначе возвращает указатель на начало массива, содержащем информацию о пикселях.
 {
@@ -141,50 +149,6 @@ int writeBMP(FILE * fOutput, int* fMemory, int *row, int *column) // Функция зап
 	return 0;
 }
 
-void median(RGB** valuePixels, int row, int column)
-{
-	for (int i = 0; i < column; i++)
-	{
-		for (int j = 0; j < row; j++)
-		{
-			if ((i != 0) && (i != column - 1) && (j != 0) && (j != row - 1))
-			{
-				valuePixels[i][j].red = (valuePixels[i][j].red + valuePixels[i][j + 1].red + valuePixels[i + 1][j].red + valuePixels[i + 1][j + 1].red + valuePixels[i - 1][j + 1].red + valuePixels[i - 1][j].red + valuePixels[i - 1][j - 1].red + valuePixels[i][j - 1].red + valuePixels[i + 1][j - 1].red) / 9;
-				valuePixels[i][j].green = (valuePixels[i][j].green + valuePixels[i][j + 1].green + valuePixels[i + 1][j].green + valuePixels[i + 1][j + 1].green + valuePixels[i - 1][j + 1].green + valuePixels[i - 1][j].green + valuePixels[i - 1][j - 1].green + valuePixels[i][j - 1].green + valuePixels[i + 1][j - 1].green) / 9;
-				valuePixels[i][j].blue = (valuePixels[i][j].blue + valuePixels[i][j + 1].blue + valuePixels[i + 1][j].blue + valuePixels[i + 1][j + 1].blue + valuePixels[i - 1][j + 1].blue + valuePixels[i - 1][j].blue + valuePixels[i - 1][j - 1].blue + valuePixels[i][j - 1].blue + valuePixels[i + 1][j - 1].blue) / 9;
-			}
-			else
-			{
-				valuePixels[i][j].red = 0;
-				valuePixels[i][j].green = 0;
-				valuePixels[i][j].blue = 0;
-			}
-		}
-	}
-}
-
-void gauss_3x3(RGB** valuePixels, int row, int column)
-{
-	for (int i = 0; i < column; i++)
-	{
-		for (int j = 0; j < row; j++)
-		{
-			if ((i != 0) && (i != column - 1) && (j != 0) && (j != row - 1))
-			{
-				valuePixels[i][j].red = (4 * valuePixels[i][j].red + 2 * valuePixels[i][j + 1].red + 2 * valuePixels[i + 1][j].red + valuePixels[i + 1][j + 1].red + valuePixels[i - 1][j + 1].red + 2 * valuePixels[i - 1][j].red + valuePixels[i - 1][j - 1].red + 2 * valuePixels[i][j - 1].red + valuePixels[i + 1][j - 1].red) / 16;
-				valuePixels[i][j].green = (4 * valuePixels[i][j].green + 2 * valuePixels[i][j + 1].green + 2 * valuePixels[i + 1][j].green + valuePixels[i + 1][j + 1].green + valuePixels[i - 1][j + 1].green + 2 * valuePixels[i - 1][j].green + valuePixels[i - 1][j - 1].green + 2 * valuePixels[i][j - 1].green + valuePixels[i + 1][j - 1].green) / 16;
-				valuePixels[i][j].blue = (4 * valuePixels[i][j].blue + 2 * valuePixels[i][j + 1].blue + 2 * valuePixels[i + 1][j].blue + valuePixels[i + 1][j + 1].blue + valuePixels[i - 1][j + 1].blue + 2 * valuePixels[i - 1][j].blue + valuePixels[i - 1][j - 1].blue + 2 * valuePixels[i][j - 1].blue + valuePixels[i + 1][j - 1].blue) / 16;
-			}
-			else
-			{
-				valuePixels[i][j].red = 0;
-				valuePixels[i][j].green = 0;
-				valuePixels[i][j].blue = 0;
-			}
-		}
-	}
-}
-
 unsigned char color(int value)
 {
 	if (value < 0)
@@ -201,7 +165,21 @@ unsigned char color(int value)
 	}
 }
 
-void sobel(RGB** valuePixels, int row, int column, int n)
+void gray(RGB** valuePixels, int row, int column)
+{
+	for (int i = 0; i < column; i++)
+	{
+		for (int j = 0; j < row; j++)
+		{
+			unsigned char k = (unsigned char)(0.2126 * valuePixels[i][j].red + 0.7152 * valuePixels[i][j].green + 0.0722 * valuePixels[i][j].blue);
+			valuePixels[i][j].red = k;
+			valuePixels[i][j].green = k;
+			valuePixels[i][j].blue = k;
+		}
+	}
+}
+
+void filt(RGB** valuePixels, int row, int column, const int array[2][9])
 {
 	unsigned char* pointer = (unsigned char*)malloc(3 * row * column * sizeof(unsigned char));
 
@@ -211,18 +189,15 @@ void sobel(RGB** valuePixels, int row, int column, int n)
 		{
 			if ((i != 0) && (i != column - 1) && (j != 0) && (j != row - 1))
 			{
-				if (n == 1)
-				{
-					*pointer++ = color(valuePixels[i - 1][j + 1].red + 2 * valuePixels[i][j + 1].red + valuePixels[i + 1][j + 1].red - valuePixels[i - 1][j - 1].red - 2 * valuePixels[i][j - 1].red - valuePixels[i + 1][j - 1].red);
-					*pointer++ = color(valuePixels[i - 1][j + 1].green + 2 * valuePixels[i][j + 1].green + valuePixels[i + 1][j + 1].green - valuePixels[i - 1][j - 1].green - 2 * valuePixels[i][j - 1].green - valuePixels[i + 1][j - 1].green);
-					*pointer++ = color(valuePixels[i - 1][j + 1].blue + 2 * valuePixels[i][j + 1].blue + valuePixels[i + 1][j + 1].blue - valuePixels[i - 1][j - 1].blue - 2 * valuePixels[i][j - 1].blue - valuePixels[i + 1][j - 1].blue);
-				}
-				else
-				{
-					*pointer++ = color(valuePixels[i + 1][j - 1].red + 2 * valuePixels[i + 1][j].red + valuePixels[i + 1][j + 1].red - valuePixels[i - 1][j - 1].red - 2 * valuePixels[i - 1][j].red - valuePixels[i - 1][j + 1].red);
-					*pointer++ = color(valuePixels[i + 1][j - 1].green + 2 * valuePixels[i + 1][j].green + valuePixels[i + 1][j + 1].green - valuePixels[i - 1][j - 1].green - 2 * valuePixels[i - 1][j].green - valuePixels[i - 1][j + 1].green);
-					*pointer++ = color(valuePixels[i + 1][j - 1].blue + 2 * valuePixels[i + 1][j].blue + valuePixels[i + 1][j + 1].blue - valuePixels[i - 1][j - 1].blue - 2 * valuePixels[i - 1][j].blue - valuePixels[i - 1][j + 1].blue);
-				}
+				*pointer++ = color(array[0][0] * valuePixels[i - 1][j - 1].red / array[1][0] + array[0][1] * valuePixels[i - 1][j].red / array[1][1] + array[0][2] * valuePixels[i - 1][j + 1].red / array[1][2]
+					       + array[0][3] * valuePixels[i][j - 1].red / array[1][3] + array[0][4] * valuePixels[i][j].red / array[1][4] + array[0][5] * valuePixels[i][j + 1].red / array[1][5]
+						   + array[0][6] * valuePixels[i + 1][j - 1].red / array[1][6] + array[0][7] * valuePixels[i + 1][j].red / array[1][7] + array[0][8] * valuePixels[i + 1][j + 1].red / array[1][8]);
+				*pointer++ = color(array[0][0] * valuePixels[i - 1][j - 1].green / array[1][0] + array[0][1] * valuePixels[i - 1][j].green / array[1][1] + array[0][2] * valuePixels[i - 1][j + 1].green / array[1][2]
+					       + array[0][3] * valuePixels[i][j - 1].green / array[1][3] + array[0][4] * valuePixels[i][j].green / array[1][4] + array[0][5] * valuePixels[i][j + 1].green / array[1][5]
+					       + array[0][6] * valuePixels[i + 1][j - 1].green / array[1][6] + array[0][7] * valuePixels[i + 1][j].green / array[1][7] + array[0][8] * valuePixels[i + 1][j + 1].green / array[1][8]);
+				*pointer++ = color(array[0][0] * valuePixels[i - 1][j - 1].blue / array[1][0] + array[0][1] * valuePixels[i - 1][j].blue / array[1][1] + array[0][2] * valuePixels[i - 1][j + 1].blue / array[1][2]
+					       + array[0][3] * valuePixels[i][j - 1].blue / array[1][3] + array[0][4] * valuePixels[i][j].blue / array[1][4] + array[0][5] * valuePixels[i][j + 1].blue / array[1][5]
+					       + array[0][6] * valuePixels[i + 1][j - 1].blue / array[1][6] + array[0][7] * valuePixels[i + 1][j].blue / array[1][7] + array[0][8] * valuePixels[i + 1][j + 1].blue / array[1][8]);
 			}
 			else
 			{
@@ -240,25 +215,11 @@ void sobel(RGB** valuePixels, int row, int column, int n)
 			valuePixels[i][j].red = *pointer++;
 			valuePixels[i][j].green = *pointer++;
 			valuePixels[i][j].blue = *pointer++;
-		}	
+		}
 	}
 	pointer -= 3 * row * column;
 
 	free(pointer);
-}
-
-void gray(RGB** valuePixels, int row, int column)
-{
-	for (int i = 0; i < column; i++)
-	{
-		for (int j = 0; j < row; j++)
-		{
-			unsigned char k = (unsigned char)(0.2126 * valuePixels[i][j].red + 0.7152 * valuePixels[i][j].green + 0.0722 * valuePixels[i][j].blue);
-			valuePixels[i][j].red = k;
-			valuePixels[i][j].green = k;
-			valuePixels[i][j].blue = k;
-		}
-	}
 }
 
 void filterArrayRGB(int *fMemory, RGB **valuePixels, int row, int column, char* filter)
@@ -284,19 +245,19 @@ void filterArrayRGB(int *fMemory, RGB **valuePixels, int row, int column, char* 
 
 	if (strcmp(filter, "median3x3") == 0)
 	{
-		median(valuePixels, row, column);
+		filt(valuePixels, row, column, median3x3);
 	}
 	else if (strcmp(filter, "gauss_3x3") == 0)
 	{
-		gauss_3x3(valuePixels, row, column);
+		filt(valuePixels, row, column, gauss3x3);
 	}
 	else if (strcmp(filter, "sobel_x") == 0)
 	{
-		sobel(valuePixels, row, column, 1);
+		filt(valuePixels, row, column, sobel_x);
 	}
 	else if (strcmp(filter, "sobel_y") == 0)
 	{
-		sobel(valuePixels, row, column, 2);
+		filt(valuePixels, row, column, sobel_y);
 	}
 	else if (strcmp(filter, "gray") == 0)
 	{

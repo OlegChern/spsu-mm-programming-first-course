@@ -35,6 +35,8 @@ int main()
 
 	while (1)
 	{
+		printf("Please enter input file name:\nExample: \"D:\\text.txt\"\n");
+
 		scanf("%s", fName);
 
 		hFile = CreateFile(fName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
