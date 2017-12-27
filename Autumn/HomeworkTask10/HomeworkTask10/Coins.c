@@ -10,7 +10,7 @@ int main()
 	int amount;
 
 	// init coins array
-	int* coins = (int*)malloc(8 * sizeof(int));
+	int* coins = (int*)malloc(NUMBEROFCOINS * sizeof(int));
 	coins[0] = 1;
 	coins[1] = 2;
 	coins[2] = 5;
@@ -27,43 +27,55 @@ int main()
 	}
 
 	// init memoization
-	int* memoization = (int*)malloc((amount + 1) * sizeof(int));
+	ULL* memoization = (ULL*)malloc((amount + 1) * sizeof(ULL));
 
 	memoization[0] = 1;
 	for (int i = 1; i < amount + 1; i++)
 	{
-		memoization[i] = -1;
+		memoization[i] = 0;
 	}
 
 	// count
-	int a = count(amount, coins, memoization);
+	ULL a = count(amount, coins, memoization);
 
 	// print
 	if (a != 1)
 	{
-		printf("There are %d ways to make change.", a);
+		printf("There are %llu ways to make change.", a);
 	}
 	else
 	{
 		printf("There is 1 way to make change.");
 	}
 
+	for (int i = 0; i < amount + 1; i++)
+	{
+		printf("\nm[%d] = %llu", i, (memoization[i]));
+	}
+
+	free(coins);
+	free(memoization);
+
 	return 0;
 }
 
-int count(int n, int* coins, int* memoization)
+ULL count(int n, int* coins, ULL* memoization)
 {
-	if (memoization[n] != -1)
+	if (memoization[n] != 0)
 	{
 		return memoization[n];
 	}
 
-	int sum = 0, i = 0;
+	ULL sum = 0;
 
-	while (n >= coins[i])
+	for (int i = 0; i < NUMBEROFCOINS; i++)
 	{
+		if (n < coins[i])
+		{
+			break;
+		}
+
 		sum += count(n - coins[i], coins, memoization);
-		i++;
 	}
 
 	memoization[n] = sum;
