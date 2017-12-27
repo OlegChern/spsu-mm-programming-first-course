@@ -1,0 +1,1 @@
+gcc Sorting.c -o Sorting.exe

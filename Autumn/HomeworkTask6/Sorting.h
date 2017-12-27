@@ -1,8 +1,5 @@
 #pragma once
 
-#include <stdlib.h>
-#include <cstdlib.h> // TRY IT
-#include <stdio.h>
 #include <sys/stat.h>   // for file size
 #include <fcntl.h>      // control options for open()
 #include <time.h>
@@ -11,8 +8,19 @@
 #include "mman.h"
 
 #define TRUE            1
+#define CHUNK			256
 
 typedef struct stat     STAT;
 
-int sortWithMMap(char*, char*);
-int cmpStr(const void*, const void*);
+#pragma pack(1)
+typedef struct
+{
+    char *start;
+    char *end;
+} STRING;
+#pragma pack()
+
+int sortWithMMap(char*);
+void qsortStrings(STRING*, int, int);
+int compareStrings(STRING*, STRING*);
+void swapStrings(STRING*, STRING*);

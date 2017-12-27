@@ -1,44 +1,55 @@
 //#pragma warning(disable:4996) // to use _open()
 
+#include <stdlib.h>
+#include <stdio.h>
+
 #include "Sorting.h"
 
 int main(int argc, char **argv)
 {
-    if (argc < 3)
+    char *path;
+
+    if (argc < 2)
     {
-        printf("Not enough arguments! Should be:\n");
-		printf("  [source path] [target path]\n\n");
-        return 0;
+        path = (char*)malloc(sizeof(char) * 128);
+
+        printf("Enter path to file:\n");
+        scanf("%s", path);
+    }
+    else
+    {
+        path = argv[1];
     }
 
-    while(!sortWithMMap(argv[1], argv[2]))
+    float startTime = (float)clock() / (float)CLOCKS_PER_SEC;
+
+    if (sortWithMMap(path))
+    {
+        float endTime = (float)clock() / (float)CLOCKS_PER_SEC;
+        printf("Done with %f sec.\n", endTime - startTime);
+    }
+
+    free(path);
+
+    /*while(!sortWithMMap(argv[1]))
     {
         printf("Path to source file:\n");
         scanf("%s", argv[1]);
 
-        printf("Path to target file:\n");
-        scanf("%s", argv[2]);
-    }
-
-    printf("Done with %ld sec.\n", clock() / CLOCKS_PER_SEC);
+        startTime = (float)clock() / (float)CLOCKS_PER_SEC;
+    }*/
 
     return 0;
 }
 
-int sortWithMMap(char *sourceName, char *targetName)
+int sortWithMMap(char *sourceName)
 {
-    char    *source,
-            *target;
+    char    *source;
+	int		sourceDescriptor;
+	size_t	sourceSize;
 
-	int		sourceDescriptor,
-			targetDescriptor;
-
-	size_t	sourceSize,
-			targetSize;
-
-	// descriptors
-    sourceDescriptor = _open(sourceName, O_RDONLY);
-	targetDescriptor = _open(targetName, O_RDWR | O_TRUNC | O_CREAT);
+	// descriptor
+    sourceDescriptor = _open(sourceName, O_RDWR);
 
     if (sourceDescriptor < 0)
 	{
@@ -46,26 +57,15 @@ int sortWithMMap(char *sourceName, char *targetName)
 		return 0;
 	}
 
-	if (targetDescriptor < 0)
-	{
-		printf("Can't open target file!\n");
-		return 0;
-	}
-
-	// file sizes
+	// file size
     {
-		STAT sourceStat, targetStat;
-
+		STAT sourceStat;
 		stat(sourceName, &sourceStat);
-		stat(targetName, &targetStat);
-
 		sourceSize = sourceStat.st_size;
-		targetSize = targetStat.st_size;
 	}
 
 	// memory mapping
-	source = (char*)mmap(NULL, sourceSize, PROT_READ, MAP_SHARED, sourceDescriptor, 0);
-	target = (char*)mmap(NULL, targetSize, PROT_WRITE | PROT_READ, MAP_SHARED, targetDescriptor, 0);
+	source = (char*)mmap(NULL, sourceSize, PROT_WRITE | PROT_READ, MAP_SHARED, sourceDescriptor, 0);
 
 	if (source == MAP_FAILED)
 	{
@@ -73,40 +73,123 @@ int sortWithMMap(char *sourceName, char *targetName)
 		return 0;
 	}
 
-	if (target == MAP_FAILED)
-	{
-		munmap(source, sourceSize);
+    // strings
+	size_t	amount = 0;
+	size_t	allocated = 0;
 
-		printf("Can't map target file!\n");
-		return 0;
-	}
+	STRING *strings = (STRING*)malloc(sizeof(STRING) * CHUNK);
 
-    // strings amount
-	size_t amount = 0;
+	strings[0].start = source;
 
 	for (size_t i = 0; i < sourceSize; i++)
     {
         if (source[i] == '\n')
         {
-            amount++;
+			strings[amount].end = &source[i];
+
+			amount++;
+
+			if (amount >= allocated)
+			{
+				STRING *strings = (STRING*)realloc(strings, sizeof(STRING) * CHUNK);
+			}
+
+			if (i + 1 < sourceSize)
+			{
+				strings[amount].start = &source[i + 1];
+			}
         }
     }
 
-    qsort(source, amount, sizeof(char*), int (*cmpStr)(const void*, const void*));
+    // sorting
+	qsortStrings(strings, 0, amount);
 
+    for (size_t i = 0; i < amount; i++)
+    {
+        size_t j = 0;
+
+        char *start = strings[i].start;
+        char *end = strings[i].start;
+
+        while (start != end)
+        {
+            source[i + j] = *start;
+
+            j++;
+            start++;
+        }
+    }
+
+    // memory
+	free(strings);
+	munmap(source, sourceSize);
     _close(sourceDescriptor);
-    _close(targetDescriptor);
 
     return 1;
 }
 
-int cmpStr(const void *aPtr, const void *bPtr)
+void qsortStrings(STRING *source, int start, int end)
+{
+	if (start >= end)
+	{
+		return;
+	}
+
+	STRING *pivot = &source[end];
+
+	int index = start;
+
+	for (int i = start; i < end; i++)
+	{
+		if (compareStrings(&source[i], pivot) < 0)
+		{
+			swapStrings(&source[i], &source[index]);
+			index++;
+		}
+	}
+
+	if (compareStrings(&source[end], &source[index]) < 0)
+	{
+		swapStrings(&source[end], &source[index]);
+	}
+
+	qsortStrings(source, start, index - 1);
+	qsortStrings(source, index + 1, end);
+}
+
+int compareStrings(STRING *aStr, STRING *bStr)
+{
+	char *a = aStr->start;
+	char *b = bStr->start;
+
+	while (*a == *b && *a != '\n') // (*b != '\n') is over condition
+	{
+		a++;
+		b++;
+	}
+
+	// '\n' is less than other symbols so
+	return  *a - *b;
+}
+
+void swapStrings(STRING *a, STRING *b)
+{
+	char *tempStart = a->start;
+	char *tempEnd = a->end;
+
+	a->start = b->start;
+	a->end = b->end;
+
+	b->start = tempStart;
+	b->end = tempEnd;
+}
+
+/*int cmpStr(const void *aPtr, const void *bPtr)
 {
     char *a = (char*)aPtr;
     char *b = (char*)bPtr;
 
-    // (*b != '\n') is over condition
-    while (*a == *b && *a != '\n') // && *b != '\n')
+    while (*a == *b && *a != '\n') // (*b != '\n') is over condition
     {
         a++;
         b++;
@@ -116,3 +199,75 @@ int cmpStr(const void *aPtr, const void *bPtr)
 
     return  *a - *b;
 }
+
+void quickSort(int arr[], int start, int end)
+{
+	if (start >= end)
+	{
+		return;
+	}
+
+	int pivot = arr[end];
+
+	int index = start;
+
+	for (int i = start; i < end; i++)
+	{
+		if (arr[i] < pivot)
+		{
+			int temp = arr[i];
+
+			arr[i] = arr[index];
+			arr[index] = temp;
+
+			index++;
+		}
+	}
+
+	if (arr[end] < arr[index])
+	{
+		int temp = arr[end];
+
+		arr[end] = arr[index];
+		arr[index] = temp;
+	}
+
+	quickSort(arr, start, index - 1);
+	quickSort(arr, index + 1, end);
+}
+
+void qsortStrings(char *source, char *target, int start, int end)
+{
+	if (start >= end)
+	{
+		return;
+	}
+
+	char *pivot = source[end];
+
+	int index = start;
+
+	for (int i = start; i < end; i++)
+	{
+		if (cmpStr(source[i], pivot) < 0)
+		{
+			int temp = source[i];
+
+			source[i] = source[index];
+			source[index] = temp;
+
+			index++;
+		}
+	}
+
+	if (source[end] < source[index])
+	{
+		int temp = source[end];
+
+		source[end] = source[index];
+		source[index] = temp;
+	}
+
+	quickSort(source, target, start, index - 1);
+	quickSort(source, target, index + 1, end);
+}*/
