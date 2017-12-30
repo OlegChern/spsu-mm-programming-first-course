@@ -27,7 +27,6 @@ int main()
 	printf("Done with %f sec.\n", endTime - startTime);
 
 	free(path);
-
 	return 0;
 }
 
@@ -60,6 +59,8 @@ int sortWithMemoryMapping(const char *sourceName)
 	map = mmap(sourceName, OPEN_EXISTING);
 	if (map == NULL)
 	{
+		_close(sourceDescriptor);
+
 		printf("Can't map source file!\n");
 		return 0;
 	}
@@ -108,6 +109,10 @@ int sortWithMemoryMapping(const char *sourceName)
 	tempDescriptor = _open(sourceName, O_RDWR | O_CREAT | O_TRUNC);
 	if (tempDescriptor == -1)
 	{
+		free(stringsArray);
+		unmap(map);
+		_close(sourceDescriptor);
+
 		printf("Can't open temp file!\n");
 		return 0;
 	}
@@ -116,7 +121,12 @@ int sortWithMemoryMapping(const char *sourceName)
 	tempMap = mmap(sourceName, CREATE_ALWAYS);
 	if (tempMap == NULL)
 	{
-		printf("Can't map source file!\n");
+		free(stringsArray);
+		unmap(map);
+		_close(sourceDescriptor);
+		_close(tempDescriptor);
+
+		printf("Can't map temp file!\n");
 		return 0;
 	}
 
@@ -262,7 +272,7 @@ char *getString()
 				sign = -1;
 			}
 
-			if (current == '\n' || current == ' ')
+			if (current == '\n')
 			{
 				source[length] = '\0';
 				return source;
