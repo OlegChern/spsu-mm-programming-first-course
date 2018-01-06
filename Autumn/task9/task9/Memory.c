@@ -1,135 +1,164 @@
-#include <stdlib.h>
 #include "Memory.h"
 
 
 int sizeOfMemory = 1024;
+void *memory;
 
-char *firstMemory;
-int *arrayOfMemory;
+
+typedef struct blockOfMemory
+{
+	size_t sizeOfBlock;
+	struct blockOfMemory *next;
+	struct blockOfMemory *previous;
+} blockOfMemory;
+
+blockOfMemory *firstBlock = NULL;
+
 
 void init()
 {
-	int sizeOfArray = sizeOfMemory;
-	arrayOfMemory = calloc(sizeOfArray, sizeof(int));
-	firstMemory = malloc(sizeOfMemory * sizeof(char));
+	memory = malloc(sizeOfMemory);
+	blockOfMemory *block = (blockOfMemory *)memory;
+	block->sizeOfBlock = sizeOfMemory;
+	block->next = NULL;
+	block->previous = NULL;
+	firstBlock = block;
 }
 
-int enoughMemory(int index, size_t size)
+int enoughMemory(blockOfMemory *block, size_t size)
 {
-	for (int i = index; i <= index + size; i++)
+	return (block->sizeOfBlock >= size + sizeof(size_t));
+}
+
+blockOfMemory *findFreeMemory(size_t size)
+{
+	blockOfMemory *tmp = firstBlock;
+	while (tmp != NULL)
 	{
-		if (arrayOfMemory[i] == 1)
+		if (enoughMemory(tmp, size))
 		{
-			return 0;
+			return tmp;
 		}
+		tmp = tmp->next;
 	}
-	return 1;
-}
-
-void takeMemory(int index, size_t size)
-{
-	for (int i = index; i < index + size; i++)
-	{
-		arrayOfMemory[i] = 1;
-	}
-	arrayOfMemory[size] = 0;
-}
-
-void* findFreeMemory(size_t size)
-{
-	int index = -1;
-	while (index < sizeOfMemory - 1)
-	{
-		index++;
-		if (arrayOfMemory[index] == 0)
-		{
-			if (index < sizeOfMemory - 1)
-			{
-				index++;
-				if (arrayOfMemory[index] == 0)
-				{
-					if (enoughMemory(index, size))
-					{
-						takeMemory(index, size);
-						return firstMemory + index;
-					}
-				}
-			}
-		}
-	}
+	
 	return NULL;
 }
 
-void freeUpMemory(int index)
+void deleteBlock(blockOfMemory *block)
 {
-	int i = index;
-	while (arrayOfMemory[i] != 0)
+	if (block = firstBlock)
 	{
-		arrayOfMemory[i] = 0;
-		i++;
-	}
-}
-
-int getSize(int index)
-{
-	int i = index;
-	while (arrayOfMemory[i] != 0)
-	{
-		i++;
-	}
-	return i - index;
-}
-
-void* myMalloc(size_t size)
-{
-	void *findMemory = findFreeMemory(size);
-	if (findMemory == NULL)
-	{
-		printf("Error! Memory is not enough\n");
+		firstBlock = block->next;
 		return;
 	}
-	return findMemory;
+
+	if (block->next == NULL)
+	{
+		block->previous->next = NULL;
+		return;
+	}
+	block->previous->next = block->next;
+	block->next->previous = block->previous;
 }
 
-void myFree(void* ptr)
+void *myMalloc(size_t size)
 {
-	int firstIndex = (int)((char*)ptr - firstMemory);
-	freeUpMemory(firstIndex);
+	blockOfMemory *block = findFreeMemory(size);
+	if (block == NULL)
+	{
+		return NULL;
+	}
+
+	if (size == block->sizeOfBlock)
+	{
+		deleteBlock(block);
+		return (char *)block + sizeof(size_t);
+	}
+
+	block->sizeOfBlock = block->sizeOfBlock - sizeof(size_t) - size;
+	blockOfMemory *newBlock = (blockOfMemory *)((char *)block + block->sizeOfBlock);
+	newBlock->sizeOfBlock = size + sizeof(size_t);
+	return (char *)newBlock + sizeof(size_t);
 }
 
-void* myRealloc(void* ptr, size_t newSize)
+blockOfMemory *findNearestBlock(blockOfMemory *block)
 {
-	int index = (int)((char*)ptr - firstMemory);
-	int oldSize = getSize(index);
-	
-	if (oldSize == newSize)
+	blockOfMemory *tmp = firstBlock;
+	while ((tmp->next != NULL) && (tmp->next < block))
 	{
-		return ptr;
+		tmp = tmp->next;
+	}
+	return tmp;
+}
+
+void unite(blockOfMemory **first, blockOfMemory **second)
+{
+	(*first)->next = (*second)->next;
+	if ((*second)->next != NULL)
+	{
+		(*second)->next->previous = (*first);
+	}
+	(*first)->sizeOfBlock = (*first)->sizeOfBlock + (*second)->sizeOfBlock;
+}
+
+void myFree(void *ptr)
+{
+	blockOfMemory *block = (blockOfMemory*)((char*)ptr - sizeof(size_t));
+	
+	if (firstBlock == NULL)
+	{
+		block->previous = NULL;
+		block->next = NULL;
+		firstBlock = block;
+		return;
 	}
 
-	if (oldSize > newSize)
+	blockOfMemory *nearestBlock = findNearestBlock(block);
+	if ((nearestBlock->previous != NULL) && (nearestBlock->next != NULL))
 	{
-		freeUpMemory(newSize + 1);
+		nearestBlock->previous->next = block;
+		nearestBlock->next->previous = block;
+	}
+	else if (nearestBlock->previous != NULL)
+	{
+		nearestBlock->previous->next = block;
+	}
+	else if (nearestBlock->next != NULL)
+	{
+		nearestBlock->next->previous = block;
+	}
+
+	if ((block->next != NULL) && (block->next == (char *)block + sizeof(block)))
+	{
+		unite(&block, &(block->next));
+	}
+	if ((block->previous != NULL) && (block->previous == (char *)block - sizeof(block)))
+	{
+		unite((&block->previous), &block);
+	}
+}
+
+void *myRealloc(void *ptr, size_t newSize)
+{
+	blockOfMemory *block = (char *)ptr - sizeof(size_t);
+	
+	if (block->sizeOfBlock - sizeof(size_t) >= newSize)
+	{
 		return ptr;
 	}
 	
-	if (enoughMemory(index + oldSize, newSize - oldSize))
+	blockOfMemory *newPtr = myMalloc(newSize);
+	if (newPtr == NULL)
 	{
-		takeMemory(index + oldSize, newSize - oldSize);
-		return ptr;
+		return NULL;
 	}
-
-	char *newPtr = myMalloc(newSize);
-	for (int i = 0; i < newSize; i++)
-	{
-		newPtr[i] = ((char*)ptr)[i];
-	}
+	memcpy(newPtr, ptr, block->sizeOfBlock - sizeof(size_t));
 	myFree(ptr);
 	return newPtr;
 }
 
 void memoryEnd()
 {
-	free(arrayOfMemory);
-	free(firstMemory);
+	free(memory);
 }

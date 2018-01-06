@@ -1,5 +1,6 @@
-#pragma once
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /*allocating a large amount of memory*/
 void init();
