@@ -60,7 +60,7 @@ RGB **input(BITMAPFILEHEADER *fileHeader, BITMAPINFOHEADER *info, FILE *file, in
 	return rgb;
 }
 
-void output(RGB **rgb, int linePadding, BITMAPFILEHEADER *fileHeader, BITMAPINFOHEADER *info, FILE *file, char *palette, unsigned long paletteSize)
+void output(RGB **rgb, int linePadding, BITMAPFILEHEADER *fileHeader, BITMAPINFOHEADER *info, FILE *file, char palette, unsigned long paletteSize)
 {
 	fwrite(fileHeader, sizeof(BITMAPFILEHEADER), 1, file);
 	fwrite(info, sizeof(BITMAPINFOHEADER), 1, file);
@@ -209,6 +209,14 @@ void sobelFilterY(RGB **rgb, int row, int column, RGB **result)
 	sobel(rgb, row, column, result, matrix);
 }
 
+void endOfFilters(RGB ***rgb, int linePadding, BITMAPFILEHEADER **fileHeader, BITMAPINFOHEADER **info, char palette, unsigned long paletteSize, FILE *finalFile)
+{
+	output(*rgb, linePadding, *fileHeader, *info, finalFile, palette, paletteSize);
+	free(*fileHeader);
+	free(*info);
+	free(*rgb);
+}
+
 int applyFilter(FILE *startFile, int filter, FILE *finalFile)
 {
 	BITMAPFILEHEADER *fileHeader = malloc(sizeof(BITMAPFILEHEADER));
@@ -232,10 +240,7 @@ int applyFilter(FILE *startFile, int filter, FILE *finalFile)
 		averageFilter(rgb, info->biHeight, info->biWidth, newRGB);
 		free(rgb);
 		rgb = newRGB;
-		output(rgb, linePadding, fileHeader, info, finalFile, palette, paletteSize);
-		free(fileHeader);
-		free(info);
-		free(rgb);
+		endOfFilters(&rgb, linePadding, &fileHeader, &info, palette, paletteSize, finalFile);
 		return 1;
 	}
 	case 2:
@@ -244,10 +249,7 @@ int applyFilter(FILE *startFile, int filter, FILE *finalFile)
 		gaussFilter(rgb, info->biHeight, info->biWidth, newRGB);
 		free(rgb);
 		rgb = newRGB;
-		output(rgb, linePadding, fileHeader, info, finalFile, palette, paletteSize);
-		free(fileHeader);
-		free(info);
-		free(rgb);
+		endOfFilters(&rgb, linePadding, &fileHeader, &info, palette, paletteSize, finalFile);
 		return 1;
 	}
 	case 3:
@@ -256,10 +258,7 @@ int applyFilter(FILE *startFile, int filter, FILE *finalFile)
 		sobelFilterX(rgb, info->biHeight, info->biWidth, newRGB);
 		free(rgb);
 		rgb = newRGB;
-		output(rgb, linePadding, fileHeader, info, finalFile, palette, paletteSize);
-		free(fileHeader);
-		free(info);
-		free(rgb);
+		endOfFilters(&rgb, linePadding, &fileHeader, &info, palette, paletteSize, finalFile);
 		return 1;
 	}
 	case 4:
@@ -268,19 +267,13 @@ int applyFilter(FILE *startFile, int filter, FILE *finalFile)
 		sobelFilterY(rgb, info->biHeight, info->biWidth, newRGB);
 		free(rgb);
 		rgb = newRGB;
-		output(rgb, linePadding, fileHeader, info, finalFile, palette, paletteSize);
-		free(fileHeader);
-		free(info);
-		free(rgb);
+		endOfFilters(&rgb, linePadding, &fileHeader, &info, palette, paletteSize, finalFile);
 		return 1;
 	}
 	case 5:
 	{
 		greyFilter(rgb, info->biHeight, info->biWidth);
-		output(rgb, linePadding, fileHeader, info, finalFile, palette, paletteSize);
-		free(fileHeader);
-		free(info);
-		free(rgb);
+		endOfFilters(&rgb, linePadding, &fileHeader, &info, palette, paletteSize, finalFile);
 		return 1;
 	}
 	default:
