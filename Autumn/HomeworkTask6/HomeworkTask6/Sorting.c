@@ -1,10 +1,10 @@
-#pragma warning(disable:4996) // to use _open()
-#pragma warning(disable:4133)
+//#pragma warning(disable:4133)
 
-#include <stdlib.h>
-#include <stdio.h>
+#include	<stdlib.h>
+#include	<stdio.h>
+#include	<time.h>
 
-#include "Sorting.h"
+#include	"Sorting.h"
 
 int main()
 {
@@ -39,28 +39,15 @@ int sortWithMemoryMapping(const char *sourceName)
 	char		*source,
 				*temp;
 
-	int			sourceDescriptor, 
-				tempDescriptor;
-
 	size_t		sourceSize, 
 				amount;
 
-	const char	*tempName = "temp.txt";
-
-	// descriptor
-	sourceDescriptor = _open(sourceName, O_RDWR);
-	if (sourceDescriptor == -1)
-	{
-		printf("Can't open source file!\n");
-		return 0;
-	}
+	const char	*tempName = "D:\\temp.txt";
 
 	// memory mapping
-	map = mmap(sourceName, OPEN_EXISTING);
+	map = mmap(sourceName, OPEN_EXISTING, 0);
 	if (map == NULL)
 	{
-		_close(sourceDescriptor);
-
 		printf("Can't map source file!\n");
 		return 0;
 	}
@@ -73,15 +60,23 @@ int sortWithMemoryMapping(const char *sourceName)
 	{
 		size_t allocated = LARGECHUNK;
 
-		stringsArray = (char**)malloc(sizeof(char*) * allocated);
+		stringsArray = (STRING*)malloc(sizeof(STRING) * allocated);
 		stringsArray[0] = source;
 
-		amount = 1; // precount last string
+		amount = 0;
 
 		for (size_t i = 0; i < sourceSize; i++)
 		{
 			if (source[i] == '\n')
 			{
+				amount++;
+
+				if (amount >= allocated)
+				{
+					allocated += LARGECHUNK;
+					stringsArray = (STRING*)realloc(stringsArray, sizeof(STRING) * allocated);
+				}
+
 				size_t next = i + 1;
 
 				if (next < sourceSize)
@@ -89,42 +84,21 @@ int sortWithMemoryMapping(const char *sourceName)
 					stringsArray[amount] = &source[next];
 				}
 
-				amount++;
-
-				if (amount >= allocated)
-				{
-					allocated += LARGECHUNK;
-					stringsArray = (char**)realloc(stringsArray, sizeof(char*) * allocated);
-				}
 			}
 		}
 	}
 
 	// sorting
-	qsort(stringsArray, amount, sizeof(char), compareStrings);
+	qsort(stringsArray, amount, sizeof(STRING), compareStrings);
 
 	remove(tempName);
 
-	// temp desciptor
-	tempDescriptor = _open(sourceName, O_RDWR | O_CREAT | O_TRUNC);
-	if (tempDescriptor == -1)
-	{
-		free(stringsArray);
-		unmap(map);
-		_close(sourceDescriptor);
-
-		printf("Can't open temp file!\n");
-		return 0;
-	}
-
 	// map temp
-	tempMap = mmap(sourceName, CREATE_ALWAYS);
+	tempMap = mmap(tempName, CREATE_ALWAYS, sourceSize);
 	if (tempMap == NULL)
 	{
 		free(stringsArray);
 		unmap(map);
-		_close(sourceDescriptor);
-		_close(tempDescriptor);
 
 		printf("Can't map temp file!\n");
 		return 0;
@@ -133,16 +107,28 @@ int sortWithMemoryMapping(const char *sourceName)
 	// data
 	temp = tempMap->dataPtr;
 
-	for (size_t i = 0; i < sourceSize; i++)
-	{
-		char chr;
-		size_t j = 0;
+	size_t charIndex = 0;
 
-		while ((chr = stringsArray[i][j]) != '\n' && chr != '\0')
+	for (size_t stringIndex = 0; stringIndex < amount; stringIndex++)
+	{
+		if (charIndex >= sourceSize)
 		{
-			temp[i] = chr;
-			j++;
+			break;
 		}
+
+		size_t offset = 0;
+		char chr;
+
+		do
+		{
+			chr = stringsArray[stringIndex][offset];
+
+			temp[charIndex] = chr;
+			charIndex++;
+
+			offset++;
+
+		} while (chr != '\n' && chr != '\0');
 	}
 
 	// copy
@@ -154,18 +140,19 @@ int sortWithMemoryMapping(const char *sourceName)
 	unmap(tempMap);
 	unmap(map);
 
-	_close(tempDescriptor);
-	_close(sourceDescriptor);
-
 	remove(tempName);
 	
 	return 1;
 }
 
+int as = 0;
+
 int compareStrings(const void *aPtr, const void *bPtr)
 {
-    char *a = (char*)aPtr;
-    char *b = (char*)bPtr;
+	as++;
+
+    char *a = *(char**)aPtr;
+    char *b = *(char**)bPtr;
 
     while (*a == *b && *a != '\n') // (*b != '\n') is over condition
     {
@@ -178,13 +165,25 @@ int compareStrings(const void *aPtr, const void *bPtr)
     return  *a - *b;
 }
 
-FILEMAPPING *mmap(const char *name, DWORD disposition)
+FILEMAPPING *mmap(const char *name, DWORD disposition, DWORD size)
 {
-	HANDLE hFile = CreateFile(name, GENERIC_READ | GENERIC_WRITE, 0, NULL, disposition, FILE_ATTRIBUTE_NORMAL, NULL);
+	LPCSTR lpcstrName = (LPCSTR)name;
+
+	HANDLE hFile = CreateFileA(lpcstrName, GENERIC_READ | GENERIC_WRITE, 0, NULL, disposition, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	if (hFile == INVALID_HANDLE_VALUE)
 	{
-		printf("CreateFile error!\n");
+		DWORD error = GetLastError();
+
+		if (error == 32)
+		{
+			printf("File is opened in another program (error %d).\n", error);
+		}
+		else
+		{
+			printf("CreateFile error: %d.\n", error);
+		}
+
 		return NULL;
 	}
 
@@ -198,13 +197,13 @@ FILEMAPPING *mmap(const char *name, DWORD disposition)
 		return NULL;
 	}
 
-	HANDLE hMapping = CreateFileMapping(hFile, NULL, PAGE_READWRITE, 0, 0, NULL);
+	HANDLE hMapping = CreateFileMappingA(hFile, NULL, PAGE_READWRITE, 0, size, NULL);
 
 	if (hMapping == NULL)
 	{
 		CloseHandle(hFile);
 
-		printf("CreateFileMapping failed!\n");
+		printf("CreateFileMapping error: %d\n", GetLastError());
 		return NULL;
 	}
 
