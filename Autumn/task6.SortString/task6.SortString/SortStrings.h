@@ -1,6 +1,6 @@
 
-int getNumberOfStrings(char *filePtr, int size);
+int getNumberOfStrings(char *filePtr);
 
 char **sortString(char *file, int size, int numberOfString);
 
-void writeStringsInFile(char *file, char** arrayOfString, int numberOfStrings);
+void writeStringsInFile(char *file, char** arrayOfString, int numberOfStrings, int size);

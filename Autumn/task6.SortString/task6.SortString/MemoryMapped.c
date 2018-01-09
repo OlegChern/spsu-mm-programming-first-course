@@ -7,7 +7,7 @@
 
 FileMapping *createFileMaping(char *nameOfFile)
 {
-	HANDLE hFile = CreateFile(nameOfFile, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+	HANDLE hFile = CreateFileA(nameOfFile, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
 	if (hFile == INVALID_HANDLE_VALUE)
 	{
 		return NULL;
@@ -20,14 +20,14 @@ FileMapping *createFileMaping(char *nameOfFile)
 		return NULL;
 	}
 
-	HANDLE hMapping = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
+	HANDLE hMapping = CreateFileMapping(hFile, NULL, PAGE_READWRITE, 0, 0, NULL);
 	if (hMapping == NULL)
 	{
 		CloseHandle(hFile);
 		return NULL;
 	}
 
-	unsigned char* dataPtr = (unsigned char*)MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, dwFileSize);
+	unsigned char* dataPtr = (unsigned char*)MapViewOfFile(hMapping, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, dwFileSize);
 	if (dataPtr == NULL)
 	{
 		CloseHandle(hMapping);
@@ -48,7 +48,6 @@ FileMapping *createFileMaping(char *nameOfFile)
 	mapping->hMapping = hMapping;
 	mapping->dataPtr = dataPtr;
 	mapping->fsize = (size_t)dwFileSize;
-
 	return mapping;
 }
 

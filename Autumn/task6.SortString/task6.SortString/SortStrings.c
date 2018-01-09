@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <windows.h>
+#include "MemoryMapped.h"
 
 #include "SortStrings.h"
 
 
 int compareString(char *str1, char *str2)
 {
-	char *ptr1 = str1;
-	char *ptr2 = str2;
+	char *ptr1 = *(char**)str1;
+	char *ptr2 = *(char**)str2;
 	while ((*ptr1 != '\n') && (*ptr2 == *ptr1))
 	{
 		ptr1++;
@@ -37,16 +37,17 @@ int compareString(char *str1, char *str2)
 	}
 }
 
-int getNumberOfStrings(char *filePtr, int size)
+int getNumberOfStrings(unsigned char *filePtr)
 {
 	unsigned char *temp = filePtr;
 	int number = 0;
-	for (int i = 0; i < size - 1; i++)
+	while(*temp > 0)
 	{
 		if (*temp == '\n')
 		{
 			number++;
 		}
+		temp++;
 	}
 	number++;
 
@@ -59,34 +60,73 @@ char **sortString(char *file, int size, int numberOfString)
 
 	int num = 0;
 	char *temp = file;
-	arrayOfString[0] = temp;
-	for (int i = 0; i < size; i++)
+	int i = 0;
+	while (*temp > 0)
 	{
-		temp++;
-		if ((*temp == '\n') || (*temp == 'EOF'))
+		arrayOfString[i] = temp;
+		i++;
+		while ((*temp != '\n') && (*temp > 0))
 		{
-			arrayOfString[num] = temp;
-			num++;
+			temp++;
+		}
+		if (*temp > 0)
+		{
+			temp++;
 		}
 	}
-
-	qsort(arrayOfString, numberOfString, sizeof(char), compareString);
+	
+	qsort(arrayOfString, numberOfString, sizeof(char*), compareString);
 
 	return arrayOfString;
 }
 
-void writeStringsInFile(char *file, char** arrayOfString, int numberOfStrings)
+void writeStringsInBuffer(char *file, char** arrayOfString, int numberOfStrings)
 {
-	char *tempFile = file;
 	for (int i = 0; i < numberOfStrings; i++)
 	{
-		char *tempArray = arrayOfString[i];
-		while ((*tempArray != '\n') && (*tempArray != 'EOF'))
+		while ((*arrayOfString[i] != '\n') && (*arrayOfString[i] > 0))
 		{
-			*file = *tempFile;
+			*file = *arrayOfString[i];
+			file++;
+			arrayOfString[i]++;
 		}
-		*file = *tempFile;
+		if (*arrayOfString[i] <= 0)
+		{
+			*file = '\n';
+			file++;
+		}
+		else
+		{
+			*file = *arrayOfString[i];
+			file++;
+		}
 	}
 
 	free(arrayOfString);
+}
+
+void writeStringsInFile(char *file, char** arrayOfString, int numberOfStrings, int size)
+{
+	HANDLE tempFile, tempMap;
+	tempFile = CreateFile("tempFile.txt", GENERIC_READ | GENERIC_WRITE | FILE_DELETE_CHILD, 0, NULL, CREATE_ALWAYS, 0, NULL);
+	tempMap = CreateFileMapping(tempFile, NULL, PAGE_READWRITE, 0, size, NULL);
+	unsigned char *tempPtr = (unsigned char*)MapViewOfFile(tempMap, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, size);
+
+	char* temp = tempPtr;
+	writeStringsInBuffer(tempPtr, arrayOfString, numberOfStrings);
+	tempPtr = temp;
+	
+	char *dataPtr = file;
+	for (int i = 0; i < size; i++)
+	{
+		*dataPtr = *tempPtr;
+		dataPtr++;
+		tempPtr++;
+	}
+	tempPtr = temp;
+
+	UnmapViewOfFile(tempPtr);
+	CloseHandle(tempMap);
+	CloseHandle(tempFile);
+	DeleteFile("tempFile.txt");
 }
