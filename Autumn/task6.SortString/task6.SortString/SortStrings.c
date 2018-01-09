@@ -41,7 +41,7 @@ int getNumberOfStrings(unsigned char *filePtr)
 {
 	unsigned char *temp = filePtr;
 	int number = 0;
-	while(*temp > 0)
+	/*while(*temp > 0)
 	{
 		if (*temp == '\n')
 		{
@@ -49,8 +49,20 @@ int getNumberOfStrings(unsigned char *filePtr)
 		}
 		temp++;
 	}
-	number++;
-
+	number++;*/
+	while (*temp > 0)
+	{
+		while ((*temp != '\n') && (*temp > 0))
+		{
+			temp++;
+		}
+		if (*temp <= 0)
+		{
+			temp--;
+		}
+		number++;
+		temp++;
+	}
 	return number;
 }
 
