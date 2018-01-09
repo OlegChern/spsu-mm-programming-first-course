@@ -27,59 +27,81 @@ int main()
 	}
 
 	// init memoization
-	ULL* memoization = (ULL*)malloc((amount + 1) * sizeof(ULL));
+	WORD **memoization = (WORD**)malloc((amount + 1) * sizeof(WORD*));
 
-	memoization[0] = 1;
-	for (int i = 1; i < amount + 1; i++)
+	
+	for (int i = 0; i <= amount; i++)
 	{
-		memoization[i] = 0;
+		memoization[i] = (WORD*)malloc(NUMBEROFCOINS * sizeof(WORD));
+
+		memoization[i][0] = 1;
+
+		for (int j = 1; j < NUMBEROFCOINS; j++)
+		{
+			memoization[i][j] = -1;
+		}
 	}
 
 	// count
-	ULL a = count(amount, coins, memoization);
+
+	int nearestCoinIndex = getNearestCoinIndex(amount, coins);
+	WORD a = count(amount, nearestCoinIndex, coins, memoization);
 
 	// print
 	if (a != 1)
 	{
-		printf("There are %llu ways to make change.", a);
+		printf("There are %d ways to make change.", a);
 	}
 	else
 	{
 		printf("There is 1 way to make change.");
 	}
 
-	for (int i = 0; i < amount + 1; i++)
+	for (int i = 0; i <= amount; i++)
 	{
-		printf("\nm[%d] = %llu", i, (memoization[i]));
+		free(memoization[i]);
 	}
 
-	free(coins);
 	free(memoization);
+	free(coins);
 
 	return 0;
 }
 
-ULL count(int n, int* coins, ULL* memoization)
+WORD count(int amount, int coinIndex, int* coins, WORD** memoization)
 {
-	if (memoization[n] != 0)
+	if (memoization[amount][coinIndex] != -1)
 	{
-		return memoization[n];
+		return memoization[amount][coinIndex];
 	}
 
-	ULL sum = 0;
+	int		currentCoinNumber = 0,
+			nextCoinIndex = coinIndex - 1;
 
+	WORD	compos,
+			sum = 0;
+
+	while ((compos = currentCoinNumber * coins[coinIndex]) <= amount)
+	{
+		sum += count(amount - compos, nextCoinIndex, coins, memoization);
+		currentCoinNumber++;
+	}
+
+	memoization[amount][coinIndex] = sum;
+	return sum;
+}
+
+int getNearestCoinIndex(int amount, int* coins)
+{
 	for (int i = 0; i < NUMBEROFCOINS; i++)
 	{
-		if (n < coins[i])
+		if (coins[i] >= amount)
 		{
-			break;
+			return i;
 		}
-
-		sum += count(n - coins[i], coins, memoization);
 	}
 
-	memoization[n] = sum;
-	return sum;
+	return NUMBEROFCOINS - 1;
 }
 
 int getInt(int *target)
