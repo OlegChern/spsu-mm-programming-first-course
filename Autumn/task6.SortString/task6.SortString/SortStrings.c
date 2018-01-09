@@ -92,6 +92,8 @@ void writeStringsInBuffer(char *file, char** arrayOfString, int numberOfStrings)
 		}
 		if (*arrayOfString[i] <= 0)
 		{
+			*file = '\r';
+			file++;
 			*file = '\n';
 			file++;
 		}
