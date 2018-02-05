@@ -6,7 +6,7 @@ namespace task4
     {
         static void Main(string[] args)
         {
-            var list = new LinkedList<int>();
+            ILinkedList<int> list = new LinkedList<int>();
             Console.WriteLine("ok!");
             Console.ReadKey();
         }

@@ -4,19 +4,19 @@ using System.Collections.Generic;
 
 namespace task4
 {
-    class LinkedList<T> : IEnumerable<T>
+    class LinkedList<T> : ILinkedList<T>
     {
         private ListElement<T> first;
         private ListElement<T> last;
+        private uint length;
 
-        public ListElement<T> First { get => first; }
+        public uint Length { get => length; }
 
-        public ListElement<T> Last { get => last; }
-
-        public LinkedList(ListElement<T> first = null, ListElement<T> last = null)
+        public LinkedList()
         {
-            this.first = first;
-            this.last = last;
+            first = null;
+            last = null;
+            length = 0;
         }
 
         public void AddToStart(T value)
@@ -40,6 +40,11 @@ namespace task4
         }
 
         public ListElement<T> PopLast()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Contains(T value)
         {
             throw new NotImplementedException();
         }
