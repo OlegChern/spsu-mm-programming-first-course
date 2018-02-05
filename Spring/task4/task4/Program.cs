@@ -6,8 +6,8 @@ namespace task4
     {
         static void Main(string[] args)
         {
-            var Element = new DoublyLinkedList();
-            Console.WriteLine("ok");
+            var list = new LinkedList<int>();
+            Console.WriteLine("ok!");
             Console.ReadKey();
         }
     }
