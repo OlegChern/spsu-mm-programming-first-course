@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace task4
 {
@@ -10,6 +6,9 @@ namespace task4
     {
         static void Main(string[] args)
         {
+            var Element = new DoublyLinkedList();
+            Console.WriteLine("ok");
+            Console.ReadKey();
         }
     }
 }
