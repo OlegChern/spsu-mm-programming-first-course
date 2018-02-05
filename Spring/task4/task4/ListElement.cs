@@ -2,11 +2,11 @@
 
 namespace task4
 {
-    internal class ListElement<T>
+    internal class ListElement<T> where T: IComparable
     {
         private ListElement<T> previous;
         private ListElement<T> next;
-        // private T value;
+        private T value;
 
         /* Setters automatically validate
          * and update corresponding references
@@ -67,12 +67,16 @@ namespace task4
             }
         }
 
-        public T Value { get; set; }
+        public T Value {
+            get => value;
+            set => this.value = value;
+        }
 
-        public ListElement(ListElement<T> previous = null, ListElement<T> next = null)
+        public ListElement(T value)
         {
-            this.previous = previous;
-            this.next = next;
+            previous = null;
+            next = null;
+            this.value = value;
         }
     }
 }
