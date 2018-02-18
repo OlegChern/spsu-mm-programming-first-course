@@ -3,6 +3,14 @@ using System.IO;
 
 namespace task1
 {
+    enum ColourPart
+    {
+        Red = 0,
+        Green = 1,
+        Blue = 2,
+        Alpha = 3
+    }
+
     internal enum Endianness
     {
         BigEndian,

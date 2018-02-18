@@ -45,7 +45,6 @@
   <ItemGroup>
     <Compile Include="AbortedException.cs" />
     <Compile Include="BasicImage.cs" />
-    <Compile Include="ColourPart.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util.cs" />

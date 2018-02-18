@@ -67,19 +67,19 @@ namespace task1
                 Util.CopyHeader(bytes, newBytes, fileHeader.bfOffBits);
                 if (filter == gauss)
                 {
-                    Util.ApplyKernel(bytes, newBytes, gaussMatrix);
+                    Util.ApplyKernel(bytes, newBytes, gaussMatrix, fileHeader, infoHeader, endianness);
                 }
                 else if (filter == sobelx)
                 {
-                    Util.ApplyKernel(bytes, newBytes, sobelxMatrix);
+                    Util.ApplyKernel(bytes, newBytes, sobelxMatrix, fileHeader, infoHeader, endianness);
                 }
                 else if (filter == sobely)
                 {
-                    Util.ApplyKernel(bytes, newBytes, sobelyMatrix);
+                    Util.ApplyKernel(bytes, newBytes, sobelyMatrix, fileHeader, infoHeader, endianness);
                 }
                 else if (filter == greyen)
                 {
-                    Util.ApplyGreyen(bytes, newBytes, );
+                    Util.ApplyGreyen(bytes, newBytes, fileHeader, infoHeader, endianness);
                 }
                 // TODO: save
                 else
