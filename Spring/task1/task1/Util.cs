@@ -230,7 +230,33 @@ namespace task1
             BitMapFileHeader fileHeader,
             BitMapInfoHeader infoHeader)
         {
-            throw new NotImplementedException();
+            var sourceImage = new BasicImage(source, fileHeader, infoHeader);
+            var destinationImage = new BasicImage(destination, fileHeader, infoHeader);
+            var lastPart = ColourPart.Alpha;
+            if (infoHeader.biBitCount == 24)
+            {
+                lastPart = ColourPart.Blue;
+            }
+
+            for (int i = 0; i < infoHeader.biHeight; i++)
+            {
+                for (int j = 0; j < infoHeader.biWidth; j++)
+                {
+
+                    for (var part = ColourPart.Red; part <= lastPart; part++)
+                    {
+                        double value = 0;
+                        for (int row = 0; row < 3; row++)
+                        {
+                            for (int column = 0; column < 3; column++)
+                            {
+                                value += kernel[row][column] * sourceImage[i - 1 + row, j - 1 + column, part];
+                            }
+                        }
+                        destinationImage[i, j, part] = ToByte(value);
+                    }
+                }
+            }
         }
 
         internal static void ApplyGreyen(
