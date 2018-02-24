@@ -12,7 +12,6 @@ namespace task1
         private int height;
         private uint offset;
         private int bytesPerPixel;
-        private Endianness endianness;
 
         /// <summary>
         /// Accesses pixel at [i, j]
@@ -34,59 +33,38 @@ namespace task1
                     return 0;
                 }
                 int start = (int)(offset + i * actualWidth + j * bytesPerPixel);
-                switch (part)
+                int index = start + bytesPerPixel - (int)part - 1;
+                if (index < 0 || index >= data.Length)
                 {
-                    case ColourPart.Red:
-                        if (endianness == Endianness.BigEndian)
-                        {
-                            return 0;
-                        }
-                        else
-                        {
-                            return 0;
-                        }
-                    case ColourPart.Green:
-                        if (endianness == Endianness.BigEndian) return 0;
-                        else
-                        {
-                            return 0;
-                        }
-                    case ColourPart.Blue:
-                        if (endianness == Endianness.BigEndian)
-                        {
-                            return 0;
-                        }
-                        else
-                        {
-                            return 0;
-                        }
-                    case ColourPart.Alpha:
-                        if (endianness == Endianness.BigEndian)
-                        {
-                            return 0;
-                        }
-                        else
-                        {
-                            return 0;
-                        }
-                    default:
-                        return 0;
+                    throw new IndexOutOfRangeException($"Index out of range: i={i}, j={j}, part={part}");
                 }
-                return data[start + (part == ColourPart.Red? 0: part == ColourPart.Green? 1: part == ColourPart.Blue? 2: 3)];
+                return data[index];
             }
-            set => data[i] = value;
+            set
+            {
+                if (part == ColourPart.Alpha && bytesPerPixel == 3)
+                {
+                    throw new ArgumentException("Error: attempt to write to alpha channel which is not provided.");
+                }
+                if (i < 0 || i >= height || j < 0 || j >= width)
+                {
+                    throw new ArgumentOutOfRangeException($"Error: index ({i}, {j}, {part}) is out of range");
+                }
+                int start = (int)(offset + i * actualWidth + j * bytesPerPixel);
+                int index = start + bytesPerPixel - (int)part - 1;
+                data[index] = value;
+            }
         }
         
-        public BasicImage(byte[] data, BitMapFileHeader fileHeader, BitMapInfoHeader infoHeader, Endianness endianness)
+        public BasicImage(byte[] data, BitMapFileHeader fileHeader, BitMapInfoHeader infoHeader)
         {
             Util.CheckSizes(fileHeader, infoHeader, data.Length);
             width = infoHeader.biWidth;
             actualWidth = ((infoHeader.biBitCount * width + 31) / 32) * 4;
             height = infoHeader.biHeight;
             offset = fileHeader.bfOffBits;
-            bytesPerPixel = infoHeader.biBitCount;
+            bytesPerPixel = infoHeader.biBitCount / 8;
             this.data = data;
-            this.endianness = endianness;
         }
     }
 }

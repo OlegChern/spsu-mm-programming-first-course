@@ -60,42 +60,41 @@ namespace task1
             {
                 Util.HandleArguments(args, out string source, out string filter, out string destination);
                 var bytes = File.ReadAllBytes(source);
-                Util.HandleBitMapFileHeader(bytes, out var fileHeader, out var endianness);
-                Util.HandleBitMapInfoHeader(bytes, out var infoHeader, endianness);
-                
+                Util.HandleBitMapFileHeader(bytes, out var fileHeader);
+                Util.HandleBitMapInfoHeader(bytes, out var infoHeader);
+
                 var newBytes = new byte[bytes.Length];
                 Util.CopyHeader(bytes, newBytes, fileHeader.bfOffBits);
                 if (filter == gauss)
                 {
-                    Util.ApplyKernel(bytes, newBytes, gaussMatrix, fileHeader, infoHeader, endianness);
+                    Util.ApplyKernel(bytes, newBytes, gaussMatrix, fileHeader, infoHeader);
                 }
                 else if (filter == sobelx)
                 {
-                    Util.ApplyKernel(bytes, newBytes, sobelxMatrix, fileHeader, infoHeader, endianness);
+                    Util.ApplyKernel(bytes, newBytes, sobelxMatrix, fileHeader, infoHeader);
                 }
                 else if (filter == sobely)
                 {
-                    Util.ApplyKernel(bytes, newBytes, sobelyMatrix, fileHeader, infoHeader, endianness);
+                    Util.ApplyKernel(bytes, newBytes, sobelyMatrix, fileHeader, infoHeader);
                 }
                 else if (filter == greyen)
                 {
-                    Util.ApplyGreyen(bytes, newBytes, fileHeader, infoHeader, endianness);
+                    Util.ApplyGreyen(bytes, newBytes, fileHeader, infoHeader);
                 }
-                // TODO: save
                 else
                 {
                     throw new ArgumentException($"Error: unknown filter type: \"{filter}\"");
                 }
+                File.WriteAllBytes(destination, newBytes);
 
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                // Could've performed a minor cleanup at this point, but what for?
                 Console.ReadKey();
                 return;
             }
-
+            Console.WriteLine("Done.");
             Console.ReadKey();
         }
     }

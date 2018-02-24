@@ -3,20 +3,14 @@ using System.IO;
 
 namespace task1
 {
-    enum ColourPart
+    internal enum ColourPart
     {
         Red = 0,
         Green = 1,
         Blue = 2,
         Alpha = 3
     }
-
-    internal enum Endianness
-    {
-        BigEndian,
-        LittleEndian
-    }
-    
+   
     // All ugly variable names are equal to the ones in documentation.
 
     internal struct BitMapFileHeader
@@ -178,31 +172,22 @@ namespace task1
             {
                 throw new AbortedException("Abort.");
             }
-
-            try
-            {
-                File.OpenWrite(destination).Close();
-            }
-            catch (Exception inner)
-            {
-                throw new IOException("Error: couldn't write to destination file.", inner);
-            }
         }
 
-        internal static void HandleBitMapFileHeader(byte[] bytes, out BitMapFileHeader header, out Endianness endianness)
+        internal static void HandleBitMapFileHeader(byte[] bytes, out BitMapFileHeader header)
         {
             header = new BitMapFileHeader();
             if (bytes[0] == 0x42 && bytes[1] == 0x4D)
             {
-                endianness = Endianness.LittleEndian;
                 header.bfSize = (uint)((bytes[5] << 24) + (bytes[4] << 16) + (bytes[3] << 8) + bytes[2]);
                 header.bfOffBits = (uint)((bytes[13] << 24) + (bytes[12] << 16) + (bytes[11] << 8) + bytes[10]);
             }
             else if (bytes[0] == 0x4D && bytes[1] == 0x42)
             {
-                endianness = Endianness.BigEndian;
+                throw new ArgumentException("Big-endian images are not supported.");
+                /*endianness = Endianness.BigEndian;
                 header.bfSize = (uint)((bytes[2] << 24) + (bytes[3] << 16) + (bytes[4] << 8) + bytes[5]);
-                header.bfOffBits = (uint)((bytes[10] << 24) + (bytes[11] << 16) + (bytes[12] << 8) + bytes[13]);
+                header.bfOffBits = (uint)((bytes[10] << 24) + (bytes[11] << 16) + (bytes[12] << 8) + bytes[13]);*/
             }
             else
             {
@@ -210,21 +195,14 @@ namespace task1
             }
         }
 
-        internal static void HandleBitMapInfoHeader(byte[] bytes, out BitMapInfoHeader infoHeader, Endianness endianness)
+        internal static void HandleBitMapInfoHeader(byte[] bytes, out BitMapInfoHeader infoHeader)
         {
-            infoHeader = new BitMapInfoHeader();
-            if (endianness == Endianness.LittleEndian)
+            infoHeader = new BitMapInfoHeader
             {
-                infoHeader.biWidth = (bytes[21] << 24) + (bytes[20] << 16) + (bytes[19] << 8) + bytes[18];
-                infoHeader.biHeight = (bytes[25] << 24) + (bytes[24] << 16) + (bytes[23] << 8) + bytes[22];
-                infoHeader.biBitCount = (ushort)((bytes[29] << 8) + (bytes[28]));
-            }
-            else
-            {
-                infoHeader.biWidth = (bytes[18] << 24) + (bytes[19] << 16) + (bytes[20] << 8) + bytes[21];
-                infoHeader.biHeight = (bytes[22] << 24) + (bytes[23] << 16) + (bytes[24] << 8) + bytes[25];
-                infoHeader.biBitCount = (ushort)((bytes[28] << 8) + (bytes[29]));
-            }
+                biWidth = (bytes[21] << 24) + (bytes[20] << 16) + (bytes[19] << 8) + bytes[18],
+                biHeight = (bytes[25] << 24) + (bytes[24] << 16) + (bytes[23] << 8) + bytes[22],
+                biBitCount = (ushort)((bytes[29] << 8) + (bytes[28]))
+            };
         }
 
         internal static void CheckSizes(BitMapFileHeader fileHeader, BitMapInfoHeader infoHeader, int actualSize)
@@ -250,253 +228,31 @@ namespace task1
             byte[] destination,
             double[][] kernel,
             BitMapFileHeader fileHeader,
-            BitMapInfoHeader infoHeader,
-            Endianness endianness)
+            BitMapInfoHeader infoHeader)
         {
-            // TODO: finish
+            throw new NotImplementedException();
         }
 
         internal static void ApplyGreyen(
             byte[] source,
             byte[] destination,
             BitMapFileHeader fileHeader,
-            BitMapInfoHeader infoHeader,
-            Endianness endianness)
+            BitMapInfoHeader infoHeader)
         {
-            // TODO: finish
+            var sourceImage = new BasicImage(source, fileHeader, infoHeader);
+            var destinationImage = new BasicImage(destination, fileHeader, infoHeader);
+            for (int i = 0; i < infoHeader.biHeight; i++)
+            {
+                for (int j = 0; j < infoHeader.biWidth; j++)
+                {
+                    byte average = ToByte(sourceImage[i, j, ColourPart.Red] * RedLuminance
+                        + sourceImage[i, j, ColourPart.Green] * GreenLuminance
+                        + sourceImage[i, j, ColourPart.Blue] * BlueLuminance);
+                    destinationImage[i, j, ColourPart.Red] = average;
+                    destinationImage[i, j, ColourPart.Green] = average;
+                    destinationImage[i, j, ColourPart.Blue] = average;
+                }
+            }
         }
     }
 }
-
-#if false
-// Image is considered to be 2 pixels wider
-// and 2 pixels higher than it actually is,
-// forming black outline out of those extra pixels,
-// so that 3x3 kernel can be applied.
-
-int applyKernel(BITMAPINFOHEADER *infoHeader, const double kernel[3][3],
-                FILE *fileStreamIn, FILE *fileStreamOut, unsigned char (*castFunction)(double))
-{
-    int result;
-    size_t bytesPerPixel = (size_t)  infoHeader->biBitCount / 8;
-    int rowSize = (infoHeader->biBitCount * infoHeader->biWidth + 31) / 32 * 4;
-
-    // Line length in file should always be a multiple of 4 bytes.
-    // Hence, gap sometimes has to be added.
-
-    int gap = rowSize - bytesPerPixel * infoHeader->biWidth;
-    char *gapBuffer = NULL;
-    if (gap != 0)
-    {
-        gapBuffer = malloc(sizeof(char) * gap);
-    }
-
-    // Initialize variables
-
-    // Following arrays contain lines of bytes as stored in file
-    // They also provide buffers of 1 black pixel in the beginning and end
-    // so that kernel can be propperly applied.
-    // They don't contain any space for gap
-
-    unsigned char *previous = calloc(sizeof(unsigned char), bytesPerPixel * (infoHeader->biWidth + 2));
-    // Since no previous line exists, let it be black.
-    // calloc is more efficient than malloc + manually setting colours to black
-    unsigned char *current = malloc(sizeof(unsigned char) * bytesPerPixel * (infoHeader->biWidth + 2));
-    unsigned char *next = malloc(sizeof(unsigned char) * bytesPerPixel * (infoHeader->biWidth + 2));
-
-    // Make sure buffer pixels of current and next are black
-    // (pixels of previous are all black anyway)
-
-    for (int i = 0; i < bytesPerPixel; i++)
-    {
-        // Pixel at the start...
-        current[i] = 0;
-        next[i] = 0;
-        // ...and at the end.
-        current[bytesPerPixel * (infoHeader->biWidth + 1) + i] = 0;
-        next[bytesPerPixel * (infoHeader->biWidth + 1) + i] = 0;
-    }
-
-    // Read first line (and it's gap if necessary).
-
-    result = fread(current + bytesPerPixel, sizeof(unsigned char), bytesPerPixel * infoHeader->biWidth, fileStreamIn);
-    FILTER_ASSERT(result == bytesPerPixel * infoHeader->biWidth, "Error reading image line.\n")
-
-    if (gap != 0)
-    {
-        result = fread(gapBuffer, sizeof(unsigned char), (size_t) gap, fileStreamIn);
-        FILTER_ASSERT(result == gap, "Error reading line gap.\n")
-    }
-
-    // Now, apply kernel to lines.
-
-    for (int i = 0; i < infoHeader->biHeight; i++)
-    {
-        // Read next line
-        // Or clear it, if the image is over
-
-        if (i != infoHeader->biHeight - 1)
-        {
-            result = fread(next + bytesPerPixel, sizeof(unsigned char), bytesPerPixel * infoHeader->biWidth, fileStreamIn);
-            FILTER_ASSERT(result == bytesPerPixel * infoHeader->biWidth, "Error reading image line.\n")
-        }
-        else
-        {
-            for (int j = bytesPerPixel; j < bytesPerPixel * (infoHeader->biWidth + 1); j++)
-            {
-                next[j] = 0;
-            }
-            // next[j] for other j's are 0 anyay
-        }
-
-        // Apply kernel
-        // In fact, we don't have to care which byte means what,
-        // we can work with all ow them in the same way.
-
-        for (int j = bytesPerPixel; j < bytesPerPixel * (infoHeader->biWidth + 1); j++)
-        {
-            // previous[j - bytesPerPixel], previous[j], previous[j + bytesPerPixel],
-            // current[j - bytesPerPixel],  current[j],  current[j + bytesPerPixel],
-            // next[j - bytesPerPixel],     next[j],     next[j + bytesPerPixel].
-
-            // We don't need to know which value exactly it represents
-            double newValue =
-                    kernel[0][0] * previous[j - bytesPerPixel] +
-                    kernel[0][1] * previous[j] +
-                    kernel[0][2] * previous[j + bytesPerPixel] +
-
-                    kernel[1][0] * current[j - bytesPerPixel] +
-                    kernel[1][1] * current[j] +
-                    kernel[1][2] * current[j + bytesPerPixel] +
-
-                    kernel[2][0] * next[j - bytesPerPixel] +
-                    kernel[2][1] * next[j] +
-                    kernel[2][2] * next[j + bytesPerPixel];
-
-            unsigned char newByte = (*castFunction)(newValue);
-
-            result = fwrite(&newByte, sizeof(unsigned char), 1, fileStreamOut);
-            FILTER_ASSERT(result == 1, "Error saving image line.\n")
-        }
-
-        // Read & write gap if necessary
-
-        if (gap != 0)
-        {
-            result = fwrite(gapBuffer, sizeof(unsigned char), (size_t) gap, fileStreamOut);
-            FILTER_ASSERT(result == gap, "Error saving line gap.\n")
-
-            if (i != infoHeader->biHeight - 1)
-            {
-                // This gap can't and doesn't have to be read
-                // Since {next} is currently just a black buffer
-                result = fread(gapBuffer, sizeof(unsigned char), (size_t) gap, fileStreamIn);
-                FILTER_ASSERT(result == gap, "Error reading line gap.\n")
-            }
-        }
-
-        // Swap lines.
-        // {next} doesn't have to be cleared
-        // since its contents are going to be overwritten anyway
-
-        unsigned char *tmp = previous;
-        previous = current;
-        current = next;
-        next = tmp;
-    }
-
-    if (gap != 0)
-    {
-        free(gapBuffer);
-    }
-
-    free(previous);
-    free(current);
-    free(next);
-
-    return 0;
-}
-
-int applyGreyen(BITMAPINFOHEADER *infoHeader, FILE *fileStreamIn, FILE *fileStreamOut, int platform)
-{
-    int result;
-    size_t bytesPerPixel = (size_t) infoHeader->biBitCount / 8;
-    size_t rowSize = (size_t) (infoHeader->biBitCount * infoHeader->biWidth + 31) / 32 * 4;
-
-    // In this method we can merge {gapBuffer} with {line}
-
-    unsigned char *line = malloc(sizeof(unsigned char) * rowSize);
-
-    // Apply filter to lines
-
-    for (int i = 0; i < infoHeader->biHeight; i++)
-    {
-        result = fread(line, sizeof(unsigned char), rowSize, fileStreamIn);
-        if (result != rowSize)
-        {
-            printf("Error reading line.\n");
-            free(line);
-            return 1;
-        }
-
-        // Modify line in-place
-
-        int j = 0;
-        while (j < bytesPerPixel * infoHeader->biWidth)
-        {
-            // Keep alpha channel
-            if (bytesPerPixel == 4 && platform == LITTLE_ENDIAN)
-            {
-                j++;
-            }
-
-            double newValue = 0;
-
-            if (platform == BIG_ENDIAN)
-            {
-                newValue =
-                        LUMINANCE_RED * line[j] +
-                        LUMINANCE_GREEN * line[j + 1] +
-                        LUMINANCE_BLUE * line[j + 2];
-            }
-            else
-            {
-                newValue =
-                        LUMINANCE_BLUE * line[j] +
-                        LUMINANCE_GREEN * line[j + 1] +
-                        LUMINANCE_RED * line[j + 2];
-            }
-
-            // This cast is always valid.
-            unsigned char newByte = (unsigned char) newValue;
-
-            line[j] = newByte;
-            line[j + 1] = newByte;
-            line[j + 2] = newByte;
-
-            // Keep alpha channel
-            if (bytesPerPixel == 4 && platform == BIG_ENDIAN)
-            {
-                j++;
-            }
-
-            j += 3;
-        }
-
-        // Save modification results. Gap bytes stay untouched.
-
-        result = fwrite(line, sizeof(unsigned char), rowSize, fileStreamOut);
-        if (result != rowSize)
-        {
-            printf("Error saving line.\n");
-            free(line);
-            return 1;
-        }
-    }
-
-    free(line);
-
-    return 0;
-}
-
-#endif
