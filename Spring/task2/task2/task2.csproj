@@ -76,5 +76,15 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\task2LibImpl\task2LibImpl.csproj">
+      <Project>{f38ac1ba-1859-47f3-9e00-70fad8f74682}</Project>
+      <Name>task2LibImpl</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\task2Lib\task2Lib.csproj">
+      <Project>{a3390f75-a2f2-48dc-aecd-346a9ceecf16}</Project>
+      <Name>task2Lib</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

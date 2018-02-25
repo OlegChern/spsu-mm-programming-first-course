@@ -6,9 +6,15 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "task2", "task2\task2.csproj", "{52E6C813-DA3F-423A-868C-4BFE202B5A12}"
 	ProjectSection(ProjectDependencies) = postProject
 		{A3390F75-A2F2-48DC-AECD-346A9CEECF16} = {A3390F75-A2F2-48DC-AECD-346A9CEECF16}
+		{F38AC1BA-1859-47F3-9E00-70FAD8F74682} = {F38AC1BA-1859-47F3-9E00-70FAD8F74682}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "task2Lib", "task2Lib\task2Lib.csproj", "{A3390F75-A2F2-48DC-AECD-346A9CEECF16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "task2LibImpl", "task2LibImpl\task2LibImpl.csproj", "{F38AC1BA-1859-47F3-9E00-70FAD8F74682}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A3390F75-A2F2-48DC-AECD-346A9CEECF16} = {A3390F75-A2F2-48DC-AECD-346A9CEECF16}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,6 +30,10 @@ Global
 		{A3390F75-A2F2-48DC-AECD-346A9CEECF16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3390F75-A2F2-48DC-AECD-346A9CEECF16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3390F75-A2F2-48DC-AECD-346A9CEECF16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F38AC1BA-1859-47F3-9E00-70FAD8F74682}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F38AC1BA-1859-47F3-9E00-70FAD8F74682}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F38AC1BA-1859-47F3-9E00-70FAD8F74682}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F38AC1BA-1859-47F3-9E00-70FAD8F74682}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
