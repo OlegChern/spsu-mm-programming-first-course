@@ -1,4 +1,6 @@
 Это ветка Глазырина Кирилла Максимовича, 171 группа.
 
-Я использую Visual Studio Community 2017.
+Я использую язык C#.
+
+IDE - Visual Studio Community 2017.
 
