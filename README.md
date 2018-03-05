@@ -2,5 +2,7 @@
 
 Я использую язык C#.
 
-IDE - Visual Studio Community 2017.
+Для создания решений 1-4 была использована IDE - Visual Studio Community 2017.
+
+Для остальных - JetBrains Rider 2017.3.1
 
