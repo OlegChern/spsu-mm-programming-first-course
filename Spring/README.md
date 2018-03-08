@@ -4,4 +4,4 @@
 
 Для остальных - JetBrains Rider 2017.3.1
 
-.NET Framework 4.6.1
+.NET Framework 4.7.1
