@@ -1,17 +1,18 @@
 ﻿using System;
 
-namespace task1
+namespace Task1
 {
-    internal sealed class BasicImage
+    sealed class BasicImage
     {
-        private byte[] data;
+        byte[] data;
 
-        private int width;
-        private int actualWidth;
+        int width;
+
+        int actualWidth;
         // Line length in bmp file is not equal to image width * 
-        private int height;
-        private uint offset;
-        private int bytesPerPixel;
+        int height;
+        uint offset;
+        int bytesPerPixel;
 
         /// <summary>
         /// Accesses pixel at [i, j]
@@ -59,11 +60,11 @@ namespace task1
         public BasicImage(byte[] data, BitMapFileHeader fileHeader, BitMapInfoHeader infoHeader)
         {
             Util.CheckSizes(fileHeader, infoHeader, data.Length);
-            width = infoHeader.biWidth;
-            actualWidth = ((infoHeader.biBitCount * width + 31) / 32) * 4;
-            height = infoHeader.biHeight;
-            offset = fileHeader.bfOffBits;
-            bytesPerPixel = infoHeader.biBitCount / 8;
+            width = infoHeader.BiWidth;
+            actualWidth = ((infoHeader.BiBitCount * width + 31) / 32) * 4;
+            height = infoHeader.BiHeight;
+            offset = fileHeader.BfOffBits;
+            bytesPerPixel = infoHeader.BiBitCount / 8;
             this.data = data;
         }
     }

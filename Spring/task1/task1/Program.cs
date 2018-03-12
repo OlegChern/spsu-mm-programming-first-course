@@ -1,48 +1,48 @@
-﻿/// Had to change quite a lot in my C code!
+﻿// Had to change quite a lot in my C code!
 
 using System;
 using System.IO;
 
-namespace task1
+namespace Task1
 {
-    class Program
+    static class Program
     {
         #region constants
 
-        const string about = "This is an utility that applies selected filter to selected .bmp image.\r\n"
-                           + "Arguments:\r\n"
-                           + "-i: path to file to be modified.\r\n"
-                           + "-o: path to desired destination of resulting image.\r\n"
-                           + "-f: filter to be applied.\npossible filters:\r\n"
-                           + "\tgauss\r\n"
-                           + "\tsobelx\r\n"
-                           + "\tsobely\r\n"
-                           + "\tgreyen\n";
+        const string About = "This is an utility that applies selected filter to selected .bmp image.\r\n"
+                             + "Arguments:\r\n"
+                             + "-i: path to file to be modified.\r\n"
+                             + "-o: path to desired destination of resulting image.\r\n"
+                             + "-f: filter to be applied.\npossible filters:\r\n"
+                             + "\tgauss\r\n"
+                             + "\tsobelx\r\n"
+                             + "\tsobely\r\n"
+                             + "\tgreyen\n";
 
-        const string gauss = "gauss";
-        const string sobelx = "sobelx";
-        const string sobely = "sobely";
-        const string greyen = "greyen";
+        const string Gauss = "gauss";
+        const string Sobelx = "sobelx";
+        const string Sobely = "sobely";
+        const string Greyen = "greyen";
 
-        readonly static double[][] gaussMatrix =
+        static readonly double[][] GaussMatrix =
         {
-            new double[] {1.0 / 16, 1.0 / 8, 1.0 / 16},
-            new double[] {1.0 / 8, 1.0 / 4, 1.0 / 8},
-            new double[] {1.0 / 16, 1.0 / 8, 1.0 / 16}
+            new[] {1.0 / 16, 1.0 / 8, 1.0 / 16},
+            new[] {1.0 / 8, 1.0 / 4, 1.0 / 8},
+            new[] {1.0 / 16, 1.0 / 8, 1.0 / 16}
         };
 
-        readonly static double[][] sobelxMatrix =
+        static readonly double[][] SobelxMatrix =
         {
-            new double[] {-3.0 / 32, 0, 3.0 / 32},
-            new double[] {-10.0 / 32, 0, 10.0 / 32},
-            new double[] {-3.0 / 32, 0, 3.0 / 32}
+            new[] {-3.0 / 32, 0, 3.0 / 32},
+            new[] {-10.0 / 32, 0, 10.0 / 32},
+            new[] {-3.0 / 32, 0, 3.0 / 32}
         };
 
-        readonly static double[][] sobelyMatrix =
+        static readonly double[][] SobelyMatrix =
         {
-            new double[] {-3.0 / 32, -10.0 / 32, -3.0 / 32},
-            new double[] {0, 0, 0},
-            new double[] {3.0 / 32, 10.0 / 32, 3.0 / 32}
+            new[] {-3.0 / 32, -10.0 / 32, -3.0 / 32},
+            new[] {0.0, 0.0, 0.0},
+            new[] {3.0 / 32, 10.0 / 32, 3.0 / 32}
         };
 
         #endregion
@@ -51,8 +51,7 @@ namespace task1
         {
             if (args.Length == 0)
             {
-                Console.WriteLine(about);
-                Console.ReadKey();
+                Console.WriteLine(About);
                 return;
             }
 
@@ -64,38 +63,34 @@ namespace task1
                 Util.HandleBitMapInfoHeader(bytes, out var infoHeader);
 
                 var newBytes = new byte[bytes.Length];
-                Util.CopyHeader(bytes, newBytes, fileHeader.bfOffBits);
-                if (filter == gauss)
+                Util.CopyHeader(bytes, newBytes, fileHeader.BfOffBits);
+                switch (filter)
                 {
-                    Util.ApplyKernel(bytes, newBytes, gaussMatrix, fileHeader, infoHeader);
+                    case Gauss:
+                        Util.ApplyKernel(bytes, newBytes, GaussMatrix, fileHeader, infoHeader);
+                        break;
+                    case Sobelx:
+                        Util.ApplyKernel(bytes, newBytes, SobelxMatrix, fileHeader, infoHeader);
+                        break;
+                    case Sobely:
+                        Util.ApplyKernel(bytes, newBytes, SobelyMatrix, fileHeader, infoHeader);
+                        break;
+                    case Greyen:
+                        Util.ApplyGreyen(bytes, newBytes, fileHeader, infoHeader);
+                        break;
+                    default:
+                        throw new ArgumentException($"Error: unknown filter type: \"{filter}\"");
                 }
-                else if (filter == sobelx)
-                {
-                    Util.ApplyKernel(bytes, newBytes, sobelxMatrix, fileHeader, infoHeader);
-                }
-                else if (filter == sobely)
-                {
-                    Util.ApplyKernel(bytes, newBytes, sobelyMatrix, fileHeader, infoHeader);
-                }
-                else if (filter == greyen)
-                {
-                    Util.ApplyGreyen(bytes, newBytes, fileHeader, infoHeader);
-                }
-                else
-                {
-                    throw new ArgumentException($"Error: unknown filter type: \"{filter}\"");
-                }
-                File.WriteAllBytes(destination, newBytes);
 
+                File.WriteAllBytes(destination, newBytes);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                Console.ReadKey();
                 return;
             }
+
             Console.WriteLine("Done.");
-            Console.ReadKey();
         }
     }
 }
