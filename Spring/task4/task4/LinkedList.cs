@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace task4
+namespace Task4
 {
     class LinkedList<T> : ILinkedList<T> where T: IComparable
     {

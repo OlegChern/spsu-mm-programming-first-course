@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace task4
+namespace Task4
 {
     /// <summary>
     /// This exception is thrown

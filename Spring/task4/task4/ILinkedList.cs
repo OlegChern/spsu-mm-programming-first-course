@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace task4
+namespace Task4
 {
     interface ILinkedList<T> : IEnumerable<T> where T: IComparable
     {
