@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace task3
+namespace Task3
 {
     class Program
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace task3
+namespace Task3
 {
     abstract class AbstractPlayer
     {

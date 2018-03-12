@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace task3
+namespace Task3
 {
     /**
      * Bot that behaves similarly to dealer:

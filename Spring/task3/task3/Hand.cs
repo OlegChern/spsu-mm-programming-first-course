@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace task3
+namespace Task3
 {
     class Hand
     {

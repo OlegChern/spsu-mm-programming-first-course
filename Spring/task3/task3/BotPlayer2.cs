@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace task3
+namespace Task3
 {
     class BotPlayer2 : AbstractPlayer
     {

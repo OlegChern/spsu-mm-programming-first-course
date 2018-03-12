@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace task3
+namespace Task3
 {
     class HumanPlayer : AbstractPlayer
     {
@@ -26,7 +26,7 @@ namespace task3
             }
             Console.WriteLine("Please, choose action.");
             string input = Console.ReadLine();
-            if (!int.TryParse(input, out int intResult)
+            if (!int.TryParse(input, out int _)
                 && Enum.TryParse<Action>(input, true, out var humanChoice)
                 && actions.Contains(humanChoice))
             {
@@ -41,12 +41,10 @@ namespace task3
             Console.WriteLine("Your turn to make bet.");
             Console.WriteLine($"Your money: {Money}$.");
 
-            bool result = false;
-            uint initialBet = 0;
             do
             {
                 Console.Write("Please, enter your initial bet: ");
-                result = UInt32.TryParse(Console.ReadLine(), out initialBet);
+                bool result = uint.TryParse(Console.ReadLine(), out uint initialBet);
                 if (!result)
                 {
                     Console.Write("Error: not a number. ");
@@ -55,6 +53,12 @@ namespace task3
                 if (initialBet > Money)
                 {
                     Console.Write("Error: not enough money. ");
+                    continue;
+                }
+
+                if (initialBet <= 0)
+                {
+                    Console.Write("Error: sum too small. ");
                     continue;
                 }
                 // Console.WriteLine($"You bet {initialBet}$");

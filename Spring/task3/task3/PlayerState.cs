@@ -1,4 +1,4 @@
-﻿namespace task3
+﻿namespace Task3
 {
     enum PlayerState
     {
