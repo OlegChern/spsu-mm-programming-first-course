@@ -1,18 +1,18 @@
-﻿using static task2Lib.Util;
+﻿using static Task2Lib.Util;
 
-namespace task2Lib
+namespace Task2Lib
 {
     public abstract class AbstractTank
     {
-        public string Name { get; }
-        public string Manufacturer { get; }
-        public double Mass { get; } // tons
-        public double Width { get; } // meters
-        public double Length { get; } // meters
-        public double MainCaliber { get; } // mm
-        public int MaxSpeed { get; } // km/h
+        string Name { get; }
+        string Manufacturer { get; }
+        double Mass { get; } // tons
+        double Width { get; } // meters
+        double Length { get; } // meters
+        double MainCaliber { get; } // mm
+        int MaxSpeed { get; } // km/h
 
-        public AbstractTank(string name, string manufacturer, double mass, double width, double length, double mainCaliber, int maxSpeed)
+        protected AbstractTank(string name, string manufacturer, double mass, double width, double length, double mainCaliber, int maxSpeed)
         {
             Name = name;
             Manufacturer = manufacturer;
@@ -23,12 +23,12 @@ namespace task2Lib
             MaxSpeed = maxSpeed;
         }
 
-        public virtual string GetFullInfo() => $"Name: {Name}{n}" +
-            $"Manufacturer: {Manufacturer}{n}" +
-            $"Mass: {Mass} tons{n}" +
-            $"Width: {Width} m{n}" +
-            $"Length: {Length} m{n}" +
-            $"Main gun caliber: {MainCaliber} mm{n}" +
-            $"Max speed: {MaxSpeed} km/h{n}";
+        public virtual string GetFullInfo() => $"Name: {Name}{N}" +
+            $"Manufacturer: {Manufacturer}{N}" +
+            $"Mass: {Mass} tons{N}" +
+            $"Width: {Width} m{N}" +
+            $"Length: {Length} m{N}" +
+            $"Main gun caliber: {MainCaliber} mm{N}" +
+            $"Max speed: {MaxSpeed} km/h{N}";
     }
 }

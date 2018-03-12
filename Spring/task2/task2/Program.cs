@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using task2Lib;
-using task2LibImpl;
+using Task2Lib;
+using Task2LibImpl;
 
-namespace task2
+namespace Task2
 {
-    class Program
+    static class Program
     {
         static void Main()
         {

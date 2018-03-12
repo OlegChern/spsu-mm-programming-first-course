@@ -1,12 +1,12 @@
-﻿using task2Lib;
+﻿using Task2Lib;
 
-using static task2Lib.Util;
+using static Task2Lib.Util;
 
-namespace task2LibImpl
+namespace Task2LibImpl
 {
     public class Sprut : AbstractTank
     {
-        public double MachineGun { get; }
+        double MachineGun { get; }
 
         public Sprut():
             base("Sprut-SD", "Russia", 18, 3.1, 9.7, 125, 70)
@@ -16,6 +16,6 @@ namespace task2LibImpl
 
         public override string GetFullInfo() =>
             base.GetFullInfo() +
-            $"Machine gun calber: {MachineGun} mm{n}";
+            $"Machine gun calber: {MachineGun} mm{N}";
     }
 }

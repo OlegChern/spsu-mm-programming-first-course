@@ -1,6 +1,6 @@
-﻿using task2Lib;
+﻿using Task2Lib;
 
-namespace task2LibImpl
+namespace Task2LibImpl
 {
     public class CustomTank : AbstractTank
     {

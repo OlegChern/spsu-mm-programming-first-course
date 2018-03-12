@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace task2Lib
+namespace Task2Lib
 {
     public static class Util
     {
-        public static string n = Environment.NewLine;
+        public static readonly string N = Environment.NewLine;
     }
 }
