@@ -8,17 +8,17 @@ namespace HomeworkTask01
 		{
 			try
 			{
-				if (args.Length < 4)
+				if (args.Length < 3)
 				{
 					throw new ArgumentException("Not enough arguments!");
 				}
 
 				try
 				{
-					BMP bmp = new BMP(args[1]);
+					BMP bmp = new BMP(args[0]);
 					BMPFilters.Type type;
 
-					switch (args[2])
+					switch (args[1])
 					{
 						case "Gauss":
 							{
@@ -53,7 +53,7 @@ namespace HomeworkTask01
 
 					BMPFilters.ProcessBMP(bmp, type);
 
-					bmp.Create(args[3]);
+					bmp.Create(args[2]);
 				}
 				catch (ArgumentException exception)
 				{
@@ -79,7 +79,7 @@ namespace HomeworkTask01
 			Console.WriteLine("- GrayScale");
 			Console.WriteLine("- Average");
 
-			string str = " " + Console.ReadLine();
+			string str = Console.ReadLine();
 			string[] words = str.Split(' ');
 
 			Main(words);
