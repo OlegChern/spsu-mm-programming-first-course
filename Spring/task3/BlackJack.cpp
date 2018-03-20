@@ -20,6 +20,7 @@ public:
         deck = new CardDeck(NUMBER_OF_DECKS);
     }
     ~BlackJack(){}
+    
     void Round(T* Bot)
     {
         int sol_1 = 1;
@@ -67,6 +68,7 @@ public:
             }
         }
     }
+    
     void Game(T* Bot, int numOfRounds)
     {
         for (int i = 0; i < numOfRounds; i++)
@@ -76,4 +78,5 @@ public:
             Casino.refill();
         }
     }
+    
 };
