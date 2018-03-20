@@ -1,4 +1,5 @@
 #pragma once
+
 class Cards
 {
 protected:
@@ -15,6 +16,7 @@ public:
         refill();
     }
     ~CardDeck(){}
+    
     pair <int, int> GiveCard()
     {
         pair <int, int> card;
@@ -32,6 +34,7 @@ public:
         }
         return card;
     }
+    
     void refill()
     {
         for (int i = 0; i < 13; i++)
@@ -42,4 +45,5 @@ public:
             }
         }
     }
+    
 };
