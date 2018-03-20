@@ -53,6 +53,7 @@ namespace IceCreamLib
         public override void GetInfo()
         {
             base.GetInfo();
+
             Console.WriteLine("Topping: {0}", Topping);
             Console.WriteLine("NumperOfBalls: {0}", NumberOfBalls);
         }
