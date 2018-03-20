@@ -10,10 +10,12 @@ public:
         refill();
     }
     ~Member(){}
+    
     int getCount()
     {
         return count;
     }
+    
     void refill()
     {
         for (int i = 0; i < 13; i++)
@@ -26,6 +28,7 @@ public:
         count = 0;
         countOfTakenCards = 0;
     }
+    
     void TakeCard(CardDeck* deck)
     {
         pair <int, int> card = deck->GiveCard();
@@ -68,14 +71,17 @@ public:
         cash = money;
     }
     ~Player(){}
+    
     void changeCash(int money)
     {
         cash += money;
     }
+    
     int showCash()
     {
         return cash;
     }
+    
 };
 
 
@@ -85,6 +91,7 @@ class SillyBot : public Player
 public:
     SillyBot(int money = START_CASH) : Player(money){}
     ~SillyBot(){}
+    
     int MakeDecision()
     {
         if (count <= 11 || (countOfTakenCards == 2 && (condition[13][0] > 0 || condition[13][1] > 0 || condition[13][2] > 0 || condition[13][3] > 0)))
@@ -96,11 +103,13 @@ public:
             return 0;
         }
     }
+    
     int PlaceBet()
     {
         cash -= MEDIUM_BET;
         return MEDIUM_BET;
     }
+    
 };
 
 class CleverBot : public Player
@@ -112,6 +121,7 @@ public:
         CheatCount = 0;
     }
     ~CleverBot(){}
+    
     int MakeDecision()
     {
         for (int i = 0; i < 13; i++)
@@ -144,6 +154,7 @@ public:
             return 0;
         }
     }
+    
     int PlaceBet()
     {
         if (CheatCount >= 0)
@@ -157,4 +168,5 @@ public:
             return LOW_BET;
         }
     }
+    
 };
