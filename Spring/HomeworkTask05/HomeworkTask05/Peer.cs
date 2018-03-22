@@ -17,8 +17,9 @@ namespace Chat
 
 		#region private properties
 		private string name;
+		private bool isRunning;
 
-		private Socket receiver;
+		//private Socket receiver;
 		private Thread receivingThread;
 
 		private List<IPEndPoint> connectedEp = new List<IPEndPoint>();
@@ -30,26 +31,233 @@ namespace Chat
 		/// </summary>
 		public Peer()
 		{
-			InitPeer();
-		}
-		#endregion
-
-		#region initialization methods
-		private void InitPeer()
-		{
 			ReadName();
-			ReadIP();
+		}
+
+		public void Start()
+		{
+			isRunning = true;
 
 			SendMessage(name + " connected.");
 
 			InitReceiver();
 			Send();
 		}
+		#endregion
+
+		// todo
+		#region main methods
+		private void InitReceiver()
+		{
+			// additional thread for receiving messages
+			receivingThread = new Thread(new ThreadStart(Receive));
+			receivingThread.IsBackground = true;
+			receivingThread.Start();
+		}
+
+		private void Receive()
+		{
+			Socket receiver = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+			try
+			{
+				// get local end point
+				IPEndPoint localEp = null;
+				IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+
+				foreach (IPAddress ip in ipHostInfo.AddressList)
+				{
+					if (ip.AddressFamily == AddressFamily.InterNetwork)
+					{
+						localEp = new IPEndPoint(ip, port);
+						break;
+					}
+				}
+
+				if (localEp == null)
+				{
+					byte[] byteIp = { 192, 168, 0, 1 };
+					localEp = new IPEndPoint(new IPAddress(byteIp), port);
+				}
+
+				receiver.Bind(localEp);
+				receiver.Listen(16);
+
+				// data array always has same length
+				byte[] data = new byte[MessageLength];
+
+				while (isRunning)
+				{
+					// wait for incoming message
+					using (Socket handler = receiver.Accept())
+					{
+						string message = string.Empty;
+
+						do
+						{
+							int length = handler.Receive(data, MessageLength, SocketFlags.None);
+							message += Encoding.ASCII.GetString(data, 0, length);
+						}
+						while (handler.Available > 0);
+
+						Console.WriteLine(message);
+
+						handler.Close();
+						handler.Shutdown(SocketShutdown.Both);
+					}
+				}
+
+				receiver.Shutdown(SocketShutdown.Both);
+				receiver.Close();
+
+				receiver.Dispose();
+			}
+			catch (SocketException exception)
+			{
+				Console.WriteLine("> Receiver SocketException: " + exception.Message);
+				Console.ReadKey();
+			}
+			catch (Exception exception)
+			{
+				Console.WriteLine("> Exception: " + exception.Message);
+				Console.ReadKey();
+			}
+			finally
+			{
+				if (receiver != null)
+				{
+					if (receiver.Connected)
+					{
+						receiver.Shutdown(SocketShutdown.Both);
+						receiver.Close();
+					}
+
+					receiver.Dispose();
+				}
+			}
+		}
+
+		// sending loop
+		private void Send()
+		{
+			while (isRunning)
+			{
+				// read message from console
+				string message = Console.ReadLine();
+
+				if (message.Length != 0)
+				{
+					// commands
+					if (message[0] == '/')
+					{
+						if (message[1] == 'q')
+						{
+							Quit();
+						}
+						else if (message[1] == 'c')
+						{
+							ProcessIP(message);
+						}
+					}
+					else
+					{
+						// format message before sending
+						message = name + ": " + message;
+
+						// local print
+						// Console.WriteLine(message);
+
+						// send to other peers
+						SendMessage(message);
+					}
+				}
+			}
+		}
+
+		private void SendMessage(string message)
+		{
+			try
+			{
+				byte[] data = Encoding.ASCII.GetBytes(message);
+
+				// send data for each socket
+				foreach (IPEndPoint ep in connectedEp)
+				{
+					using (Socket sender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+					{
+						// connect to endpoint
+						sender.Connect(ep);
+
+						// convert and send data to it
+						sender.Send(data);
+
+						sender.Shutdown(SocketShutdown.Both);
+						sender.Close();
+					}
+				}
+
+			}
+			catch (SocketException exception)
+			{
+				Console.WriteLine("> Sender SocketException: " + exception.Message);
+				Console.ReadKey();
+			}
+			catch (Exception exception)
+			{
+				Console.WriteLine("> Exception: " + exception.Message);
+				Console.ReadKey();
+			}
+			/*finally
+			{
+				Free();
+			}*/
+		}
+		#endregion
+
+		#region additional
+		private void ReadName()
+		{
+			while (true)
+			{
+				Console.Write("> Enter username: ");
+
+				bool success = true;
+
+				string temp = Console.ReadLine();
+				name = string.Empty;
+
+				foreach (char c in temp)
+				{
+					if ((c < '0' || c > '9') && (c < 'A' || c > 'Z') && (c < 'a' || c > 'z'))
+					{
+						Console.WriteLine("> Username must contain only symbols: a-z, A-Z, 0-9!");
+						success = false;
+
+						break;
+					}
+
+					name += c;
+				}
+
+				if (!success)
+				{
+					break;
+				}
+
+				if (name.Length > 2)
+				{
+					break;
+				}
+				else
+				{
+					Console.WriteLine("> Username must contain more than 2 symbols!");
+				}
+			}
+		}
 
 		// connect to peer with given ip address
-		private void Connect(string ipString)
+		private void Connect(IPAddress ip)
 		{
-			IPAddress ip = IPAddress.Parse(ipString);
 			IPEndPoint remoteEp = new IPEndPoint(ip, port);
 
 			// make sure that there is no same endpoint
@@ -68,242 +276,62 @@ namespace Chat
 				connectedEp.Add(remoteEp);
 			}
 
-			// to do: 
+			// todo: 
 			// must receive all IPs from peer we are connecting to,
 			// connect to them and add local peer to their lists
 		}
 
-		private void InitReceiver()
+		private void ProcessIP(string rawMessage)
 		{
-			receiver = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+			string ipString;
+			string[] splitted = rawMessage.Split(' ');
 
-			// additional thread for receiving messages
-			receivingThread = new Thread(new ThreadStart(Receive));
-			receivingThread.IsBackground = true;
-			receivingThread.Start();
-		}
-		#endregion
-
-		#region receiving and sending
-		private void Receive()
-		{
-			try
+			if (splitted.Length < 2)
 			{
-				// get local end point
-				IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+				Console.WriteLine("> Not enough arguments!");
+				return;
+			}
 
-				// just init
-				byte[] byteIp = { 192, 168, 0, 1 };
-				IPEndPoint localEp = new IPEndPoint(new IPAddress(byteIp), port);
+			// assume that after space will be ip
+			ipString = splitted[1];
 
-				// actual ip
-				foreach (IPAddress ip in ipHostInfo.AddressList)
+			string temp = string.Empty;
+			int dots = 0;
+
+			foreach (char c in ipString)
+			{
+				if (c >= '0' && c <= '9')
 				{
-					if (ip.AddressFamily == AddressFamily.InterNetwork)
-					{
-						localEp = new IPEndPoint(ip, port);
-						break;
-					}
+					temp += c;
 				}
-
-				receiver.Bind(localEp);
-				receiver.Listen(16);
-
-				// data array always has same length
-				byte[] data = new byte[MessageLength];
-
-				while (true)
+				else if (c == '.' || c == ',') // c == ' ' ||
 				{
-					// wait for incoming message
-					Socket handler = receiver.Accept();
-
-					string message = string.Empty;
-
-					do
-					{
-						int length = handler.Receive(data, MessageLength, SocketFlags.None);
-						message += Encoding.ASCII.GetString(data, 0, length);
-					}
-					while (handler.Available > 0);
-
-					Console.WriteLine(message);
-
-					handler.Close();
-					handler.Shutdown(SocketShutdown.Both);
-				}
-
-			}
-			catch (SocketException exception)
-			{
-				Console.WriteLine("> Receiver SocketException: " + exception.Message);
-			}
-			catch (Exception exception)
-			{
-				Console.WriteLine("> Exception: " + exception.Message);
-				Console.ReadKey();
-			}
-		}
-
-		private void Send()
-		{
-			// read message from console
-			string message = Console.ReadLine();
-
-			
-			// exit code
-			if (message == "/q" || message == "/quit")
-			{
-				Quit();
-				message = string.Empty;
-			}
-
-			if (message.Length != 0)
-			{
-				// format message before sending
-				message = name + ": " + message;
-
-				// local print
-				Console.WriteLine(message);
-
-				// send to other peers
-				SendMessage(message);
-			}
-
-			// sending loop
-			Send();
-		}
-
-		private void SendMessage(string message)
-		{
-			try
-			{
-				// send data for each socket
-				foreach (IPEndPoint ep in connectedEp)
-				{
-					using (Socket sender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
-					{
-						// connect to endpoint
-						sender.Connect(ep);
-
-						// convert and send data to it
-						byte[] data = Encoding.ASCII.GetBytes(message);
-						sender.Send(data);
-
-						sender.Shutdown(SocketShutdown.Both);
-						sender.Close();
-					}
-				}
-
-			}
-			catch (SocketException exception)
-			{
-				Console.WriteLine("> Sender SocketException: " + exception.Message);
-			}
-			catch (Exception exception)
-			{
-				Console.WriteLine("> Exception: " + exception.Message);
-				Console.ReadKey();
-			}
-		}
-		#endregion
-
-		#region additional
-		private void ReadName()
-		{
-			while (true)
-			{
-				Console.Write("Enter username: ");
-				name = string.Empty;
-
-				string temp = Console.ReadLine();
-
-				foreach (char c in temp)
-				{
-					if ((c < '0' || c > '9') && (c < 'A' || c > 'Z') && (c < 'a' || c > 'z'))
-					{
-						Console.WriteLine("Username must contain only symbols: a-z, A-Z, 0-9!");
-						name = string.Empty;
-
-						break;
-					}
-
-					name += c;
-				}
-
-				if (name.Length > 2)
-				{
-					break;
+					temp += '.';
+					dots++;
 				}
 				else
 				{
-					Console.WriteLine("Username must contain more than 2 symbols!");
-				}
-			}
-		}
+					Console.WriteLine("> IP must contain only symbols: 0-9, ':', '.'!");
+					dots = 0;
 
-		private void ReadIP()
-		{
-			string ip = string.Empty;
-
-			while (true)
-			{
-				Console.Write("Connect to exact IP? Y / N: ");
-				string str = Console.ReadLine();
-
-				if (str == "N" || str == "n")
-				{
 					return;
 				}
-				else if (str != "Y" && str != "y")
-				{
-					continue;
-				}
+			}
 
-				Console.Write("Enter IP to connect: ");
+			if (dots != 3)
+			{
+				Console.WriteLine("> IP must have 4 32-bit numbers!");
+				return;
+			}
 
-				string temp = Console.ReadLine();
-				int dots = 0;
-
-				foreach (char c in temp)
-				{
-					if (c >= '0' && c <= '9')
-					{
-						ip += c;
-					}
-					else if (c == '.' || c == ' ' || c == ',')
-					{
-						ip += '.';
-						dots++;
-					}
-					else
-					{
-						Console.WriteLine("IP must contain only symbols: 0-9, ':', '.'!");
-						dots = 0;
-
-						break;
-					}
-				}
-
-				if (dots != 3)
-				{
-					Console.WriteLine("IP must have 4 32-bit numbers!");
-					continue;
-				}
-
-				IPAddress test;
-				if (IPAddress.TryParse(ip, out test))
-				{
-					break;
-				}
-				else
-				{
-					Console.WriteLine("Wrong IP!");
-					continue;
-				}
+			IPAddress ip;
+			if (!IPAddress.TryParse(temp, out ip))
+			{
+				Console.WriteLine("> Wrong IP!");
+				return;
 			}
 
 			Console.WriteLine();
-
 			Connect(ip);
 		}
 
@@ -311,7 +339,7 @@ namespace Chat
 		{
 			while (true)
 			{
-				Console.Write("Do you want to quit? Y / N: ");
+				Console.Write("> Do you want to quit? Y / N: ");
 				string str = Console.ReadLine();
 
 				if (str == "Y" || str == "y")
@@ -328,10 +356,7 @@ namespace Chat
 
 		private void Free()
 		{
-			receiver.Shutdown(SocketShutdown.Both);
-			receiver.Close();
-
-			receiver.Dispose();
+			isRunning = false;
 		}
 		#endregion
 

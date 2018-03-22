@@ -7,6 +7,7 @@ namespace Chat
 		static void Main(string[] args)
 		{
 			Peer localPeer = new Peer();
+			localPeer.Start();
 		}
 	}
 }
