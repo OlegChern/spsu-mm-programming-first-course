@@ -45,7 +45,6 @@ namespace Chat
 		}
 		#endregion
 
-		// todo
 		#region main methods 
 		private void InitReceiver()
 		{
@@ -102,8 +101,8 @@ namespace Chat
 
 						Console.WriteLine(message);
 
-						handler.Close();
 						handler.Shutdown(SocketShutdown.Both);
+						handler.Close();
 					}
 				}
 
@@ -119,7 +118,7 @@ namespace Chat
 			}
 			catch (Exception exception)
 			{
-				Console.WriteLine("> Exception: " + exception.Message);
+				Console.WriteLine("> Receiver Exception: " + exception.Message);
 				Console.ReadKey();
 			}
 			finally
@@ -142,6 +141,10 @@ namespace Chat
 		{
 			while (isRunning)
 			{
+				// local print
+				string format = name + ": ";
+				// Console.Write(format);
+
 				// read message from console
 				string message = Console.ReadLine();
 
@@ -162,10 +165,7 @@ namespace Chat
 					else
 					{
 						// format message before sending
-						message = name + ": " + message;
-
-						// local print
-						// Console.WriteLine(message);
+						message = format + message;
 
 						// send to other peers
 						SendMessage(message);
@@ -204,7 +204,7 @@ namespace Chat
 			}
 			catch (Exception exception)
 			{
-				Console.WriteLine("> Exception: " + exception.Message);
+				Console.WriteLine("> Sender Exception: " + exception.Message);
 				Console.ReadKey();
 			}
 			/*finally
