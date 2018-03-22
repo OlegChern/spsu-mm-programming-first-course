@@ -4,7 +4,7 @@ namespace Chat
 {
 	class Program
 	{
-		static void Main(string[] args)
+		static void Main()
 		{
 			Peer localPeer = new Peer();
 			localPeer.Start();

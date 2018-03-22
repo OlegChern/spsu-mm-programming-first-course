@@ -46,7 +46,7 @@ namespace Chat
 		#endregion
 
 		// todo
-		#region main methods
+		#region main methods 
 		private void InitReceiver()
 		{
 			// additional thread for receiving messages
