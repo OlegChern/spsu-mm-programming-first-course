@@ -4,15 +4,15 @@ using System.Linq;
 
 namespace Task3
 {
-    class Program
+    static class Program
     {
-        public const uint InitialMoney = 100;
-        public const uint MaxPlayers = 10;
+        const uint InitialMoney = 100;
+        const uint MaxPlayers = 10;
 
-        public static void PressAnyKey()
+        static void PressAnyKey()
         {
             Console.Write("Press any key to continue...");
-            var key = Console.ReadKey();
+            Console.ReadKey();
             int currentLineCursor = Console.CursorTop;
             Console.SetCursorPosition(0, Console.CursorTop);
             Console.Write(new string(' ', Console.WindowWidth));
@@ -55,6 +55,8 @@ namespace Task3
                         number = CountTypes<BotPlayer2>(players);
                         players.Add(new BotPlayer2(InitialMoney, $"Bot 2{(number == 0 ? "" : $" #{number + 1}")}"));
                         break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
 
@@ -67,17 +69,9 @@ namespace Task3
             Console.ReadKey();
         }
 
-        static int CountTypes<T>(List<AbstractPlayer> players) where T : AbstractPlayer
+        static int CountTypes<T>(IEnumerable<AbstractPlayer> players) where T : AbstractPlayer
         {
-            int result = 0;
-            foreach (var player in players)
-            {
-                if (player is T)
-                {
-                    result++;
-                }
-            }
-            return result;
+            return players.OfType<T>().Count();
         }
 
         static uint GetPlayerCount()
@@ -95,22 +89,21 @@ namespace Task3
         {
             Console.Write(message);
             string s = Console.ReadLine();
-            if (s[0] == 'Y' || s[0] == 'y')
+            switch (s[0])
             {
-                return true;
-            }
-            else if (s[0] == 'N' || s[0] == 'n')
-            {
-                return false;
-            }
-            else
-            {
-                Console.Write("Error. ");
-                return Confirm(message);
+                case 'Y':
+                case 'y':
+                    return true;
+                case 'N':
+                case 'n':
+                    return false;
+                default:
+                    Console.Write("Error. ");
+                    return Confirm(message);
             }
         }
 
-        static void Round(List<AbstractPlayer> players, List<Card> deck, int roundNumber, List<AbstractPlayer> lost)
+        static void Round(IList<AbstractPlayer> players, IList<Card> deck, int roundNumber, List<AbstractPlayer> lost)
         {
             int i = 0;
             while (i < players.Count)
@@ -156,14 +149,7 @@ namespace Task3
             i = 0;
             while (i < hands.Count)
             {
-                if (hands[i].Owner.Name == "You")
-                {
-                    Console.WriteLine("Your turn!");
-                }
-                else
-                {
-                    Console.WriteLine($"Turn of {hands[i].Owner.Name}.");
-                }
+                Console.WriteLine(hands[i].Owner.Name == "You" ? "Your turn!" : $"Turn of {hands[i].Owner.Name}.");
                 if (!PerformActions(hands, deck, i, dealer))
                 {
                     hands.RemoveAt(i);
@@ -191,14 +177,14 @@ namespace Task3
                 {
                     if (Card.GetScore(hand.Cards) == 21 && hand.Cards.Count == 2)
                     {
-                        Console.WriteLine("{0} {1} blackjack!", hand.Owner.Name, hand.Owner.Name == "You" ? "have" : "has");
-                        Console.WriteLine("{0} {1} repaid 3:2!", hand.Owner.Name, hand.Owner.Name == "You" ? "get" : "gets");
+                        Console.WriteLine($"{hand.Owner.Name} {(hand.Owner.Name == "You" ? "have" : "has")} blackjack!");
+                        Console.WriteLine($"{hand.Owner.Name} {(hand.Owner.Name == "You" ? "get" : "gets")} repaid 3:2!");
                         hand.Owner.GiveMoney((int)hand.InitialBet * 5 / 2);
                         Console.WriteLine();
                     }
                     else
                     {
-                        Console.WriteLine("{0} {1} repaid 1:1!", hand.Owner.Name, hand.Owner.Name == "You" ? "get" : "gets");
+                        Console.WriteLine($"{hand.Owner.Name} {(hand.Owner.Name == "You" ? "get" : "gets")} repaid 1:1!");
                         hand.Owner.GiveMoney((int)hand.InitialBet * 2);
                         Console.WriteLine();
                     }
@@ -213,22 +199,20 @@ namespace Task3
 
                     if (score == dealer.Score())
                     {
-                        Console.WriteLine("{0} {1} equal score with dealer. {2}$ bet is returned.",
-                            hand.Owner.Name, hand.Owner.Name == "You" ? "have" : "has",
-                            hand.InitialBet);
+                        Console.WriteLine($"{hand.Owner.Name} {(hand.Owner.Name == "You" ? "have" : "has")} equal score with dealer. {hand.InitialBet}$ bet is returned.");
                         hand.Owner.GiveMoney((int)hand.InitialBet);
                         Console.WriteLine();
                     }
                     else if (score > dealer.Score())
                     {
-                        Console.WriteLine("{0} {1} the dealer!", hand.Owner.Name, hand.Owner.Name == "You" ? "beat" : "beats");
-                        Console.WriteLine("{0} {1} repaid 1:1!", hand.Owner.Name, hand.Owner.Name == "You" ? "get" : "gets");
+                        Console.WriteLine($"{hand.Owner.Name} {(hand.Owner.Name == "You" ? "beat" : "beats")} the dealer!");
+                        Console.WriteLine($"{hand.Owner.Name} {(hand.Owner.Name == "You" ? "get" : "gets")} repaid 1:1!");
                         hand.Owner.GiveMoney((int)hand.InitialBet * 2);
                         Console.WriteLine();
                     }
                     else
                     {
-                        Console.WriteLine("{0} lost.", hand.Owner.Name);
+                        Console.WriteLine($"{hand.Owner.Name} lost.");
                         Console.WriteLine();
                     }
                 }
@@ -238,7 +222,7 @@ namespace Task3
             Round(players, deck, roundNumber + 1, lost);
         }
 
-        public static void WriteList<T>(List<T> list, string message = null)
+        static void WriteList<T>(IReadOnlyList<T> list, string message = null)
         {
             if (message != null)
             {
@@ -280,13 +264,15 @@ namespace Task3
                 Console.WriteLine();
                 return PlayerState.Won;
             }
-            if (Card.GetScore(hand.Cards) > 21)
+
+            if (Card.GetScore(hand.Cards) <= 21)
             {
-                Console.WriteLine("{0} {1} above 21... Bet removed.", hand.Owner.Name, hand.Owner.Name == "You" ? "are" : "is");
-                Console.WriteLine();
-                return PlayerState.Lost;
+                return PlayerState.Playing;
             }
-            return PlayerState.Playing;
+
+            Console.WriteLine("{0} {1} above 21... Bet removed.", hand.Owner.Name, hand.Owner.Name == "You" ? "are" : "is");
+            Console.WriteLine();
+            return PlayerState.Lost;
         }
 
         /// <summary>
@@ -295,7 +281,7 @@ namespace Task3
         /// <returns>
         /// Whether hand should stay in hands or not
         /// </returns>
-        static bool PerformActions(List<Hand> hands, List<Card> deck, int index, Dealer dealer)
+        static bool PerformActions(IList<Hand> hands, IList<Card> deck, int index, Dealer dealer)
         {
             AbstractPlayer.WriteCards(hands[index].Cards, "Current hand: ");
             Console.WriteLine($" (score: {Card.GetScore(hands[index].Cards)})");
@@ -309,6 +295,8 @@ namespace Task3
                     return false;
                 case PlayerState.BlackJack:
                     return true;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             var action = hands[index].Owner.ChooseAction(dealer, hands[index]);
@@ -353,11 +341,11 @@ namespace Task3
                     Console.WriteLine();
                     return false;
                 default:
-                    throw new NotImplementedException();
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
-        static void GiveCard(List<Hand> hands, List<Card> deck, int index)
+        static void GiveCard(IList<Hand> hands, IList<Card> deck, int index)
         {
             Console.WriteLine($"New card is {deck[0]}.");
             hands[index].Cards.Add(deck[0]);
@@ -365,7 +353,7 @@ namespace Task3
             // Console.WriteLine($"New Score is {Card.GetScore(hands[index].Cards)}.");
         }
 
-        static List<Hand> GetHands(List<AbstractPlayer> players, uint[] bets, List<Card> deck)
+        static List<Hand> GetHands(IList<AbstractPlayer> players, IReadOnlyList<uint> bets, IList<Card> deck)
         {
             var hands = new List<Hand>();
             for (int i = 0; i < players.Count; i++)
@@ -386,7 +374,7 @@ namespace Task3
             return hands;
         }
 
-        static uint[] GetInitialBets(List<AbstractPlayer> players)
+        static uint[] GetInitialBets(IList<AbstractPlayer> players)
         {
             uint[] bets = new uint[players.Count];
             for (int i = 0; i < players.Count; i++)

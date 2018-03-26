@@ -30,8 +30,8 @@ namespace Task3
 
     public struct Card
     {
-        public Suit suit;
-        public Value value;
+        Suit suit;
+        Value value;
 
         public override string ToString()
         {
@@ -51,7 +51,7 @@ namespace Task3
             return 10;
         }
 
-        public static uint GetScore(List<Card> list)
+        public static uint GetScore(IEnumerable<Card> list)
         {
             uint result = 0;
             uint aces = 0;
@@ -87,13 +87,7 @@ namespace Task3
             {
                 m = aces;
             }
-
-#if DEBUG
-            if (m < 0 || result + aces + m * 10 > 21)
-            {
-                throw new Exception("Error: unexpected code behaviour");
-            }
-#endif
+            
             return result + aces + m * 10;
         }
 
@@ -111,7 +105,7 @@ namespace Task3
             return list;
         }
 
-        private static List<Card> CreateDecks(uint decks)
+        static List<Card> CreateDecks(uint decks)
         {
             var list = new List<Card>();
             foreach (Suit suit in Enum.GetValues(typeof(Suit)))

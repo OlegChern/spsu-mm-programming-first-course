@@ -6,40 +6,42 @@ namespace Task3
 {
     class Dealer
     {
-        private List<Card> hand;
+        List<Card> Hand { get; }
 
         public Card FirstCard
         {
             get
             {
-                if (hand != null && hand.Any())
+                if (Hand != null && Hand.Any())
                 {
-                    return hand[0];
+                    return Hand[0];
                 }
                 throw new InvalidOperationException("Attempt to access first card before it has been given.");
             }
         }
 
-        public Dealer(List<Card> deck)
+        public Dealer(IList<Card> deck)
         {
-            hand = new List<Card>
+            Hand = new List<Card>
             {
                 deck[0]
             };
             deck.RemoveAt(0);
         }
 
-        public void TakeEnoughCards(List<Card> deck)
+        public void TakeEnoughCards(IList<Card> deck)
         {
-            if (Score() < 17)
+            if (Score() >= 17)
             {
-                hand.Add(deck[0]);
-                deck.RemoveAt(0);
-                TakeEnoughCards(deck);
+                return;
             }
+
+            Hand.Add(deck[0]);
+            deck.RemoveAt(0);
+            TakeEnoughCards(deck);
         }
 
-        public uint Score() => Card.GetScore(hand);
+        public uint Score() => Card.GetScore(Hand);
 
         public void WriteCards(string message = null)
         {
@@ -47,14 +49,14 @@ namespace Task3
             {
                 Console.Write(message);
             }
-            for (int i = 0; i < hand.Count; i++)
+            for (int i = 0; i < Hand.Count; i++)
             {
-                Console.Write(hand[i]);
-                if (i == hand.Count - 2)
+                Console.Write(Hand[i]);
+                if (i == Hand.Count - 2)
                 {
                     Console.Write(" and ");
                 }
-                else if (i != hand.Count - 1)
+                else if (i != Hand.Count - 1)
                 {
                     Console.Write(", ");
                 }

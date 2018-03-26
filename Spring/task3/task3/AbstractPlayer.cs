@@ -6,14 +6,14 @@ namespace Task3
     abstract class AbstractPlayer
     {
         // I'll just trust nothing goes wrong with that public setter...
-        public uint Money { get; set; }
+        public uint Money { get; protected set; }
         public string Name { get; }
 
         public abstract uint MakeInitialBet();
 
         public abstract Action ChooseAction(Dealer dealer, Hand hand);
 
-        public bool CanPerform(Action action, Hand hand)
+        bool CanPerform(Action action, Hand hand)
         {
             switch (action)
             {
@@ -27,11 +27,11 @@ namespace Task3
                 case Action.Surrender:
                     return hand.Cards.Count == 2;
                 default:
-                    throw new NotImplementedException();
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
-        public List<Action> GetPossibleActions(Hand hand)
+        protected List<Action> GetPossibleActions(Hand hand)
         {
             var list = new List<Action>();
             foreach (Action action in Enum.GetValues(typeof(Action)))
@@ -44,7 +44,7 @@ namespace Task3
             return list;
         }
 
-        public static void WriteCards(List<Card> hand, string message = null)
+        public static void WriteCards(IList<Card> hand, string message = null)
         {
             if (message != null)
             {
@@ -79,7 +79,7 @@ namespace Task3
             Console.WriteLine("{0} now {1} {2}$", Name, Name == "You" ? "have" : "has", Money);
         }
 
-        public AbstractPlayer(uint initialMoney, string name)
+        protected AbstractPlayer(uint initialMoney, string name)
         {
             Money = initialMoney;
             Name = name;

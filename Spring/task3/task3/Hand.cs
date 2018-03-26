@@ -2,11 +2,12 @@
 
 namespace Task3
 {
+    // I don't know whether it should be struct or not
     class Hand
     {
-        public AbstractPlayer Owner { get; private set; }
-        public List<Card> Cards { get; set; }
-        public uint InitialBet { get; private set; }
+        public AbstractPlayer Owner { get; }
+        public List<Card> Cards { get; }
+        public uint InitialBet { get; }
 
         public Hand(AbstractPlayer owner, List<Card> cards, uint initialBet)
         {
