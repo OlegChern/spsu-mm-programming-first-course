@@ -82,6 +82,8 @@ namespace Chat
                     if (ip.AddressFamily == AddressFamily.InterNetwork)
                     {
                         localEp = new IPEndPoint(ip, port);
+                        Console.WriteLine("Your IPv4: " + ip);
+
                         break;
                     }
                 }
@@ -130,6 +132,11 @@ namespace Chat
                                 }
                             case MessageType.IPRequest:
                                 {
+                                    IPEndPoint remoteEp = (IPEndPoint)handler.RemoteEndPoint;
+                                    IPAddress ip = remoteEp.Address;
+
+                                    Connect(ip);
+
                                     // send all connected endpoints to all peers
                                     foreach (IPEndPoint ep in connectedEp)
                                     {
@@ -202,12 +209,13 @@ namespace Chat
 		{
 			while (isRunning)
 			{
-				// local print
 				string format = name + ": ";
-				Console.Write(format);
 
-				// read message from console
-				string message = Console.ReadLine();
+                // local print
+                // Console.Write(format);
+
+                // read message from console
+                string message = Console.ReadLine();
 
 				if (message.Length > 1)
 				{
@@ -371,7 +379,7 @@ namespace Chat
 
 				if (!success)
 				{
-					break;
+					continue;
 				}
 
 				if (name.Length > 2)
