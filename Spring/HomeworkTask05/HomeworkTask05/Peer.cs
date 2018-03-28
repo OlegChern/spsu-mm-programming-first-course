@@ -159,7 +159,7 @@ namespace Chat
                                 {
                                     // get sender's endpoint and then disconnect it
                                     IPEndPoint remoteEp = (IPEndPoint)handler.RemoteEndPoint;
-                                    Disconnect(remoteEp);
+                                    Disconnect(remoteEp.Address);
 
                                     break;
                                 }
@@ -330,11 +330,17 @@ namespace Chat
             // make sure that there is no same endpoint
             if (connectedEp.Contains(ep))
             {
-                UserInterface.ShowMessage("> Already connected to " + ip);
+                if (showMesage)
+                {
+                    UserInterface.ShowMessage("> Already connected to " + ip);
+                }
             }
             else if (ip.ToString() == localEp.Address.ToString())
             {
-                UserInterface.ShowMessage("> Can't connect to yourself");
+                if (showMesage)
+                {
+                    UserInterface.ShowMessage("> Can't connect to yourself");
+                }
             }
             else
             {
@@ -342,16 +348,22 @@ namespace Chat
                 connectedEp.Add(ep);
                 SendIPRequest();
 
-                UserInterface.ShowMessage("> Connected to " + ip);
-                Send(name + " connected.", MessageType.Message);
+                if (showMesage)
+                {
+                    UserInterface.ShowMessage("> Connected to " + ip);
+                    Send(name + " connected.", MessageType.Message);
+                }
             }
         }
 
-        private void Disconnect(IPEndPoint ep)
+        private void Disconnect(IPAddress ip)
         {
-            if (connectedEp.Contains(ep) && ep != localEp)
+            IPEndPoint ep = new IPEndPoint(ip, port);
+
+            if (connectedEp.Contains(ep) && ip.ToString() != localEp.Address.ToString())
             {
                 connectedEp.Remove(ep);
+                UserInterface.ShowMessage("> " + ip.ToString() + " disconnected");
             }
         }
         #endregion
@@ -386,6 +398,8 @@ namespace Chat
                             {
                                 SendDisconnectRequest();
                                 connectedEp.Clear();
+
+                                UserInterface.ShowMessage("> Disconnected");
                                 break;
                             }
                         case 'q':
