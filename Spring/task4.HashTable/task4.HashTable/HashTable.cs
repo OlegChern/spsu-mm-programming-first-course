@@ -27,10 +27,10 @@ namespace task4.HashTable
 
         public void DeleteElement(int key)
         {
-            lists[HashFunction(key)].deleteElement(key);
+            lists[HashFunction(key)].DeleteElement(key);
         }
 
-        public T GetValueByKey(int key, ref bool wasFound) => (lists[HashFunction(key)].GetValueByKey(key, ref wasFound));
+        public T GetValueByKey(int key) => (lists[HashFunction(key)].GetValueByKey(key));
 
         public bool Contains(int key) => (lists[HashFunction(key)].Contains(key));
 

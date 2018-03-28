@@ -85,23 +85,21 @@ namespace task4.HashTable
             Length++;
         }
 
-        public T GetValueByKey(int key, ref bool wasFound)
+        public T GetValueByKey(int key)
         {
             ListElement temp = first;
             while(temp != null)
             {
                 if (temp.Key == key)
                 {
-                    wasFound = true;
                     return temp.Value;
                 }
                 temp = temp.Next;
             }
-            wasFound = false;
             return default(T);
         }
 
-        public void deleteElement(int key)
+        public void DeleteElement(int key)
         {
             while ((first != null) && (first.Key == key))
             {
@@ -123,9 +121,16 @@ namespace task4.HashTable
 
         public bool Contains(int key)
         {
-            bool contains = false;
-            GetValueByKey(key, ref contains);
-            return contains;
+            ListElement temp = first;
+            while (temp != null)
+            {
+                if (temp.Key == key)
+                {
+                    return true;
+                }
+                temp = temp.Next;
+            }
+            return false;
         }
 
         public void PrintList()

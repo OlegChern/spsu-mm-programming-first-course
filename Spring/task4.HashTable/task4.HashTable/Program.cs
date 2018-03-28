@@ -25,8 +25,7 @@ namespace task4.HashTable
             table.DeleteElement(77);
             bool temp2 = (!table.Contains(15) && !table.Contains(23));
 
-            bool tmp = false;
-            bool temp3 = (table.GetValueByKey(24, ref tmp) == 24);
+            bool temp3 = (table.GetValueByKey(24) == 24);
 
             bool temp4 = (table.Contains(3) && table.Contains(14)
                 && table.Contains(133) && table.Contains(24)
@@ -51,17 +50,37 @@ namespace task4.HashTable
             bool temp1 = (tableDouble.Contains(3) && tableDouble.Contains(4) 
                 && tableDouble.Contains(133) && !tableDouble.Contains(23));
 
-            bool tmp = false;
-            bool temp2 = (tableDouble.GetValueByKey(133, ref tmp) == 133.1);
+            bool temp2 = (tableDouble.GetValueByKey(133) == 133.1);
 
             tableDouble.DeleteTable();
 
             return (temp1 && temp2);
         }
 
+        private static bool TestString()
+        {
+            HashTable<string> tableString = new HashTable<string>(10);
+
+            tableString.AddElement("abc", 1);
+            tableString.AddElement("a", 2);
+            tableString.AddElement("qwerty", 3);
+            tableString.AddElement("Abc", 4);
+
+            tableString.DeleteElement(2);
+
+            bool temp1 = (tableString.Contains(3) && tableString.Contains(4)
+                && tableString.Contains(1) && !tableString.Contains(2));
+
+            bool temp2 = (tableString.GetValueByKey(3) == "qwerty");
+
+            tableString.DeleteTable();
+
+            return (temp1 && temp2);
+        }
+
         static void Main(string[] args)
         {
-            if(TestInt() && TestDouble())
+            if(TestInt() && TestDouble() && TestString())
             {
                 Console.WriteLine("Program works correctly");
             }
