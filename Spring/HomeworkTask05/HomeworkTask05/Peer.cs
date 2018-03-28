@@ -8,7 +8,7 @@ using System.Net.Sockets;
 
 namespace Chat
 {
-	public class Peer
+	class Peer
 	{
         #region enums
         public enum MessageType
@@ -16,18 +16,20 @@ namespace Chat
             Null = 0,
             Message = 1,
             IP = 2,
-            IPRequest
+            IPRequest = 3,
+            Disconnect = 4
         }
         #endregion
 
         #region constants
         private const int MessageLength = 256;
-		private const int port = 8151;
 		#endregion
 
 		#region private fields
 		private string name;
-		private bool isRunning;
+        private int port;
+
+        private bool isRunning;
 
 		private Thread receivingThread;
 
@@ -41,22 +43,27 @@ namespace Chat
 		/// </summary>
 		public Peer()
 		{
-			ReadName();
-		}
+            name = UserInterface.GetName();
+            port = UserInterface.GetPort();
+        }
 
-		public void Start()
+        /// <summary>
+        /// Startes sending and receiving
+        /// </summary>
+        public void Start()
 		{
 			isRunning = true;
 
-            Send(name + " connected.", MessageType.Message);
+            UserInterface.ShowMessage("> Peer started");
 
-			InitReceiver();
+            InitReceiver();
             InitSender();
 		}
 		#endregion
 
 		#region main methods 
-		private void InitReceiver()
+        #region receiving
+        private void InitReceiver()
 		{
 			// additional thread for receiving messages
 			receivingThread = new Thread(new ThreadStart(ReceiveLoop));
@@ -64,12 +71,6 @@ namespace Chat
 			receivingThread.Start();
 		}
 
-        private void InitSender()
-        {
-            SendLoop();
-        }
-
-        #region receiving
         private void ReceiveLoop()
 		{
 			Socket receiver = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -82,7 +83,7 @@ namespace Chat
                     if (ip.AddressFamily == AddressFamily.InterNetwork)
                     {
                         localEp = new IPEndPoint(ip, port);
-                        Console.WriteLine("Your IPv4: " + ip);
+                        UserInterface.ShowMessage("> Current IPv4: " + ip);
 
                         break;
                     }
@@ -127,17 +128,16 @@ namespace Chat
                         {
                             case MessageType.Message:
                                 {
-                                    Console.WriteLine(message);
+                                    UserInterface.ShowMessage(message);
                                     break;
                                 }
                             case MessageType.IPRequest:
                                 {
+                                    // connect to requester
                                     IPEndPoint remoteEp = (IPEndPoint)handler.RemoteEndPoint;
-                                    IPAddress ip = remoteEp.Address;
+                                    Connect(remoteEp.Address, false);
 
-                                    Connect(ip);
-
-                                    // send all connected endpoints to all peers
+                                    // send all current connected endpoints to all peers
                                     foreach (IPEndPoint ep in connectedEp)
                                     {
                                         Send(ep.Address.ToString(), MessageType.IP);
@@ -147,21 +147,19 @@ namespace Chat
                                 }
                             case MessageType.IP:
                                 {
-                                    string[] ipSplitted = message.Split('.');
-
-                                    if (ipSplitted.Length > 4)
+                                    IPAddress ip;
+                                    if (UserInterface.GetIP(false, message, out ip))
                                     {
-                                        // read ip
-                                        byte[] ipBytes = new byte[4];
-
-                                        for (int i = 0; i < 4; i++)
-                                        {
-                                            ipBytes[i] = byte.Parse(ipSplitted[i]);
-                                        }
-
-                                        IPAddress ip = new IPAddress(ipBytes);
-                                        Connect(ip);
+                                        Connect(ip, false);
                                     }
+
+                                    break;
+                                }
+                            case MessageType.Disconnect:
+                                {
+                                    // get sender's endpoint and then disconnect it
+                                    IPEndPoint remoteEp = (IPEndPoint)handler.RemoteEndPoint;
+                                    Disconnect(remoteEp);
 
                                     break;
                                 }
@@ -180,15 +178,13 @@ namespace Chat
 			}
 			catch (SocketException exception)
 			{
-				Console.WriteLine("> Receiver SocketException: " + exception.Message);
-				Console.ReadKey();
+                UserInterface.ShowException(exception, "Receiver");
 			}
 			catch (Exception exception)
 			{
-				Console.WriteLine("> Receiver Exception: " + exception.Message);
-				Console.ReadKey();
-			}
-			finally
+                UserInterface.ShowException(exception);
+            }
+            finally
 			{
 				if (receiver != null)
 				{
@@ -201,53 +197,34 @@ namespace Chat
 					receiver.Dispose();
 				}
 			}
-		}
+        }
         #endregion
 
         #region sending
+        private void InitSender()
+        {
+            SendLoop();
+        }
+
         private void SendLoop()
 		{
 			while (isRunning)
 			{
-				string format = name + ": ";
+                string message = UserInterface.GetMessage();
 
-                // local print
-                // Console.Write(format);
+                if (!ProcessCommand(message))
+                {
+                    // format message before sending
+                    message = DateTime.Now.ToString("[HH:mm:ss]") + name + ": " + message;
 
-                // read message from console
-                string message = Console.ReadLine();
+                    // send to other peers
+                    Send(message, MessageType.Message);
+                }
+            }
+        }
 
-				if (message.Length > 1)
-				{
-					// commands
-					if (message[0] == '/')
-					{
-						if (message[1] == 'q')
-						{
-							Quit();
-						}
-						else if (message[1] == 'c')
-						{
-							ProcessIP(message);
-						}
-                        else if (message[1] == 'd')
-                        {
-                            ProcessIP(message);
-                        }
-                    }
-					else
-					{
-						// format message before sending
-						message = format + message;
-
-						// send to other peers
-						Send(message, MessageType.Message);
-					}
-				}
-			}
-		}
-
-		private void Send(string message, MessageType type)
+        // send message to all
+        private void Send(string message, MessageType type)
 		{
 			try
 			{
@@ -262,16 +239,45 @@ namespace Chat
 
                 Send(data);
 			}
-			catch (SocketException exception)
+            catch (Exception exception)
 			{
-				Console.WriteLine("> Sender SocketException: " + exception.Message);
-				Console.ReadKey();
-			}
-			catch (Exception exception)
-			{
-				Console.WriteLine("> Sender Exception: " + exception.Message);
-				Console.ReadKey();
-			}
+                UserInterface.ShowException(exception);
+            }
+        }
+
+        // send message to exact ip
+        private void Send(IPEndPoint ep, string message, MessageType type)
+        {
+            try
+            {
+                // using first byte as message type
+                byte[] temp = Encoding.ASCII.GetBytes(message);
+                int tempLength = temp.Length;
+
+                byte[] data = new byte[tempLength + 1];
+
+                data[0] = (byte)type;
+                Array.Copy(temp, 0, data, 1, tempLength);
+
+                using (Socket sender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+                {
+                    // connect to endpoint
+                    sender.Connect(ep);
+
+                    sender.Send(data);
+
+                    sender.Shutdown(SocketShutdown.Both);
+                    sender.Close();
+                }
+            }
+            catch (SocketException exception)
+            {
+                UserInterface.ShowException(exception, "Sender");
+            }
+            catch (Exception exception)
+            {
+                UserInterface.ShowException(exception);
+            }
         }
 
         private void Send(byte[] data)
@@ -296,189 +302,142 @@ namespace Chat
             }
             catch (SocketException exception)
             {
-                Console.WriteLine("> Sender SocketException: " + exception.Message);
-                Console.ReadKey();
+                UserInterface.ShowException(exception, "Sender");
             }
             catch (Exception exception)
             {
-                Console.WriteLine("> Sender Exception: " + exception.Message);
-                Console.ReadKey();
+                UserInterface.ShowException(exception);
             }
         }
 
         private void SendIPRequest()
         {
-            try
+            byte[] data = { (byte)MessageType.IPRequest };
+            Send(data);
+        }
+
+        private void SendDisconnectRequest()
+        {
+            byte[] data = { (byte)MessageType.Disconnect };
+            Send(data);
+        }
+        #endregion
+
+        private void Connect(IPAddress ip, bool showMesage)
+        {
+            IPEndPoint ep = new IPEndPoint(ip, port);
+
+            // make sure that there is no same endpoint
+            if (connectedEp.Contains(ep))
             {
-                byte[] data = { (byte)MessageType.IPRequest };
-                Send(data);
+                UserInterface.ShowMessage("> Already connected to " + ip);
             }
-            catch (SocketException exception)
+            else if (ip.ToString() == localEp.Address.ToString())
             {
-                Console.WriteLine("> Sender SocketException: " + exception.Message);
-                Console.ReadKey();
+                UserInterface.ShowMessage("> Can't connect to yourself");
             }
-            catch (Exception exception)
+            else
             {
-                Console.WriteLine("> Sender Exception: " + exception.Message);
-                Console.ReadKey();
+                // add to list of all endpoints in current space
+                connectedEp.Add(ep);
+                SendIPRequest();
+
+                UserInterface.ShowMessage("> Connected to " + ip);
+                Send(name + " connected.", MessageType.Message);
+            }
+        }
+
+        private void Disconnect(IPEndPoint ep)
+        {
+            if (connectedEp.Contains(ep) && ep != localEp)
+            {
+                connectedEp.Remove(ep);
             }
         }
         #endregion
 
-        // connect to peer with given ip address
-        private void Connect(IPAddress ip)
+        #region additional methods
+        // process message to find commands
+        // return true if there is any command
+        private bool ProcessCommand(string message)
         {
-            IPEndPoint remoteEp = new IPEndPoint(ip, port);
-
-            // make sure that there is no same endpoint
-            bool same = false;
-            foreach (IPEndPoint ep in connectedEp)
+            if (message.Length > 1)
             {
-                if (ep.ToString() == remoteEp.ToString())
+                if (message[0] == '/')
                 {
-                    same = true;
+                    switch(message[1])
+                    {
+                        case 'c':
+                            {
+                                IPAddress ip;
+                                if (UserInterface.GetIP(true, message, out ip))
+                                {
+                                    Connect(ip, true);
+                                }
+
+                                break;
+                            }
+                        case 's':
+                            {
+                                ShowAllConnections();
+                                break;
+                            }
+                        case 'd':
+                            {
+                                SendDisconnectRequest();
+                                connectedEp.Clear();
+                                break;
+                            }
+                        case 'q':
+                            {
+                                Quit();
+                                break;
+                            }
+                    }
+
+                    return true;
                 }
             }
 
-            if (!same)
+            return false;
+        }
+
+        private void ShowAllConnections()
+        {
+            if (connectedEp.Count == 0)
             {
-                // add to list of all endpoints in current space
-                connectedEp.Add(remoteEp);
+                UserInterface.ShowMessage("> Not connected");
+                return;
             }
 
-            // request from all peers to send their IP's
-            SendIPRequest();
+            UserInterface.ShowMessage("> Connected to:");
+            foreach (IPEndPoint ep in connectedEp)
+            {
+                UserInterface.ShowMessage("  " + ep.ToString());
+            }
+        }
+
+        private void Quit()
+        {
+            if (UserInterface.ToQuit())
+            {
+                Free();
+            }
         }
         #endregion
 
-        #region additional
-        private void ReadName()
-		{
-			while (true)
-			{
-				Console.Write("> Enter username: ");
-
-				bool success = true;
-
-				string temp = Console.ReadLine();
-				name = string.Empty;
-
-				foreach (char c in temp)
-				{
-					if ((c < '0' || c > '9') && (c < 'A' || c > 'Z') && (c < 'a' || c > 'z'))
-					{
-						Console.WriteLine("> Username must contain only symbols: a-z, A-Z, 0-9!");
-						success = false;
-
-						break;
-					}
-
-					name += c;
-				}
-
-				if (!success)
-				{
-					continue;
-				}
-
-				if (name.Length > 2)
-				{
-					break;
-				}
-				else
-				{
-					Console.WriteLine("> Username must contain more than 2 symbols!");
-				}
-			}
-		}
-
-        // process ip to connect to it
-		private void ProcessIP(string rawMessage)
-		{
-			string ipString;
-			string[] splitted = rawMessage.Split(' ');
-
-			if (splitted.Length < 2)
-			{
-				Console.WriteLine("> Not enough arguments!");
-				return;
-			}
-
-			// expecting ip after space
-			ipString = splitted[1];
-
-			string temp = string.Empty;
-			int dots = 0;
-
-			foreach (char c in ipString)
-			{
-				if (c >= '0' && c <= '9')
-				{
-					temp += c;
-				}
-				else if (c == '.' || c == ',')
-				{
-					temp += '.';
-					dots++;
-				}
-				else
-				{
-					Console.WriteLine("> IPv4 must contain only symbols: 0-9, ':', '.'!");
-					dots = 0;
-
-					return;
-				}
-			}
-
-			if (dots != 3)
-			{
-				Console.WriteLine("> IPv4 must have 4 32-bit numbers!");
-				return;
-			}
-
-			IPAddress ip;
-			if (!IPAddress.TryParse(temp, out ip))
-			{
-				Console.WriteLine("> Wrong IPv4!");
-				return;
-			}
-
-			Console.WriteLine();
-			Connect(ip);
-		}
-
-		private void Quit()
-		{
-			while (true)
-			{
-				Console.Write("> Do you want to quit? Y / N: ");
-				ConsoleKeyInfo key = Console.ReadKey();
-
-				if (key.Key == ConsoleKey.Y)
-				{
-					Free();
-					break;
-				}
-
-                if (key.Key == ConsoleKey.N)
-                {
-                    return;
-				}
-			}
-		}
-
-		private void Free()
-		{
-			isRunning = false;
-		}
-		#endregion
-
-		#region destructor
-		~Peer()
+        #region freeing memory
+        ~Peer()
 		{
 			Free();
 		}
-		#endregion
-	}
+
+        private void Free()
+        {
+            SendDisconnectRequest();
+            isRunning = false;
+            connectedEp.Clear();
+        }
+        #endregion
+    }
 }
