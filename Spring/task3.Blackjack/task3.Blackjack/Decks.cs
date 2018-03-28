@@ -1,37 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
-
-namespace task3.Blackjack
+namespace Task3.Blackjack
 {
-    public enum Suit { Diamonds, Hearts, Spades, Clubs }
-
-    public enum Value { Ace = 11, King = 10, Queen = 10, Jack = 10,
-        Ten = 10, Nine = 9, Eight = 8, Seven = 7, Six = 6, Five = 5, Four = 4, Three = 3, Two = 2 }
-
-    public class Card
-    {
-        private Suit suit;
-
-        private Value value;
-
-        public Card(Suit suit, Value value)
-        {
-            this.value = value;
-            this.suit = suit;
-        }
-
-        public int GetValueOfCard()
-        {
-            return (int)value;
-        }
-
-        public void Print()
-        {
-            Console.Write("{0} {1}", value, suit);
-        }
-    }
-
     public class Decks
     {
         private int numberOfDecks;
@@ -45,7 +16,7 @@ namespace task3.Blackjack
 
             for (int i = 0; i < numberOfDecks; i++)
             {
-                foreach(Value value in Enum.GetValues(typeof(Value)))
+                foreach (Value value in Enum.GetValues(typeof(Value)))
                 {
                     foreach (Suit suit in Enum.GetValues(typeof(Suit)))
                     {

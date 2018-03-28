@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 
-namespace task3.Blackjack
+namespace Task3.Blackjack
 {
     public class Dealer
     {

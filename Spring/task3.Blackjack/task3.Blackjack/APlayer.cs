@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 
 
-namespace task3.Blackjack
+namespace Task3.Blackjack
 {
-    public enum Action { hit = 0, stand = 1};
-
     public abstract class APlayer
     {
         public readonly string name;
@@ -13,6 +11,7 @@ namespace task3.Blackjack
         private List<Card> cards;
 
         private double money;
+
         public double Money
         {
             get
@@ -26,6 +25,7 @@ namespace task3.Blackjack
         }
 
         private int sumCards;
+
         public int SumCards
         {
             get
@@ -51,7 +51,7 @@ namespace task3.Blackjack
             SumCards = 0;
         }
 
-        public abstract Action Play(Dealer dealer);
+        public abstract Action Play(Card dealersFirstCard);
 
         public void Print()
         {

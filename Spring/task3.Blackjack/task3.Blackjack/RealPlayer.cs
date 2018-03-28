@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace task3.Blackjack
+namespace Task3.Blackjack
 {
     public class RealPlayer : APlayer
     {
@@ -10,19 +10,18 @@ namespace task3.Blackjack
         {
         }
 
-        public override Action Play(Dealer dealer)
+        public override Action Play(Card dealersFirstCard)
         {
             Print();
             Console.WriteLine();
             Console.WriteLine("Your turn");
             int input = -1;
-            bool correct = false;
-            while((correct == false) || ((input != 0) && (input != 1)))
+            while((input != 1) && (input != 2))
             {
-                Console.WriteLine("0 - hit");
-                Console.WriteLine("1 - stand");
+                Console.WriteLine("1 - hit");
+                Console.WriteLine("2 - stand");
 
-                correct = Int32.TryParse(Console.ReadLine(), out input);
+                Int32.TryParse(Console.ReadLine(), out input);
             }
 
             return (Action)input;

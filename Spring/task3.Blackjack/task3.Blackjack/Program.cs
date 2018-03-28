@@ -1,22 +1,22 @@
 ﻿using System;
 
 
-namespace task3.Blackjack
+namespace Task3.Blackjack
 {
     class Program
     {
         static double CheckBot(APlayer bot)
         {
             double result = 0;
-            Play play;
+            Blackjack blackjack;
 
             for (int i = 0; i < 100; i++)
             {
-                play = new Play(bot, null);
+                blackjack = new Blackjack(bot, null);
                 for (int j = 0; j < 40; j++)
                 {
-                    play.PlayBlackjack(false);
-                    play.Reset();
+                    blackjack.PlayBlackjack(false);
+                    blackjack.Reset();
                 }
                 result += bot.Money;
                 bot.ChangeAmountOfMoney(-bot.Money);
@@ -28,58 +28,56 @@ namespace task3.Blackjack
         static void Main(string[] args)
         {
             Console.WriteLine("Checking Bots:");
-            Console.WriteLine("Bot1: {0}", CheckBot(new Bot1(0)));
-            Console.WriteLine("Bot2: {0}", CheckBot(new Bot2(0)));
+            Console.WriteLine("BotRandom: {0}", CheckBot(new Bot1(0)));
+            Console.WriteLine("BotDependentOnDealer: {0}", CheckBot(new Bot2(0)));
             Console.WriteLine();
 
             int input = -1;
-            bool correct = false;
-            while ((correct == false) || ((input != 0) && (input != 1) && (input != 2)))
+            while ((input != 1) && (input != 2) && (input != 3))
             {
-                Console.WriteLine("0 - play without bot");
-                Console.WriteLine("1 - play with bot1");
-                Console.WriteLine("2 - play with bot2");
+                Console.WriteLine("1 - play without bot");
+                Console.WriteLine("2 - play with botRandom");
+                Console.WriteLine("3 - play with botDependentOnDealer");
 
-                correct = int.TryParse(Console.ReadLine(), out input);
+                Int32.TryParse(Console.ReadLine(), out input);
             }
 
-            Play play;
+            Blackjack blackjack;
             RealPlayer realPlayer = new RealPlayer("You", 1000);
-            if (input == 0)
+            if (input == 1)
             {
-                play = new Play(realPlayer, null);
+                blackjack = new Blackjack(realPlayer, null);
             }
-            else if(input == 1)
+            else if(input == 2)
             {
-                play = new Play(realPlayer, new Bot1(1000));
+                blackjack = new Blackjack(realPlayer, new Bot1(1000));
             }
             else
             {
-                play = new Play(realPlayer, new Bot2(1000));
+                blackjack = new Blackjack(realPlayer, new Bot2(1000));
             }
 
             Console.WriteLine();
-            play.PrintMoney();
+            blackjack.PrintMoney();
 
             bool stop = false;
             while (!stop)
             {
-                play.Reset();
+                blackjack.Reset();
                 Console.WriteLine("Game on");
-                play.PlayBlackjack(true);
-                play.PrintResult();
+                blackjack.PlayBlackjack(true);
+                blackjack.PrintResult();
 
                 Console.WriteLine();
                 input = -1;
-                correct = false;
-                while((correct == false) || ((input != 0) && (input != 1)))
+                while((input != 1) && (input != 2))
                 {
-                    Console.WriteLine("Continue play - 0");
-                    Console.WriteLine("Stop play - 1");
-                    correct = Int32.TryParse(Console.ReadLine(), out input);
+                    Console.WriteLine("Continue play - 1");
+                    Console.WriteLine("Stop play - 2");
+                    Int32.TryParse(Console.ReadLine(), out input);
                 }
                 Console.WriteLine();
-                if(input == 0)
+                if(input == 1)
                 {
                     stop = false;
                 }
@@ -91,7 +89,7 @@ namespace task3.Blackjack
 
             Console.WriteLine();
             Console.WriteLine("Results:");
-            play.PrintMoney();
+            blackjack.PrintMoney();
         }
     }
 }

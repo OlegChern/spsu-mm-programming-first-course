@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 
 
-namespace task3.Blackjack
+namespace Task3.Blackjack
 {
-    public class Play
+    public class Blackjack
     {
+        private const int standardBet = 100;
+
+        private const int standardNumberOfDecks = 8;
+
         private Dealer dealer;
 
         private Decks decks;
@@ -14,11 +18,11 @@ namespace task3.Blackjack
 
         private int bet;
 
-        public Play(APlayer player1, APlayer player2)
+        public Blackjack(APlayer player1, APlayer player2)
         {
             dealer = new Dealer();
-            decks = new Decks(8);
-            bet = 120;
+            decks = new Decks(standardNumberOfDecks);
+            bet = standardBet;
             players = new List<APlayer>();
             players.Add(player1);
             if (player2 != null)
@@ -125,7 +129,7 @@ namespace task3.Blackjack
                         stop = true;
                         break;
                     }
-                    if(temp.Play(dealer) == Action.stand)
+                    if(temp.Play(dealer.FirstCard) == Action.stand)
                     {
                         stop = true;
                     }

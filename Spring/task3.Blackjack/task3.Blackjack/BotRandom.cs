@@ -1,16 +1,16 @@
 ﻿using System;
 
 
-namespace task3.Blackjack
+namespace Task3.Blackjack
 {
     public class Bot1 : APlayer
     {
         public Bot1(double money)
-            : base("Bot1", money)
+            : base("BotRandom", money)
         {
         }
 
-        public override Action Play(Dealer dealer)
+        public override Action Play(Card dealersFirstCard)
         {
             if(SumCards > 16)
             {
