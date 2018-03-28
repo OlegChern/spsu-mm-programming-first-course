@@ -5,6 +5,7 @@ namespace AbstractIceCreamLib
     public abstract class AbstractIceCream
     {
         private string name;
+
         public string Name
         {
             get
@@ -18,6 +19,7 @@ namespace AbstractIceCreamLib
         }
 
         private int weight; // grams
+
         public int Weight
         {
             get
@@ -41,24 +43,17 @@ namespace AbstractIceCreamLib
             }
         }
 
-        enum TypeOfIceCream { eskimo , cone, cake};
         private TypeOfIceCream type;
-        public string Type
+
+        public TypeOfIceCream Type
         {
             get
             {
-                return type.ToString();
+                return type;
             }
             private set
             {
-                if (value == "eskimo" || value == "cone" || value == "cake")
-                {
-                    type = (TypeOfIceCream)Enum.Parse(typeof(TypeOfIceCream), value);
-                }
-                else
-                {
-                    type = TypeOfIceCream.cake;
-                }
+                type = value;
             }
         }
 
@@ -75,7 +70,7 @@ namespace AbstractIceCreamLib
             }
         }
 
-        public AbstractIceCream(string name, int weight, string type, string flavor)
+        public AbstractIceCream(string name, int weight, TypeOfIceCream type, string flavor)
         {
             Name = name;
             Weight = weight;

@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="AbstractIceCream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TypeOfIceCream.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

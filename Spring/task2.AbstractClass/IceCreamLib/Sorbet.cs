@@ -7,6 +7,7 @@ namespace IceCreamLib
     public class Sorbet : AbstractIceCream
     {
         private string syrup;
+
         public string Syrup
         {
             get
@@ -19,7 +20,7 @@ namespace IceCreamLib
             }
         }
 
-        public Sorbet(string name, string type, string flavor, string syrup)
+        public Sorbet(string name, TypeOfIceCream type, string flavor, string syrup)
             : base(name, 70, type, flavor)
         {
             Syrup = syrup;
