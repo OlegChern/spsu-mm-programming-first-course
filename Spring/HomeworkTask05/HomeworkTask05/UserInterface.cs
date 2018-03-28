@@ -46,66 +46,74 @@ namespace Chat
             return Console.ReadKey();
         }
 
-        public static bool GetIP(bool manual, string message, out IPAddress ip)
+        public static bool GetEndPoint(bool manual, string message, out IPEndPoint ep)
         {
-            ip = null;
+            ep = null;
 
             if (manual)
             {
-                string ipString;
                 string[] splitted = message.Split(' ');
 
                 if (splitted.Length < 2)
                 {
-                    Console.WriteLine("> Not enough arguments!");
+                    ShowMessage("> Not enough arguments!");
                     return false;
                 }
 
+                string ipString = string.Empty;
+
+                bool readPort = false;
+                string portString = string.Empty;
+
                 // expecting ip after space
-                ipString = splitted[1];
-
-                string temp = string.Empty;
-                int dots = 0;
-
-                foreach (char c in ipString)
+                foreach (char c in splitted[1])
                 {
                     if (c >= '0' && c <= '9')
                     {
-                        temp += c;
+                        if (readPort)
+                        {
+                            portString += c;
+                        }
+                        else
+                        {
+                            ipString += c;
+                        }
                     }
-                    else if (c == '.' || c == ',')
+                    else if ((c == '.' || c == ',') && !readPort)
                     {
-                        temp += '.';
-                        dots++;
+                        ipString += '.';
+                    }
+                    else if (c == ':')
+                    {
+                        readPort = true;
                     }
                     else
                     {
-                        Console.WriteLine("> IPv4 must contain only symbols: 0-9, ':', '.'!");
-                        dots = 0;
-
+                        ShowMessage("> IPv4 must contain only symbols: 0-9, ':', '.'!");
                         return false;
                     }
                 }
 
-                if (dots != 3)
+                IPAddress ip;
+                if (!IPAddress.TryParse(ipString, out ip))
                 {
-                    Console.WriteLine("> IPv4 must have 4 32-bit numbers!");
+                    ShowMessage("> Wrong IPv4!");
                     return false;
                 }
 
-                IPAddress resultIp;
-                if (!IPAddress.TryParse(temp, out resultIp))
+                int port;
+                if (!int.TryParse(portString, out port))
                 {
-                    Console.WriteLine("> Wrong IPv4!");
+                    ShowMessage("> Wrong port!");
                     return false;
                 }
 
-                ip = resultIp;
+                ep = new IPEndPoint(ip, port);
                 return true;
             }
             else
             {
-                string[] ipSplitted = message.Split('.');
+                string[] ipSplitted = message.Split('.', ':');
 
                 if (ipSplitted.Length < 5)
                 {
@@ -120,7 +128,10 @@ namespace Chat
                     ipBytes[i] = byte.Parse(ipSplitted[i]);
                 }
 
-                ip = new IPAddress(ipBytes);
+                IPAddress ip = new IPAddress(ipBytes);
+                int port = int.Parse(ipSplitted[4]);
+
+                ep = new IPEndPoint(ip, port);
                 return true;
             }
         }

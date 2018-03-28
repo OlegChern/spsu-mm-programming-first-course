@@ -83,8 +83,6 @@ namespace Chat
                     if (ip.AddressFamily == AddressFamily.InterNetwork)
                     {
                         localEp = new IPEndPoint(ip, port);
-                        UserInterface.ShowMessage("> Current IPv4: " + ip);
-
                         break;
                     }
                 }
@@ -94,6 +92,8 @@ namespace Chat
                     byte[] byteIp = { 192, 168, 0, 1 };
                     localEp = new IPEndPoint(new IPAddress(byteIp), port);
                 }
+
+                UserInterface.ShowMessage("> Current IP and port: " + localEp.ToString());
 
                 receiver.Bind(localEp);
                 receiver.Listen(16);
@@ -133,33 +133,35 @@ namespace Chat
                                 }
                             case MessageType.IPRequest:
                                 {
-                                    // connect to requester
-                                    IPEndPoint remoteEp = (IPEndPoint)handler.RemoteEndPoint;
-                                    Connect(remoteEp.Address, false);
+                                    // connect to requester's local socket, not to sender socket!
+                                    IPEndPoint requester;
+                                    UserInterface.GetEndPoint(false, message, out requester);
+                                    Connect(requester, false);
 
                                     // send all current connected endpoints to all peers
                                     foreach (IPEndPoint ep in connectedEp)
                                     {
-                                        Send(ep.Address.ToString(), MessageType.IP);
+                                        Send(ep.ToString(), MessageType.IP);
                                     }
 
                                     break;
                                 }
                             case MessageType.IP:
                                 {
-                                    IPAddress ip;
-                                    if (UserInterface.GetIP(false, message, out ip))
+                                    IPEndPoint ep;
+                                    if (UserInterface.GetEndPoint(false, message, out ep))
                                     {
-                                        Connect(ip, false);
+                                        Connect(ep, false);
                                     }
 
                                     break;
                                 }
                             case MessageType.Disconnect:
                                 {
-                                    // get sender's endpoint and then disconnect it
-                                    IPEndPoint remoteEp = (IPEndPoint)handler.RemoteEndPoint;
-                                    Disconnect(remoteEp.Address);
+                                    // get requester's endpoint and then disconnect it
+                                    IPEndPoint requester;
+                                    UserInterface.GetEndPoint(false, message, out requester);
+                                    Disconnect(requester);
 
                                     break;
                                 }
@@ -312,34 +314,30 @@ namespace Chat
 
         private void SendIPRequest()
         {
-            byte[] data = { (byte)MessageType.IPRequest };
-            Send(data);
+            Send(localEp.ToString(), MessageType.IPRequest);
         }
 
         private void SendDisconnectRequest()
         {
-            byte[] data = { (byte)MessageType.Disconnect };
-            Send(data);
+            Send(localEp.ToString(), MessageType.Disconnect);
         }
         #endregion
 
-        private void Connect(IPAddress ip, bool showMesage)
+        private void Connect(IPEndPoint ep, bool showMesage)
         {
-            IPEndPoint ep = new IPEndPoint(ip, port);
-
             // make sure that there is no same endpoint
             if (connectedEp.Contains(ep))
             {
                 if (showMesage)
                 {
-                    UserInterface.ShowMessage("> Already connected to " + ip);
+                    UserInterface.ShowMessage("> Already connected to " + ep.ToString());
                 }
             }
-            else if (ip.ToString() == localEp.Address.ToString())
+            else if (ep.ToString() == localEp.ToString())
             {
                 if (showMesage)
                 {
-                    UserInterface.ShowMessage("> Can't connect to yourself");
+                    UserInterface.ShowMessage("> Can't connect to same IP and port");
                 }
             }
             else
@@ -350,20 +348,18 @@ namespace Chat
 
                 if (showMesage)
                 {
-                    UserInterface.ShowMessage("> Connected to " + ip);
+                    UserInterface.ShowMessage("> Connected to " + ep.ToString());
                     Send(name + " connected.", MessageType.Message);
                 }
             }
         }
 
-        private void Disconnect(IPAddress ip)
+        private void Disconnect(IPEndPoint ep)
         {
-            IPEndPoint ep = new IPEndPoint(ip, port);
-
-            if (connectedEp.Contains(ep) && ip.ToString() != localEp.Address.ToString())
+            if (connectedEp.Contains(ep) && ep.ToString() != localEp.ToString())
             {
                 connectedEp.Remove(ep);
-                UserInterface.ShowMessage("> " + ip.ToString() + " disconnected");
+                UserInterface.ShowMessage("> " + ep.ToString() + " disconnected");
             }
         }
         #endregion
@@ -381,10 +377,10 @@ namespace Chat
                     {
                         case 'c':
                             {
-                                IPAddress ip;
-                                if (UserInterface.GetIP(true, message, out ip))
+                                IPEndPoint ep;
+                                if (UserInterface.GetEndPoint(true, message, out ep))
                                 {
-                                    Connect(ip, true);
+                                    Connect(ep, true);
                                 }
 
                                 break;
