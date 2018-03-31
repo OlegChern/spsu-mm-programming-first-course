@@ -6,31 +6,14 @@ using System.Threading.Tasks;
 
 namespace BlackJack
 {
-    public enum Card
-    {
-        Ace = 1,
-        Two,
-        Three,
-        Four,
-        Five,
-        Six,
-        Seven,
-        Eight,
-        Nine,
-        Ten,
-        Jack,
-        Queen,
-        King
-    }
-
-    public class Game
+    class Game
     {
         #region constants
         private const int DefaultBotMoney = 300;
         #endregion
 
         #region fields
-        private Stack<Card> deck;
+        private Deck deck;
         private Player[] players;
 
         private Card[] dealerCards = new Card[2];
@@ -39,24 +22,18 @@ namespace BlackJack
         #endregion
 
         #region constructor
-        public Game(int playerCount)
+        public Game(params Player[] players)
         {
             instance = this;
+            this.players = players;
 
-            deck = CreateDeck();
-            players = new Player[playerCount];
+            deck = new Deck();
         }
         #endregion
 
         #region game logic
         public void Start()
         {
-            // init players
-            for (int i = 0; i < players.Length; i++)
-            {
-                players[i] = new Bot(DefaultBotMoney);
-            }
-
             // 0 is dealer's index
             dealerCards[0] = GetCard();
             dealerCards[1] = GetCard();
@@ -64,10 +41,9 @@ namespace BlackJack
             if (dealerCards[0] != Card.Ace)
             {
                 // every player take 2 cards
-                foreach (Player player in players)
+                for (int i = 0; i < players.Length; i++)
                 {
-                    player.TakeCard(GetCard());
-                    player.TakeCard(GetCard());
+                    players[i] = new Bot(this, DefaultBotMoney);
                 }
 
                 Update();
@@ -80,25 +56,33 @@ namespace BlackJack
 
         private void Update()
         {
-            foreach (Player player in players)
+            bool updatable = true;
+
+            do
             {
-                player.MakeDecision();
-                player.TakeCard(GetCard());
-            }
+                updatable = false;
 
-            Update();
+                foreach (Player player in players)
+                {
+                    if (!player.IsFinished)
+                    {
+                        player.Update();
+                        updatable = true;
+                    }
+                }
+            } while (updatable);
         }
-        #endregion
 
-        #region public methods
         public void Stop()
         {
 
         }
+        #endregion
 
-        public static Card GetCard()
+        #region public methods
+        public Card GetCard()
         {
-            return instance.deck.Pop();
+            return deck.Pop();
         }
 
         public static int GetCardValue(Card card)
@@ -113,46 +97,6 @@ namespace BlackJack
                 default:
                     return (int)card;
             }
-        }
-        #endregion
-
-        #region init methods
-        private Stack<Card> CreateDeck()
-        {
-            Stack<Card> resultDeck = new Stack<Card>();
-
-            for (int deck = 0; deck < 8; deck++)
-            {
-                for (int suit = 0; suit < 4; suit++)
-                {
-                    int[] shuffle = GetShuffle(13);
-
-                    for (int type = 0; type < 13; type++)
-                    {
-                        resultDeck.Push((Card)shuffle[type]);
-                    }
-                }
-            }
-
-            return resultDeck;
-        }
-
-        // Knuth shuffle
-        private int[] GetShuffle(int count)
-        {
-            Random random = new Random();
-            int[] shuffle = new int[count];
-
-            for (int j = 13; j > 1; j--)
-            {
-                int k = random.Next(j);
-
-                int temp = shuffle[j];
-                shuffle[j] = shuffle[k];
-                shuffle[k] = temp;
-            }
-
-            return shuffle;
         }
         #endregion
     }

@@ -15,17 +15,23 @@ namespace BlackJack
         Surrender
     }
 
-    public abstract class Player
+    abstract class Player
     {
         #region fields
-        protected int money;
-        protected int bet;
+        private Game    game;
 
-        protected List<Card> cards = new List<Card>();
+        private bool    finished;
+        private bool    surrendered;
+
+        private int     money;
+        private int     bet;
+
+        protected int   cardsSum;
+        // private List<Card> cards = new List<Card>();
         #endregion
 
         #region properties
-        public int GetMoney
+        public int Money
         {
             get
             {
@@ -33,68 +39,112 @@ namespace BlackJack
             }
         }
 
-        public int Sum
+        public int CardsSum
         {
             get
             {
-                int sum = 0;
-
-                foreach(Card card in cards)
+                /* foreach(Card card in cards)
                 {
                     sum += Game.GetCardValue(card);
-                }
+                } */
 
-                return sum;
+                return cardsSum;
+            }
+        }
+
+        public bool IsFinished
+        {
+            get
+            {
+                return surrendered || finished;
             }
         }
         #endregion
 
         #region constructor
-        public Player(int startMoney)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="game">game to which player refers</param>
+        /// <param name="startMoney">player's starting amount of money</param>
+        public Player(Game game, int startMoney)
         {
+            this.game = game;
+
             money = startMoney;
+            bet = money / 4;
+
+            finished = false;
+            surrendered = false;
+
+            cardsSum = 0;
+
+            // initial cards
+            TakeCard();
+            TakeCard();
         }
         #endregion
 
         #region methods
-        public void TakeCard(Card card)
+        /// <summary>
+        /// Update logic and check state
+        /// </summary>
+        public void Update()
         {
-            cards.Add(card);
+            if (finished || surrendered)
+            {
+                return;
+            }
+
+            if (CardsSum > 21)
+            {
+                surrendered = true;
+                return;
+            }
+
+            MakeDecision();
         }
 
         // player's logic
-        public virtual void MakeDecision() { }
+        protected virtual void MakeDecision() { }
 
         #region decisions
         protected void Hit()
         {
-            cards.Add(Game.GetCard());
+            TakeCard();
         }
 
-        /*protected void Stand()
+        protected void Stand()
         {
-
-        }*/
-
-        protected void Split()
-        {
-
+            finished = true;
         }
 
         protected void DoubleDown()
         {
+            bet *= 2;
+            TakeCard();
 
+            finished = true;
         }
 
         protected void Surrender()
         {
-            money -= bet / 2;
+            bet = bet / 2;
+            surrendered = true;
         }
         #endregion
 
-        protected virtual int AceValue(int cardsSum)
+        protected virtual int AceValue()
         {
             return cardsSum + 11 > 21 ? 1 : 11;
+        }
+
+        private void TakeCard()
+        {
+            Card card = game.GetCard();
+            // cards.Add(card);
+
+            cardsSum += Game.GetCardValue(card);
         }
         #endregion
     }

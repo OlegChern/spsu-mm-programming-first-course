@@ -6,10 +6,16 @@ using System.Threading.Tasks;
 
 namespace BlackJack
 {
-    public class Bot : Player
+    class Bot : Player
     {
+        public Bot(Game game, int startMoney) : base(game, startMoney) { }
 
-        public Bot(int startMoney) : base(startMoney) { }
+        protected override void MakeDecision()
+        {
+            if (CardsSum > 0)
+            {
 
+            }
+        }
     }
 }
