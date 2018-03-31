@@ -21,5 +21,5 @@ ShavedIce::ShavedIce(
 std::string ShavedIce::getRecipe()
 {
     return MilkyIceCream::getRecipe() +
-           " Add " + std::to_string(fruitIce.weight) + " grams of frozen " + fruitIce.name + " juice.";
+           " Add " + std::to_string(fruitIce.weight) + " grams of shaved frozen " + fruitIce.name + " juice.";
 }
