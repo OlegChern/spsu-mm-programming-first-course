@@ -28,6 +28,7 @@ int main()
 
     for (int i = 0; i < 4; ++i) {
         cout << iceCreams[i]->getRecipe() << '\n';
+        delete iceCreams[i];
     }
 
     return 0;
