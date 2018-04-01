@@ -1,9 +1,8 @@
 I use:
 <ul>
-  <li>Language: C++</li>
-  <li>Standard: C++11 (ISO/IEC 14882:2011)</li>
-  <li>IDE: CLion</li>
-  <li>OS: Linux (Ubuntu 16.04)</li>
-  <li>Compiler: GNU C++</li>
-  <li>Building utility: CMake 3.11</li>
+  <li>Language: Java</li>
+  <li>Standard: Java SE8</li>
+  <li>JDK: openjdk 1.8</li>
+  <li>IDE: IntelliJ Idea 2018.1</li>
+  <li> OS: Linux (Ubuntu 16.04)</li>
 </ul>
