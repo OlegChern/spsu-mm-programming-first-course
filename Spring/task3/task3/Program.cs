@@ -103,7 +103,7 @@ namespace Task3
             }
         }
 
-        static void Round(IList<AbstractPlayer> players, IList<Card> deck, int roundNumber, List<AbstractPlayer> lost)
+        static void Round(IList<AbstractPlayer> players, IList<Card> deck, int roundNumber, IList<AbstractPlayer> lost)
         {
             int i = 0;
             while (i < players.Count)
@@ -222,7 +222,7 @@ namespace Task3
             Round(players, deck, roundNumber + 1, lost);
         }
 
-        static void WriteList<T>(IReadOnlyList<T> list, string message = null)
+        static void WriteList<T>(IList<T> list, string message = null)
         {
             if (message != null)
             {
