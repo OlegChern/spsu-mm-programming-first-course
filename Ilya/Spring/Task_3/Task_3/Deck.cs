@@ -12,8 +12,8 @@ namespace Task_3
     {
         static readonly int NumberOfDecks = 8;
         static readonly int NumberOfCards = 13;
-        public static readonly int DeckSize = NumberOfDecks * NumberOfCards;
-        private static int CardsInDeckNow = DeckSize;
+        public static readonly int DeckSize = NumberOfCards * NumberOfDecks;
+        private int CardsInDeckNow = NumberOfCards * NumberOfDecks;
 
         private int _two = NumberOfDecks;
         private int _three = NumberOfDecks;

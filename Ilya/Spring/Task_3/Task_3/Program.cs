@@ -11,15 +11,33 @@ namespace Task_3
     {
         static void Main(string[] args)
         {
+            double sum1 = 0;
+            double sum2 = 0;
+
+
             List<int> GameDeck = ShuffleDeck();
 
-            FirstBot FirstPlayer = new FirstBot(500,GameDeck);
-            for (int i = 0; i < 15; i++)
+            Bot FirstPlayer = new Bot(500, GameDeck);
+            Bot SecondPlayer = new Bot(500, GameDeck);
+
+
+            for (int i = 0; i < 40; i++)
             {
+                if (GameDeck.Count <= 35)
+                {
+                    GameDeck.Clear();
+                    GameDeck.AddRange(ShuffleDeck());
+                }
 
+                PlayGame(GameDeck, FirstPlayer, SecondPlayer);
 
-                PlayGame(GameDeck, FirstPlayer);
+                sum2 += SecondPlayer.Money;
+                sum1 += FirstPlayer.Money;
             }
+
+
+            Console.WriteLine(sum1/40);
+            Console.WriteLine(sum2/40);
 
         }
 
@@ -36,40 +54,47 @@ namespace Task_3
             return ShuffledDeck;
         }
 
-        static void PlayGame(List <int> gameDeck, FirstBot FirstPlayer)
+        static void PlayGame(List <int> gameDeck, Bot FirstPlayer, Bot SecondPlayer)
         {
             int DealersFirstCard = gameDeck[gameDeck.Count - 1];
             Dealer DealerPlayer = new Dealer(gameDeck);
-            
-            int PlayerSum = FirstPlayer.FirstStrategy(DealersFirstCard);
-            int DealerSum = DealerPlayer.DealersPlay(gameDeck);
-
-            if (FirstPlayer.IsBlackjack)
-            {
-                FirstPlayer.Money += FirstPlayer.Rate;
-                if (!DealerPlayer.IsBlackjack)
-                {
-                    FirstPlayer.Money += 3 * FirstPlayer.Rate / 2;
-                }
-            }
-
-            if (PlayerSum <= 21 && DealerSum > 21)
-            {
-                FirstPlayer.Money += 2 * FirstPlayer.Rate;
-            }
-
-            else if (PlayerSum<=21 && DealerSum <=21 && PlayerSum >= DealerSum)
-            {
-                FirstPlayer.Money += FirstPlayer.Rate;
-                if (PlayerSum != DealerSum)
-                {
-                    FirstPlayer.Money += FirstPlayer.Rate;
-                }
-            }
-
-            Console.WriteLine("Dealer: {0} Player: {1} IsBlackjack: {2}  PlayerMoney: {3} ",DealerSum,PlayerSum,FirstPlayer.IsBlackjack,FirstPlayer.Money);
-
             DealerPlayer.DealersPlay(gameDeck);
+            Payment(FirstPlayer, DealerPlayer, DealersFirstCard, gameDeck);
+            Payment(SecondPlayer, DealerPlayer, DealersFirstCard, gameDeck);
+
         }
+
+        public static void Payment(Bot player, Dealer dealer, int dealersFirstCard,List <int> gameDeck)
+        {
+            int playerSum = player.FirstStrategy(dealersFirstCard);
+
+            int dealerSum = dealer.DealersPlay(gameDeck);
+
+            if (player.IsBlackjack)
+            {
+                player.Money += player.Rate;
+                if (!dealer.IsBlackjack)
+                {
+                    player.Money += 3 * player.Rate / 2;
+                }
+            }
+
+            else if (playerSum <= 21 && dealerSum > 21)
+            {
+                player.Money += 2 * player.Rate;
+            }
+
+            else if (playerSum <= 21 && dealerSum <= 21 && playerSum >= dealerSum)
+            {
+                player.Money += player.Rate;
+                if (playerSum != dealerSum)
+                {
+                    player.Money += player.Rate;
+                }
+            }
+
+
+        }
+
     }
 }
