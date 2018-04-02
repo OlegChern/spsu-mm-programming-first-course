@@ -57,11 +57,13 @@ namespace Task5
             ExitApplicationButton.Click += OnExitClicked;
 
             SettingsButton.Click += OnSettingsClicked;
+
+            SendButton.Click += OnSendClicked;
         }
 
         #region callbacks
 
-        private void OnExitClicked(object sender, RoutedEventArgs args)
+        void OnExitClicked(object sender, RoutedEventArgs args)
         {
             if (client.IsListening)
             {
@@ -78,11 +80,22 @@ namespace Task5
             Close();
         }
 
-        private void OnSettingsClicked(object sender, RoutedEventArgs args)
+        void OnSettingsClicked(object sender, RoutedEventArgs args)
         {
-            new SettingsWindow().Show();
+            // TODO: verify this singleton works correctly
+            SettingsWindow.Instance.Show();
+        }
+
+        void OnSendClicked(object sender, RoutedEventArgs args)
+        {
+            
         }
 
         #endregion callbacks
+
+        void Send()
+        {
+
+        }
     }
 }

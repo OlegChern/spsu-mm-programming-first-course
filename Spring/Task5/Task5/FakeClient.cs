@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace Task5
 {
+    /// <summary>
+    /// Class exists merely for debugging purposes
+    /// </summary>
     public class FakeClient : IClient
     {
         public int IncomingConnectionsCount { get; private set; }

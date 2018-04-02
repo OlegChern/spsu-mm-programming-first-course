@@ -16,12 +16,42 @@ namespace Task5
 {
     /// <summary>
     /// Interaction logic for SettingsWindow.xaml
+    /// Singleton
     /// </summary>
-    public sealed partial class SettingsWindow : Window
+    public sealed partial class SettingsWindow : Window, IDisposable
     {
-        public SettingsWindow()
+        static SettingsWindow instance;
+
+        public static SettingsWindow Instance
         {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new SettingsWindow();
+                }
+                return instance;
+            }
+        }
+
+        bool isDisposed;
+
+        SettingsWindow()
+        {
+            isDisposed = false;
             InitializeComponent();
         }
+
+        public void Dispose()
+        {
+            isDisposed = true;
+            instance = null;
+        }
+
+        #region callbacks
+
+        // TODO: check that object is not disposed
+
+        #endregion
     }
 }
