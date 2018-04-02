@@ -64,7 +64,7 @@ namespace Task_3
 
         }
 
-        public static void Payment(Bot player, Dealer dealer, int dealersFirstCard,List <int> gameDeck)
+        static void Payment(Bot player, Dealer dealer, int dealersFirstCard,List <int> gameDeck)
         {
             int playerSum = player.FirstStrategy(dealersFirstCard);
 
