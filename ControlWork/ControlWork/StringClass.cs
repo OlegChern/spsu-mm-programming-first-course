@@ -14,7 +14,14 @@ namespace ControlWork
         /// <returns>formatted string</returns>
         public override string Format(string obj)
         {
-            return Value + " -- " + obj + " ++";
+            if (obj.Length > 3)
+            {
+                return Value + " -- " + obj + " ++";
+            }
+            else
+            {
+                return " - " + Value + " - " + obj + " ++";
+            }
         }
     }
 }

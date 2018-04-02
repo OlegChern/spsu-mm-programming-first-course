@@ -14,7 +14,14 @@ namespace ControlWork
         /// <returns>sum of initial value and obj</returns>
         public override string Format(int obj)
         {
-            return (Value + obj).ToString();
+            if (obj >= 0)
+            {
+                return (Value + obj).ToString();
+            }
+            else
+            {
+                return (Value - obj).ToString();
+            }
         }
     }
 }

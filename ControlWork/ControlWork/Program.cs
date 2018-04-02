@@ -10,20 +10,33 @@ namespace ControlWork
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Example #1");
 
-            IntClass example = new IntClass(3);
-            Console.WriteLine(example.Format(2));
+            #region int
+            IntClass intExample = new IntClass(3);
 
-            Console.WriteLine("\nExample #2");
+            Console.WriteLine("Int Example #1");
+            Console.WriteLine(intExample.Format(3));
 
+            Console.WriteLine("\nInt Example #2");
+            Console.WriteLine(intExample.Format(-4));
+            #endregion
+
+            #region string
             StringClass strExample = new StringClass("StringExample");
+
+            Console.WriteLine("\nSting Example #1");
             Console.WriteLine(strExample.Format("FormatTest"));
 
-            Console.WriteLine("\nExample #3");
+            Console.WriteLine("\nSting Example #2");
+            Console.WriteLine(strExample.Format("VS"));
+            #endregion
 
+            #region bool
             BoolClass boolExample = new BoolClass(true);
+
+            Console.WriteLine("\nBool Example #1");
             Console.WriteLine(boolExample.Format(true));
+            #endregion
         }
     }
 }
