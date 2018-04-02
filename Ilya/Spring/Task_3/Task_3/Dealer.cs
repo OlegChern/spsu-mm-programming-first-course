@@ -40,9 +40,9 @@ namespace Task_3
                 _dealers_hand.Add(gameDeck.Last());
                 gameDeck.RemoveAt(gameDeck.Count - 1);
                 _sum += _dealers_hand[(_dealers_hand.Count - 1)];
-                if (_sum > 21 && (_dealers_hand.IndexOf(11) >= 0))
+                if (_sum > 21 && (_dealers_hand.IndexOf((int)CardsValue.Ace) >= 0))
                 {
-                    _dealers_hand[_dealers_hand.IndexOf(11)] = _dealers_hand[_dealers_hand.IndexOf(11)] - 10;
+                    _dealers_hand[_dealers_hand.IndexOf((int)CardsValue.Ace)] = _dealers_hand[_dealers_hand.IndexOf((int)CardsValue.Ace)] - 10;
                     _sum -= 10;
                 }
             }

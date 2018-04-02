@@ -40,7 +40,7 @@ namespace Task_3
             {
                 CardsInDeckNow--;
                 _two--;
-                return 2;
+                return (int)CardsValue.Two;
             }
 
             SelectedValue += _three;
@@ -49,7 +49,7 @@ namespace Task_3
             {
                 CardsInDeckNow--;
                 _three--;
-                return 3;
+                return (int)CardsValue.Three;
             }
 
             SelectedValue += _four;
@@ -58,7 +58,7 @@ namespace Task_3
             {
                 CardsInDeckNow--;
                 _four--;
-                return 4;
+                return (int)CardsValue.Four;
             }
 
             SelectedValue += _five;
@@ -67,7 +67,7 @@ namespace Task_3
             {
                 CardsInDeckNow--;
                 _five--;
-                return 5;
+                return (int)CardsValue.Five;
             }
 
             SelectedValue += _six;
@@ -76,7 +76,7 @@ namespace Task_3
             {
                 CardsInDeckNow--;
                 _six--;
-                return 6;
+                return (int)CardsValue.Six;
             }
 
             SelectedValue += _seven;
@@ -85,7 +85,7 @@ namespace Task_3
             {
                 CardsInDeckNow--;
                 _seven--;
-                return 7;
+                return (int)CardsValue.Seven;
             }
 
             SelectedValue += _eight;
@@ -94,7 +94,7 @@ namespace Task_3
             {
                 CardsInDeckNow--;
                 _eight--;
-                return 8;
+                return (int)CardsValue.Eight;
             }
 
             SelectedValue += _nine;
@@ -103,7 +103,7 @@ namespace Task_3
             {
                 CardsInDeckNow--;
                 _nine--;
-                return 9;
+                return (int)CardsValue.Nine;
             }
 
             SelectedValue += _ten;
@@ -112,7 +112,7 @@ namespace Task_3
             {
                 CardsInDeckNow--;
                 _ten--;
-                return 10;
+                return (int)CardsValue.Ten;
             }
 
             SelectedValue += _jack;
@@ -121,7 +121,7 @@ namespace Task_3
             {
                 CardsInDeckNow--;
                 _jack--;
-                return 10;
+                return (int)CardsValue.Jack;
             }
 
             SelectedValue += _queen;
@@ -130,7 +130,7 @@ namespace Task_3
             {
                 CardsInDeckNow--;
                 _queen--;
-                return 10;
+                return (int)CardsValue.Queen;
             }
 
             SelectedValue += _king;
@@ -139,7 +139,7 @@ namespace Task_3
             {
                 CardsInDeckNow--;
                 _king--;
-                return 10;
+                return (int)CardsValue.King;
             }
 
             SelectedValue += _ace;
@@ -148,7 +148,7 @@ namespace Task_3
             {
                 CardsInDeckNow--;
                 _ace--;
-                return 11;
+                return (int)CardsValue.Ace;
             }
 
             return -1;

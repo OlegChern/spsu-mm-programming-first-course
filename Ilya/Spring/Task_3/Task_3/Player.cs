@@ -42,9 +42,9 @@ namespace Task_3
             _game_deck.RemoveAt(_game_deck.Count - 1);
             _sum += Hand[(Hand.Count - 1)];
 
-            if ((_sum > 21) && (Hand.IndexOf(11) >= 0))
+            if ((_sum > 21) && (Hand.IndexOf((int)CardsValue.Ace) >= 0))
             {
-                Hand[Hand.IndexOf(11)] = Hand[Hand.IndexOf(11)] - 10;
+                Hand[Hand.IndexOf((int)CardsValue.Ace)] = Hand[Hand.IndexOf((int)CardsValue.Ace)] - 10;
                 _sum -= 10;
             }
 
