@@ -11,17 +11,17 @@
         {
             if (SumCards > 17)
             {
-                return Action.stand;
+                return Action.Stand;
             }
             if(SumCards < 10)
             {
-                return Action.hit;
+                return Action.Hit;
             }
             if(dealersFirstCard.GetValueOfCard() > 9)
             {
-                return Action.hit;
+                return Action.Hit;
             }
-            return Action.stand;
+            return Action.Stand;
         }
     }
 }

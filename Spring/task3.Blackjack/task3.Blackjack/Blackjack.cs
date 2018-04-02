@@ -129,7 +129,7 @@ namespace Task3.Blackjack
                         stop = true;
                         break;
                     }
-                    if(temp.Play(dealer.FirstCard) == Action.stand)
+                    if(temp.Play(dealer.FirstCard) == Action.Stand)
                     {
                         stop = true;
                     }

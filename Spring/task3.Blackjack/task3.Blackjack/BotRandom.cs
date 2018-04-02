@@ -14,7 +14,7 @@ namespace Task3.Blackjack
         {
             if(SumCards > 16)
             {
-                return Action.stand;
+                return Action.Stand;
             }
 
             Random rand = new Random();
