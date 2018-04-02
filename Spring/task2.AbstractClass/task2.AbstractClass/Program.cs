@@ -9,8 +9,8 @@ namespace task2.AbstractClass
     {
         static void Main(string[] args)
         {
-            ClassicIceCream IceCreamCake = new ClassicIceCream("Ice cream cake", TypeOfIceCream.cake, "chocolate", 3);
-            Sorbet MelonSorbet = new Sorbet("Melon Sorbet", TypeOfIceCream.cone, "melon", "strawberry");
+            ClassicIceCream IceCreamCake = new ClassicIceCream("Ice cream cake", TypeOfIceCream.Cake, "chocolate", 3);
+            Sorbet MelonSorbet = new Sorbet("Melon Sorbet", TypeOfIceCream.Cone, "melon", "strawberry");
             FruitIce AppleIce = new FruitIce("Apple Ice", "apple");
 
             IceCreamCake.GetInfo();

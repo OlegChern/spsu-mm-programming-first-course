@@ -1,4 +1,4 @@
 ﻿namespace AbstractIceCreamLib
 {
-    public enum TypeOfIceCream { eskimo, cone, cake };
+    public enum TypeOfIceCream { Eskimo, Cone, Cake };
 }
