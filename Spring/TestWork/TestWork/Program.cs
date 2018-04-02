@@ -39,6 +39,7 @@ namespace TestWork
             stringFormaters.Clear();
             stringFormaters.Add(new CustomStringFormater(FormatMode.AddFour, CustomFormat));
             stringFormaters.Add(new CustomStringFormater(FormatMode.AddTwo, AnotherCustomFormat));
+            stringFormaters.Add(new CustomStringFormater(FormatMode.SubstractTwo, YetAnotherCustomFormat));
             
             foreach (var formater in stringFormaters)
             {
@@ -85,6 +86,29 @@ namespace TestWork
                     return "))))";
                 case FormatMode.SubstractTwo:
                     return "))";
+                case FormatMode.None:
+                    return string.Empty;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(mode));
+            }
+        }
+
+        static string YetAnotherCustomFormat(FormatMode mode)
+        {
+            switch (mode)
+            {
+                case FormatMode.AddTwo:
+                    return "[[";
+                case FormatMode.AddFour:
+                    return "[[[[";
+                case FormatMode.AddSix:
+                    return "[[[[[[";
+                case FormatMode.SubstractSix:
+                    return "]]]]]]";
+                case FormatMode.SubstractFour:
+                    return "]]]]";
+                case FormatMode.SubstractTwo:
+                    return "]]";
                 case FormatMode.None:
                     return string.Empty;
                 default:
