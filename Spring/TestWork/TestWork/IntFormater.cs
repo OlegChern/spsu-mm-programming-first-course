@@ -2,7 +2,7 @@
 
 namespace TestWork
 {
-    public class IntFormater : IFormater<int>
+    public sealed class IntFormater : IFormater<int>
     {
         public FormatMode Mode { get; }
 

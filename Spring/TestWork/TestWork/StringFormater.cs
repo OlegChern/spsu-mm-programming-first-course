@@ -18,25 +18,36 @@ namespace TestWork
         
         public string Format(string arg)
         {
+            return GetPrefixModificator() + arg + GetPostfixModificator();
+        }
+
+        protected virtual string GetPrefixModificator()
+        {
             switch (Mode)
             {
                 case FormatMode.AddTwo:
-                    return "++" + arg + "++";
+                    return "++";
                 case FormatMode.AddFour:
-                    return "++++" + arg + "++++";
+                    return "++++";
                 case FormatMode.AddSix:
-                    return "++++++" + arg + "++++++";
+                    return "++++++";
                 case FormatMode.SubstractSix:
-                    return "------" + arg + "------";
+                    return "------";
                 case FormatMode.SubstractFour:
-                    return "----" + arg + "----";
+                    return "----";
                 case FormatMode.SubstractTwo:
-                    return "--" + arg + "--";
+                    return "--";
                 case FormatMode.None:
-                    return arg;
+                    return string.Empty;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(arg));
+                    // Never reached actually
+                    return null;
             }
+        }
+
+        protected virtual string GetPostfixModificator()
+        {
+            return GetPrefixModificator();
         }
     }
 }

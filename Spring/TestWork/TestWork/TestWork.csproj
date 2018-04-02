@@ -38,6 +38,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomStringFormater.cs" />
     <Compile Include="FormatMode.cs" />
     <Compile Include="IFormater.cs" />
     <Compile Include="IntFormater.cs" />
