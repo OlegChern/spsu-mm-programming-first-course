@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,9 +14,12 @@ namespace Task_3
             List<int> GameDeck = ShuffleDeck();
 
             FirstBot FirstPlayer = new FirstBot(500,GameDeck);
-            SecondBot SecondPlayer = new SecondBot(500, GameDeck);
-            PlayGame(GameDeck,FirstPlayer, SecondPlayer);
+            for (int i = 0; i < 15; i++)
+            {
 
+
+                PlayGame(GameDeck, FirstPlayer);
+            }
 
         }
 
@@ -32,13 +36,38 @@ namespace Task_3
             return ShuffledDeck;
         }
 
-        static void PlayGame(List <int> gameDeck, FirstBot FirstPlayer, SecondBot SecondPlayer)
+        static void PlayGame(List <int> gameDeck, FirstBot FirstPlayer)
         {
             int DealersFirstCard = gameDeck[gameDeck.Count - 1];
             Dealer DealerPlayer = new Dealer(gameDeck);
-            FirstPlayer.FirstStrategy(DealersFirstCard);
+            
+            int PlayerSum = FirstPlayer.FirstStrategy(DealersFirstCard);
+            int DealerSum = DealerPlayer.DealersPlay(gameDeck);
 
+            if (FirstPlayer.IsBlackjack)
+            {
+                FirstPlayer.Money += FirstPlayer.Rate;
+                if (!DealerPlayer.IsBlackjack)
+                {
+                    FirstPlayer.Money += 3 * FirstPlayer.Rate / 2;
+                }
+            }
 
+            if (PlayerSum <= 21 && DealerSum > 21)
+            {
+                FirstPlayer.Money += 2 * FirstPlayer.Rate;
+            }
+
+            else if (PlayerSum<=21 && DealerSum <=21 && PlayerSum >= DealerSum)
+            {
+                FirstPlayer.Money += FirstPlayer.Rate;
+                if (PlayerSum != DealerSum)
+                {
+                    FirstPlayer.Money += FirstPlayer.Rate;
+                }
+            }
+
+            Console.WriteLine("Dealer: {0} Player: {1} IsBlackjack: {2}  PlayerMoney: {3} ",DealerSum,PlayerSum,FirstPlayer.IsBlackjack,FirstPlayer.Money);
 
             DealerPlayer.DealersPlay(gameDeck);
         }

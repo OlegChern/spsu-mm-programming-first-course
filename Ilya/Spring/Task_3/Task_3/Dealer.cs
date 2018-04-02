@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,6 +11,7 @@ namespace Task_3
     {
         private List <int> _dealers_hand;
         private int _sum;
+        public bool IsBlackjack { get; set; }
 
         public Dealer(List<int> gameDeck)
         {
@@ -24,6 +26,10 @@ namespace Task_3
             gameDeck.RemoveAt(gameDeck.Count - 1);
             _sum += _dealers_hand[(_dealers_hand.Count - 1)];
 
+            if (_sum == 21)
+            {
+                IsBlackjack = true;
+            }
         }
 
 
