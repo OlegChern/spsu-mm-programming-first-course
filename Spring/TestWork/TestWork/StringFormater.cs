@@ -26,6 +26,14 @@ namespace TestWork
                     return "++++" + arg + "++++";
                 case FormatMode.AddSix:
                     return "++++++" + arg + "++++++";
+                case FormatMode.SubstractSix:
+                    return "------" + arg + "------";
+                case FormatMode.SubstractFour:
+                    return "----" + arg + "----";
+                case FormatMode.SubstractTwo:
+                    return "--" + arg + "--";
+                case FormatMode.None:
+                    return arg;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(arg));
             }

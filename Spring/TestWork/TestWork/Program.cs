@@ -9,33 +9,27 @@ namespace TestWork
         static void Main()
         {
             const int formatedInt = 42;
-            
-            var intFormaters = new List<IFormater<int>>
+            const string formatedString = "Kirill";
+
+            IList<IFormater<int>> intFormaters = new List<IFormater<int>>();
+            IList<IFormater<string>> stringFormaters = new List<IFormater<string>>();
+
+            foreach (FormatMode mode in Enum.GetValues(typeof(FormatMode)))
             {
-                new IntFormater(AddTwo),
-                new IntFormater(AddFour),
-                new IntFormater(AddSix)
-            };
+                intFormaters.Add(new IntFormater(mode));
+                stringFormaters.Add(new StringFormater(mode));
+            }
             
             foreach (var formater in intFormaters)
             {
-                Console.WriteLine(formater.Format(formatedInt));
+                Console.WriteLine($"{formater.Mode}: {formater.Format(formatedInt)}");
             }
             
             Console.WriteLine();
-
-            const string formatedString = "42";
-            
-            var stringFormaters = new List<IFormater<string>>
-            {
-                new StringFormater(AddTwo),
-                new StringFormater(AddFour),
-                new StringFormater(AddSix)
-            };
             
             foreach (var formater in stringFormaters)
             {
-                Console.WriteLine(formater.Format(formatedString));
+                Console.WriteLine($"{formater.Mode}: {formater.Format(formatedString)}");
             }
 
             // Error CS1503:
