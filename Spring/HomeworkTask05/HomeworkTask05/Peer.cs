@@ -102,7 +102,8 @@ namespace Chat
                     }
                 }
 
-                UserInterface.ShowSpecification("Current IP and port: " + localEp.ToString());
+                UserInterface.ShowSpecification("Current IPv4: " + localEp.Address.MapToIPv4().ToString());
+                UserInterface.ShowSpecification("Current IPv6: " + localEp.Address.MapToIPv6().ToString());
             }
 
             // additional thread for receiving messages

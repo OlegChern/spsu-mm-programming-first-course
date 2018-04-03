@@ -22,19 +22,16 @@ namespace Chat
         public static void ShowException(Exception exception, string from)
         {
             Console.WriteLine(">> " + from + " " + exception.GetType().ToString() + ": " + exception.Message);
-            Console.ReadKey();
         }
 
         public static void ShowException(Exception exception)
         {
             Console.WriteLine(">> " + exception.GetType().ToString() + ": " + exception.Message);
-            Console.ReadKey();
         }
 
         public static void ShowSpecification(string message)
         {
             Console.WriteLine("> " + message);
-            Console.ReadKey();
         }
 
         public static void ShowMessage(string message)
@@ -56,59 +53,37 @@ namespace Chat
         {
             ep = null;
 
-            string[] splitted = message.Split(' ');
+            string[] splitted = message.Split(' ', ':');
 
-            if (splitted.Length < 2)
+            IPAddress ip;
+            if (splitted.Length < 3)
             {
                 ShowSpecification("Not enough arguments!");
                 return false;
             }
-
-            string ipString = string.Empty;
-
-            bool readPort = false;
-            string portString = string.Empty;
-
-            // expecting ip after space
-            foreach (char c in splitted[1])
+            else if (splitted.Length == 3)
             {
-                if (c >= '0' && c <= '9')
+                // ipv4
+                if (!IPAddress.TryParse(splitted[1], out ip))
                 {
-                    if (readPort)
-                    {
-                        portString += c;
-                    }
-                    else
-                    {
-                        ipString += c;
-                    }
+                    ShowSpecification("Wrong IP address!");
+                    return false;
                 }
-                else if ((c == '.' || c == ',') && !readPort)
+            }
+            else
+            {
+                // ipv6
+                if (!IPAddress.TryParse(string.Join(":", splitted, 1, splitted.Length - 2), out ip))
                 {
-                    ipString += '.';
-                }
-                else if (c == ':')
-                {
-                    readPort = true;
-                }
-                else
-                {
-                    ShowSpecification("IPv4 must contain only symbols: 0-9, ':', '.'!");
+                    ShowSpecification("Wrong IP address!");
                     return false;
                 }
             }
 
-            IPAddress ip;
-            if (!IPAddress.TryParse(ipString, out ip))
-            {
-                ShowSpecification("Wrong IPv4!");
-                return false;
-            }
-
             int port;
-            if (!int.TryParse(portString, out port))
+            if (!int.TryParse(splitted[splitted.Length-1], out port))
             {
-                ShowSpecification("Wrong port!");
+                ShowSpecification("Wrong IP address!");
                 return false;
             }
 
