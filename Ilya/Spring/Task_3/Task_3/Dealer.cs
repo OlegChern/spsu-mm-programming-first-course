@@ -7,24 +7,24 @@ using System.Threading.Tasks;
 
 namespace Task_3
 {
-    class Dealer
+    internal sealed class Dealer
     {
-        private List <int> _dealers_hand;
+        private readonly List <int> _dealersHand;
         private int _sum;
         public bool IsBlackjack { get; set; }
 
         public Dealer(List<int> gameDeck)
         {
-            _dealers_hand = new List<int>
+            _dealersHand = new List<int>
             {
                 gameDeck.Last()
             };
             gameDeck.RemoveAt(gameDeck.Count - 1);
-            _sum += _dealers_hand[(_dealers_hand.Count - 1)];
+            _sum += _dealersHand[(_dealersHand.Count - 1)];
 
-            _dealers_hand.Add(gameDeck[gameDeck.Count-1]);
+            _dealersHand.Add(gameDeck[gameDeck.Count-1]);
             gameDeck.RemoveAt(gameDeck.Count - 1);
-            _sum += _dealers_hand[(_dealers_hand.Count - 1)];
+            _sum += _dealersHand[(_dealersHand.Count - 1)];
 
             if (_sum == 21)
             {
@@ -37,12 +37,12 @@ namespace Task_3
         {
             while (_sum <= 17)
             {
-                _dealers_hand.Add(gameDeck.Last());
+                _dealersHand.Add(gameDeck.Last());
                 gameDeck.RemoveAt(gameDeck.Count - 1);
-                _sum += _dealers_hand[(_dealers_hand.Count - 1)];
-                if (_sum > 21 && (_dealers_hand.IndexOf((int)CardsValue.Ace) >= 0))
+                _sum += _dealersHand[(_dealersHand.Count - 1)];
+                if (_sum > 21 && (_dealersHand.IndexOf((int)CardsValue.Ace) >= 0))
                 {
-                    _dealers_hand[_dealers_hand.IndexOf((int)CardsValue.Ace)] = _dealers_hand[_dealers_hand.IndexOf((int)CardsValue.Ace)] - 10;
+                    _dealersHand[_dealersHand.IndexOf((int)CardsValue.Ace)] = _dealersHand[_dealersHand.IndexOf((int)CardsValue.Ace)] - 10;
                     _sum -= 10;
                 }
             }

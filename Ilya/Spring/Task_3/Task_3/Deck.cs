@@ -13,7 +13,7 @@ namespace Task_3
         static readonly int NumberOfDecks = 8;
         static readonly int NumberOfCards = 13;
         public static readonly int DeckSize = NumberOfCards * NumberOfDecks;
-        private int CardsInDeckNow = NumberOfCards * NumberOfDecks;
+        private int _cardsInDeckNow = NumberOfCards * NumberOfDecks;
 
         private int _two = NumberOfDecks;
         private int _three = NumberOfDecks;
@@ -32,13 +32,13 @@ namespace Task_3
         public int TakeRandomCard(Random r)
         {
             int SelectedValue = 0;
-            int IndCardPos = r.Next(CardsInDeckNow);
+            int IndCardPos = r.Next(_cardsInDeckNow);
 
             SelectedValue += _two;
 
             if (SelectedValue > IndCardPos)
             {
-                CardsInDeckNow--;
+                _cardsInDeckNow--;
                 _two--;
                 return (int)CardsValue.Two;
             }
@@ -47,7 +47,7 @@ namespace Task_3
 
             if (SelectedValue > IndCardPos)
             {
-                CardsInDeckNow--;
+                _cardsInDeckNow--;
                 _three--;
                 return (int)CardsValue.Three;
             }
@@ -56,7 +56,7 @@ namespace Task_3
 
             if (SelectedValue  > IndCardPos)
             {
-                CardsInDeckNow--;
+                _cardsInDeckNow--;
                 _four--;
                 return (int)CardsValue.Four;
             }
@@ -65,7 +65,7 @@ namespace Task_3
 
             if (SelectedValue  > IndCardPos)
             {
-                CardsInDeckNow--;
+                _cardsInDeckNow--;
                 _five--;
                 return (int)CardsValue.Five;
             }
@@ -74,7 +74,7 @@ namespace Task_3
 
             if (SelectedValue  > IndCardPos)
             {
-                CardsInDeckNow--;
+                _cardsInDeckNow--;
                 _six--;
                 return (int)CardsValue.Six;
             }
@@ -83,7 +83,7 @@ namespace Task_3
 
             if (SelectedValue  > IndCardPos)
             {
-                CardsInDeckNow--;
+                _cardsInDeckNow--;
                 _seven--;
                 return (int)CardsValue.Seven;
             }
@@ -92,7 +92,7 @@ namespace Task_3
 
             if (SelectedValue  > IndCardPos)
             {
-                CardsInDeckNow--;
+                _cardsInDeckNow--;
                 _eight--;
                 return (int)CardsValue.Eight;
             }
@@ -101,7 +101,7 @@ namespace Task_3
 
             if (SelectedValue  > IndCardPos)
             {
-                CardsInDeckNow--;
+                _cardsInDeckNow--;
                 _nine--;
                 return (int)CardsValue.Nine;
             }
@@ -110,7 +110,7 @@ namespace Task_3
 
             if (SelectedValue  > IndCardPos)
             {
-                CardsInDeckNow--;
+                _cardsInDeckNow--;
                 _ten--;
                 return (int)CardsValue.Ten;
             }
@@ -119,7 +119,7 @@ namespace Task_3
 
             if (SelectedValue  > IndCardPos)
             {
-                CardsInDeckNow--;
+                _cardsInDeckNow--;
                 _jack--;
                 return (int)CardsValue.Jack;
             }
@@ -128,7 +128,7 @@ namespace Task_3
 
             if (SelectedValue  > IndCardPos)
             {
-                CardsInDeckNow--;
+                _cardsInDeckNow--;
                 _queen--;
                 return (int)CardsValue.Queen;
             }
@@ -137,7 +137,7 @@ namespace Task_3
 
             if (SelectedValue  > IndCardPos)
             {
-                CardsInDeckNow--;
+                _cardsInDeckNow--;
                 _king--;
                 return (int)CardsValue.King;
             }
@@ -146,7 +146,7 @@ namespace Task_3
 
             if (SelectedValue  > IndCardPos)
             {
-                CardsInDeckNow--;
+                _cardsInDeckNow--;
                 _ace--;
                 return (int)CardsValue.Ace;
             }

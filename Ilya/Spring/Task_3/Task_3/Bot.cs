@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace Task_3
 {
-    class Bot : Player
+    internal sealed class Bot : Player
     {
         public Bot(double money, List<int> gameDeck) : base(money, gameDeck)
         {
         }
-
-
 
         public int FirstStrategy(int dealersCard)
         {

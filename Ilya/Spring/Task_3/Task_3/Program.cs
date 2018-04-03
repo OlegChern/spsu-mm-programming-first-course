@@ -41,7 +41,7 @@ namespace Task_3
 
         }
 
-        static List<int> ShuffleDeck()
+        private static List<int> ShuffleDeck()
         {
             Deck NotMixedDeck = new Deck();
             List<int> ShuffledDeck = new List<int>();
@@ -54,7 +54,7 @@ namespace Task_3
             return ShuffledDeck;
         }
 
-        static void PlayGame(List <int> gameDeck, Bot FirstPlayer, Bot SecondPlayer)
+        private static void PlayGame(List <int> gameDeck, Bot FirstPlayer, Bot SecondPlayer)
         {
             int DealersFirstCard = gameDeck[gameDeck.Count - 1];
             Dealer DealerPlayer = new Dealer(gameDeck);

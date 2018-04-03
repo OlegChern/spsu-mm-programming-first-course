@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Task_3
 {
-    enum CardsValue : int
+    internal enum CardsValue : int
     {
         Two = 2,
         Three = 3,

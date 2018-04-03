@@ -9,20 +9,13 @@ using System.Threading.Tasks;
 
 namespace Task_3
 {
-    class Player
+    internal class Player
     {
         public List<int> Hand { get; set; }
 
-        private readonly List<int> _game_deck;
+        private readonly List<int> _gameDeck;
 
-        private int _sum = 0;
-
-        public int Sum
-        {
-            get { return _sum; }
-            set { _sum = value; }
-        }
-
+        public int Sum { get; set; }
         public double Money { get; set; }
         public double Rate { get; set; }
         public bool IsBlackjack { get; set; }
@@ -30,7 +23,8 @@ namespace Task_3
 
         public Player(double money, List<int> gameDeck)
         {
-            _game_deck = gameDeck;
+            Sum = 0;
+            _gameDeck = gameDeck;
             Money = money;
             Hand = new List<int>();
         }
@@ -38,14 +32,14 @@ namespace Task_3
 
         public void Hit()
         {
-            Hand.Add(_game_deck.Last());
-            _game_deck.RemoveAt(_game_deck.Count - 1);
-            _sum += Hand[(Hand.Count - 1)];
+            Hand.Add(_gameDeck.Last());
+            _gameDeck.RemoveAt(_gameDeck.Count - 1);
+            Sum += Hand[(Hand.Count - 1)];
 
-            if ((_sum > 21) && (Hand.IndexOf((int)CardsValue.Ace) >= 0))
+            if ((Sum > 21) && (Hand.IndexOf((int)CardsValue.Ace) >= 0))
             {
                 Hand[Hand.IndexOf((int)CardsValue.Ace)] = Hand[Hand.IndexOf((int)CardsValue.Ace)] - 10;
-                _sum -= 10;
+                Sum -= 10;
             }
 
         }
@@ -53,10 +47,9 @@ namespace Task_3
         public int Stand()
         {
             Hand.Clear();
-            return _sum;
+            return Sum;
 
         }
-
 
         public Player Split()
         {
@@ -64,9 +57,8 @@ namespace Task_3
             List<int> SecondHand = new List<int>();
             SecondHand.Add(Hand[1]);
             Hand.RemoveAt(Hand.Count - 1);
-            return new Player(Rate, _game_deck);
+            return new Player(Rate, _gameDeck);
         }
-
 
         public int DoubleDown()
         {
