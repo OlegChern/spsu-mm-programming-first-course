@@ -54,10 +54,11 @@ namespace Task_3
         public Player Split()
         {
             Money -= Rate;
-            List<int> SecondHand = new List<int>();
-            SecondHand.Add(Hand[1]);
+            Player newPlayer = new Player(Rate,_gameDeck);
+            _gameDeck.Add(Hand[Hand.Count -1]);
             Hand.RemoveAt(Hand.Count - 1);
-            return new Player(Rate, _gameDeck);
+            newPlayer.Hit();
+            return newPlayer;
         }
 
         public int DoubleDown()

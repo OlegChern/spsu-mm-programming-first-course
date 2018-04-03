@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Task_3
 {
-    class Deck
+    internal class Deck
     {
-        static readonly int NumberOfDecks = 8;
-        static readonly int NumberOfCards = 13;
+        private const int NumberOfDecks = 8;
+        private const int NumberOfCards = 13;
         public static readonly int DeckSize = NumberOfCards * NumberOfDecks;
         private int _cardsInDeckNow = NumberOfCards * NumberOfDecks;
 
@@ -31,120 +31,120 @@ namespace Task_3
 
         public int TakeRandomCard(Random r)
         {
-            int SelectedValue = 0;
-            int IndCardPos = r.Next(_cardsInDeckNow);
+            int selectedValue = 0;
+            int indCardPos = r.Next(_cardsInDeckNow);
 
-            SelectedValue += _two;
+            selectedValue += _two;
 
-            if (SelectedValue > IndCardPos)
+            if (selectedValue > indCardPos)
             {
                 _cardsInDeckNow--;
                 _two--;
                 return (int)CardsValue.Two;
             }
 
-            SelectedValue += _three;
+            selectedValue += _three;
 
-            if (SelectedValue > IndCardPos)
+            if (selectedValue > indCardPos)
             {
                 _cardsInDeckNow--;
                 _three--;
                 return (int)CardsValue.Three;
             }
 
-            SelectedValue += _four;
+            selectedValue += _four;
 
-            if (SelectedValue  > IndCardPos)
+            if (selectedValue  > indCardPos)
             {
                 _cardsInDeckNow--;
                 _four--;
                 return (int)CardsValue.Four;
             }
 
-            SelectedValue += _five;
+            selectedValue += _five;
 
-            if (SelectedValue  > IndCardPos)
+            if (selectedValue  > indCardPos)
             {
                 _cardsInDeckNow--;
                 _five--;
                 return (int)CardsValue.Five;
             }
 
-            SelectedValue += _six;
+            selectedValue += _six;
 
-            if (SelectedValue  > IndCardPos)
+            if (selectedValue  > indCardPos)
             {
                 _cardsInDeckNow--;
                 _six--;
                 return (int)CardsValue.Six;
             }
 
-            SelectedValue += _seven;
+            selectedValue += _seven;
 
-            if (SelectedValue  > IndCardPos)
+            if (selectedValue  > indCardPos)
             {
                 _cardsInDeckNow--;
                 _seven--;
                 return (int)CardsValue.Seven;
             }
 
-            SelectedValue += _eight;
+            selectedValue += _eight;
 
-            if (SelectedValue  > IndCardPos)
+            if (selectedValue  > indCardPos)
             {
                 _cardsInDeckNow--;
                 _eight--;
                 return (int)CardsValue.Eight;
             }
 
-            SelectedValue += _nine;
+            selectedValue += _nine;
 
-            if (SelectedValue  > IndCardPos)
+            if (selectedValue  > indCardPos)
             {
                 _cardsInDeckNow--;
                 _nine--;
                 return (int)CardsValue.Nine;
             }
 
-            SelectedValue += _ten;
+            selectedValue += _ten;
 
-            if (SelectedValue  > IndCardPos)
+            if (selectedValue  > indCardPos)
             {
                 _cardsInDeckNow--;
                 _ten--;
                 return (int)CardsValue.Ten;
             }
 
-            SelectedValue += _jack;
+            selectedValue += _jack;
 
-            if (SelectedValue  > IndCardPos)
+            if (selectedValue  > indCardPos)
             {
                 _cardsInDeckNow--;
                 _jack--;
                 return (int)CardsValue.Jack;
             }
 
-            SelectedValue += _queen;
+            selectedValue += _queen;
 
-            if (SelectedValue  > IndCardPos)
+            if (selectedValue  > indCardPos)
             {
                 _cardsInDeckNow--;
                 _queen--;
                 return (int)CardsValue.Queen;
             }
 
-            SelectedValue += _king;
+            selectedValue += _king;
 
-            if (SelectedValue  > IndCardPos)
+            if (selectedValue  > indCardPos)
             {
                 _cardsInDeckNow--;
                 _king--;
                 return (int)CardsValue.King;
             }
 
-            SelectedValue += _ace;
+            selectedValue += _ace;
 
-            if (SelectedValue  > IndCardPos)
+            if (selectedValue  > indCardPos)
             {
                 _cardsInDeckNow--;
                 _ace--;

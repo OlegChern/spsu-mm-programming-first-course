@@ -46,7 +46,6 @@
     <Compile Include="Dealer.cs" />
     <Compile Include="Deck.cs" />
     <Compile Include="Bot.cs" />
-    <Compile Include="GameProcess.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

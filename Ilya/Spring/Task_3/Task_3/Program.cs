@@ -15,24 +15,24 @@ namespace Task_3
             double sum2 = 0;
 
 
-            List<int> GameDeck = ShuffleDeck();
+            List<int> gameDeck = ShuffleDeck();
 
-            Bot FirstPlayer = new Bot(500, GameDeck);
-            Bot SecondPlayer = new Bot(500, GameDeck);
+            Bot firstPlayer = new Bot(500, gameDeck);
+            Bot secondPlayer = new Bot(500, gameDeck);
 
 
-            for (int i = 0; i < 40; i++)
+            for (int i = 0; i < 40; ++i)
             {
-                if (GameDeck.Count <= 35)
+                if (gameDeck.Count <= 35)
                 {
-                    GameDeck.Clear();
-                    GameDeck.AddRange(ShuffleDeck());
+                    gameDeck.Clear();
+                    gameDeck.AddRange(ShuffleDeck());
                 }
 
-                PlayGame(GameDeck, FirstPlayer, SecondPlayer);
+                PlayGame(gameDeck, firstPlayer, secondPlayer);
 
-                sum2 += SecondPlayer.Money;
-                sum1 += FirstPlayer.Money;
+                sum2 += secondPlayer.Money;
+                sum1 += firstPlayer.Money;
             }
 
 
@@ -43,24 +43,24 @@ namespace Task_3
 
         private static List<int> ShuffleDeck()
         {
-            Deck NotMixedDeck = new Deck();
-            List<int> ShuffledDeck = new List<int>();
-            Random MyR = new Random();
+            Deck notMixedDeck = new Deck();
+            List<int> shuffledDeck = new List<int>();
+            Random myR = new Random();
             for (int i = 0; i < Deck.DeckSize; i++)
             {
-                ShuffledDeck.Add(NotMixedDeck.TakeRandomCard(MyR));
+                shuffledDeck.Add(notMixedDeck.TakeRandomCard(myR));
             }
 
-            return ShuffledDeck;
+            return shuffledDeck;
         }
 
-        private static void PlayGame(List <int> gameDeck, Bot FirstPlayer, Bot SecondPlayer)
+        private static void PlayGame(List <int> gameDeck, Bot firstPlayer, Bot secondPlayer)
         {
-            int DealersFirstCard = gameDeck[gameDeck.Count - 1];
-            Dealer DealerPlayer = new Dealer(gameDeck);
-            DealerPlayer.DealersPlay(gameDeck);
-            Payment(FirstPlayer, DealerPlayer, DealersFirstCard, gameDeck);
-            Payment(SecondPlayer, DealerPlayer, DealersFirstCard, gameDeck);
+            int dealersFirstCard = gameDeck[gameDeck.Count - 1];
+            Dealer dealerPlayer = new Dealer(gameDeck);
+            dealerPlayer.DealersPlay(gameDeck);
+            Payment(firstPlayer, dealerPlayer, dealersFirstCard, gameDeck);
+            Payment(secondPlayer, dealerPlayer, dealersFirstCard, gameDeck);
 
         }
 
