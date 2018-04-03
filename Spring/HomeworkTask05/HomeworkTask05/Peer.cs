@@ -11,13 +11,13 @@ namespace Chat
 	class Peer
 	{
         #region enums
-        public enum MessageType
+        public enum DataType
         {
-            Null = 0,
-            Message = 1,
-            IP = 2,
-            IPRequest = 3,
-            Disconnect = 4
+            Null,
+            Message,
+            ConnectRequest,
+            IPRequest,
+            Disconnect
         }
         #endregion
 
@@ -27,10 +27,9 @@ namespace Chat
 
 		#region private fields
 		private string name;
-        private int port;
-
         private bool isRunning;
 
+        Socket receiver;
 		private Thread receivingThread;
 
         private IPEndPoint localEp = null;
@@ -44,7 +43,6 @@ namespace Chat
 		public Peer()
 		{
             name = UserInterface.GetName();
-            port = UserInterface.GetPort();
         }
 
         /// <summary>
@@ -54,9 +52,9 @@ namespace Chat
 		{
 			isRunning = true;
 
-            UserInterface.ShowMessage("> Peer started");
-
             InitReceiver();
+            UserInterface.ShowSpecification("Peer started");
+
             InitSender();
 		}
 		#endregion
@@ -65,103 +63,127 @@ namespace Chat
         #region receiving
         private void InitReceiver()
 		{
-			// additional thread for receiving messages
-			receivingThread = new Thread(new ThreadStart(ReceiveLoop));
+            receiver = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            
+            // get local endpoint
+            {
+                IPEndPoint temp = null;
+
+                foreach (IPAddress ip in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
+                {
+                    if (ip.AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        temp = new IPEndPoint(ip, 0);
+                        break;
+                    }
+                }
+
+                if (temp == null)
+                {
+                    byte[] byteIp = { 192, 168, 0, 1 };
+                    temp = new IPEndPoint(new IPAddress(byteIp), 0);
+                }
+
+                while (true)
+                {
+                    try
+                    {
+                        temp.Port = UserInterface.GetPort();
+
+                        localEp = temp;
+                        receiver.Bind(localEp);
+
+                        break;
+                    }
+                    catch
+                    {
+                        UserInterface.ShowSpecification("This port is already in use!");
+                        continue;
+                    }
+                }
+
+                UserInterface.ShowSpecification("Current IP and port: " + localEp.ToString());
+            }
+
+            // additional thread for receiving messages
+            receivingThread = new Thread(new ThreadStart(ReceiveLoop));
 			receivingThread.IsBackground = true;
 			receivingThread.Start();
 		}
 
         private void ReceiveLoop()
 		{
-			Socket receiver = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
             try
             {
-                // get local end point
-                foreach (IPAddress ip in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
-                {
-                    if (ip.AddressFamily == AddressFamily.InterNetwork)
-                    {
-                        localEp = new IPEndPoint(ip, port);
-                        break;
-                    }
-                }
-
-                if (localEp == null)
-                {
-                    byte[] byteIp = { 192, 168, 0, 1 };
-                    localEp = new IPEndPoint(new IPAddress(byteIp), port);
-                }
-
-                UserInterface.ShowMessage("> Current IP and port: " + localEp.ToString());
-
-                receiver.Bind(localEp);
                 receiver.Listen(16);
 
-				// data array always has same length
-				byte[] data = new byte[MessageLength];
+                // data array always has same length
+                byte[] data = new byte[MessageLength];
 
-				while (isRunning)
-				{
-					// wait for incoming message
-					using (Socket handler = receiver.Accept())
-					{
-						string message = string.Empty;
+                while (isRunning)
+                {
+                    // wait for incoming message
+                    using (Socket handler = receiver.Accept())
+                    {
+                        string message = string.Empty;
 
                         do
-						{
-							int length = handler.Receive(data, MessageLength, SocketFlags.None);
-							message += Encoding.ASCII.GetString(data, 0, length);
-						}
-						while (handler.Available > 0);
+                        {
+                            int length = handler.Receive(data, MessageLength, SocketFlags.None);
+                            message += Encoding.ASCII.GetString(data, 0, length);
+                        }
+                        while (handler.Available > 0);
 
-                        #region process message type
-                        MessageType type = MessageType.Null;
+                        #region process data type
+                        DataType type = DataType.Null;
 
                         if (message != string.Empty)
                         {
-                            type = (MessageType)message[0];
+                            type = (DataType)message[0];
                             message = message.Remove(0, 1);
                         }
 
                         switch (type)
                         {
-                            case MessageType.Message:
+                            case DataType.Message:
                                 {
                                     UserInterface.ShowMessage(message);
                                     break;
                                 }
-                            case MessageType.IPRequest:
+                            case DataType.IPRequest:
                                 {
                                     // connect to requester's local socket, not to sender socket!
                                     IPEndPoint requester;
-                                    UserInterface.GetEndPoint(false, message, out requester);
+                                    GetEndPoint(message, out requester);
                                     Connect(requester, false);
 
                                     // send all current connected endpoints to all peers
                                     foreach (IPEndPoint ep in connectedEp)
                                     {
-                                        Send(ep.ToString(), MessageType.IP);
+                                        Send(ep.ToString(), DataType.ConnectRequest);
                                     }
 
                                     break;
                                 }
-                            case MessageType.IP:
+                            case DataType.ConnectRequest:
                                 {
+                                    // connect to received endpoint
                                     IPEndPoint ep;
-                                    if (UserInterface.GetEndPoint(false, message, out ep))
+                                    if (GetEndPoint(message, out ep))
                                     {
                                         Connect(ep, false);
                                     }
 
                                     break;
                                 }
-                            case MessageType.Disconnect:
+                            case DataType.Disconnect:
                                 {
-                                    // get requester's endpoint and then disconnect it
-                                    IPEndPoint requester;
-                                    UserInterface.GetEndPoint(false, message, out requester);
-                                    Disconnect(requester);
+                                    // get received endpoint and then disconnect it
+                                    IPEndPoint ep;
+                                    if (GetEndPoint(message, out ep))
+                                    {
+                                        Disconnect(ep);
+                                    }
 
                                     break;
                                 }
@@ -169,36 +191,36 @@ namespace Chat
                         #endregion
 
                         handler.Shutdown(SocketShutdown.Both);
-						handler.Close();
-					}
-				}
+                        handler.Close();
+                    }
+                }
 
-				receiver.Shutdown(SocketShutdown.Both);
-				receiver.Close();
+                receiver.Shutdown(SocketShutdown.Both);
+                receiver.Close();
 
-				receiver.Dispose();
-			}
-			catch (SocketException exception)
-			{
+                receiver.Dispose();
+            }
+            catch (SocketException exception)
+            {
                 UserInterface.ShowException(exception, "Receiver");
-			}
-			catch (Exception exception)
-			{
+            }
+            catch (Exception exception)
+            {
                 UserInterface.ShowException(exception);
             }
             finally
-			{
-				if (receiver != null)
-				{
-					if (receiver.Connected)
-					{
-						receiver.Shutdown(SocketShutdown.Both);
-						receiver.Close();
-					}
+            {
+                if (receiver != null)
+                {
+                    if (receiver.Connected)
+                    {
+                        receiver.Shutdown(SocketShutdown.Both);
+                        receiver.Close();
+                    }
 
-					receiver.Dispose();
-				}
-			}
+                    receiver.Dispose();
+                }
+            }
         }
         #endregion
 
@@ -214,19 +236,24 @@ namespace Chat
 			{
                 string message = UserInterface.GetMessage();
 
+                if (message.Length == 0)
+                {
+                    continue;
+                }
+
                 if (!ProcessCommand(message))
                 {
                     // format message before sending
                     message = DateTime.Now.ToString("[HH:mm:ss]") + name + ": " + message;
 
                     // send to other peers
-                    Send(message, MessageType.Message);
+                    Send(message, DataType.Message);
                 }
             }
         }
 
         // send message to all
-        private void Send(string message, MessageType type)
+        private void Send(string message, DataType type)
 		{
 			try
 			{
@@ -247,54 +274,38 @@ namespace Chat
             }
         }
 
-        // send message to exact ip
-        private void Send(IPEndPoint ep, string message, MessageType type)
-        {
-            try
-            {
-                // using first byte as message type
-                byte[] temp = Encoding.ASCII.GetBytes(message);
-                int tempLength = temp.Length;
-
-                byte[] data = new byte[tempLength + 1];
-
-                data[0] = (byte)type;
-                Array.Copy(temp, 0, data, 1, tempLength);
-
-                using (Socket sender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
-                {
-                    // connect to endpoint
-                    sender.Connect(ep);
-
-                    sender.Send(data);
-
-                    sender.Shutdown(SocketShutdown.Both);
-                    sender.Close();
-                }
-            }
-            catch (SocketException exception)
-            {
-                UserInterface.ShowException(exception, "Sender");
-            }
-            catch (Exception exception)
-            {
-                UserInterface.ShowException(exception);
-            }
-        }
-
         private void Send(byte[] data)
         {
             try
             {
+                // create temp list because the original one is changed in loop
+                List<IPEndPoint> tempList = new List<IPEndPoint>(connectedEp);
+                int length = data.Length;
+
                 // send data for each socket
-                foreach (IPEndPoint ep in connectedEp)
+                foreach (IPEndPoint ep in tempList)
                 {
                     using (Socket sender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
                     {
-                        // connect to endpoint
-                        sender.Connect(ep);
+                        try
+                        {
+                            // connect to endpoint
+                            sender.Connect(ep);
+                        }
+                        catch
+                        {
+                            UserInterface.ShowSpecification("Can't connect to " + ep.ToString() + ". Disconnecting it...");
+                            SendDisconnectRequest(ep);
 
-                        sender.Send(data);
+                            continue;
+                        }
+
+                        int sendedLength = sender.Send(data);
+
+                        if (length != sendedLength)
+                        {
+                            sender.Send(data);
+                        }
 
                         sender.Shutdown(SocketShutdown.Both);
                         sender.Close();
@@ -314,42 +325,62 @@ namespace Chat
 
         private void SendIPRequest()
         {
-            Send(localEp.ToString(), MessageType.IPRequest);
+            Send(localEp.ToString(), DataType.IPRequest);
         }
 
-        private void SendDisconnectRequest()
+        private void SendDisconnectRequest(IPEndPoint ep)
         {
-            Send(localEp.ToString(), MessageType.Disconnect);
+            if (ep != localEp)
+            {
+                Disconnect(ep);
+            }
+
+            Send(ep.ToString(), DataType.Disconnect);
         }
         #endregion
 
-        private void Connect(IPEndPoint ep, bool showMesage)
+        private void Connect(IPEndPoint ep, bool showMessage)
         {
             // make sure that there is no same endpoint
             if (connectedEp.Contains(ep))
             {
-                if (showMesage)
+                if (showMessage)
                 {
-                    UserInterface.ShowMessage("> Already connected to " + ep.ToString());
+                    UserInterface.ShowSpecification("Already connected to " + ep.ToString());
                 }
             }
             else if (ep.ToString() == localEp.ToString())
             {
-                if (showMesage)
+                if (showMessage)
                 {
-                    UserInterface.ShowMessage("> Can't connect to same IP and port");
+                    UserInterface.ShowSpecification("Can't connect to same IP and port");
                 }
             }
             else
             {
+                // check existence
+                using (Socket check = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+                {
+                    try
+                    {
+                        // connect to endpoint
+                        check.Connect(ep);
+                    }
+                    catch
+                    {
+                        UserInterface.ShowSpecification("Can't connect to " + ep.ToString());
+                        return;
+                    }
+                }
+
                 // add to list of all endpoints in current space
                 connectedEp.Add(ep);
                 SendIPRequest();
 
-                if (showMesage)
+                if (showMessage)
                 {
-                    UserInterface.ShowMessage("> Connected to " + ep.ToString());
-                    Send(name + " connected.", MessageType.Message);
+                    UserInterface.ShowSpecification("Connected to " + ep.ToString());
+                    Send(name + " connected.", DataType.Message);
                 }
             }
         }
@@ -359,7 +390,7 @@ namespace Chat
             if (connectedEp.Contains(ep) && ep.ToString() != localEp.ToString())
             {
                 connectedEp.Remove(ep);
-                UserInterface.ShowMessage("> " + ep.ToString() + " disconnected");
+                UserInterface.ShowSpecification(ep.ToString() + " disconnected");
             }
         }
         #endregion
@@ -378,7 +409,7 @@ namespace Chat
                         case 'c':
                             {
                                 IPEndPoint ep;
-                                if (UserInterface.GetEndPoint(true, message, out ep))
+                                if (UserInterface.GetEndPoint(message, out ep))
                                 {
                                     Connect(ep, true);
                                 }
@@ -392,15 +423,15 @@ namespace Chat
                             }
                         case 'd':
                             {
-                                SendDisconnectRequest();
+                                SendDisconnectRequest(localEp);
                                 connectedEp.Clear();
 
-                                UserInterface.ShowMessage("> Disconnected");
+                                UserInterface.ShowSpecification("Disconnected");
                                 break;
                             }
                         case 'q':
                             {
-                                Quit();
+                                Exit();
                                 break;
                             }
                     }
@@ -412,24 +443,50 @@ namespace Chat
             return false;
         }
 
+        public static bool GetEndPoint(string message, out IPEndPoint ep)
+        {
+            ep = null;
+
+            string[] ipSplitted = message.Split('.', ':');
+
+            if (ipSplitted.Length < 5)
+            {
+                return false;
+            }
+
+            // read ip
+            byte[] ipBytes = new byte[4];
+
+            for (int i = 0; i < 4; i++)
+            {
+                ipBytes[i] = byte.Parse(ipSplitted[i]);
+            }
+
+            IPAddress ip = new IPAddress(ipBytes);
+            int port = int.Parse(ipSplitted[4]);
+
+            ep = new IPEndPoint(ip, port);
+            return true;
+        }
+
         private void ShowAllConnections()
         {
             if (connectedEp.Count == 0)
             {
-                UserInterface.ShowMessage("> Not connected");
+                UserInterface.ShowSpecification("Not connected");
                 return;
             }
 
-            UserInterface.ShowMessage("> Connected to:");
+            UserInterface.ShowSpecification("Connected to:");
             foreach (IPEndPoint ep in connectedEp)
             {
                 UserInterface.ShowMessage("  " + ep.ToString());
             }
         }
 
-        private void Quit()
+        private void Exit()
         {
-            if (UserInterface.ToQuit())
+            if (UserInterface.RequestExit())
             {
                 Free();
             }
@@ -444,7 +501,7 @@ namespace Chat
 
         private void Free()
         {
-            SendDisconnectRequest();
+            SendDisconnectRequest(localEp);
             isRunning = false;
             connectedEp.Clear();
         }
