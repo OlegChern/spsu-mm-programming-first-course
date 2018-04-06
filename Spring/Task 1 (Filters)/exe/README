@@ -1,0 +1,43 @@
+Description:
+	The program gets 24- or 32-bits .BMP file, applies a set of filters to it and move result to the output file.
+
+Usage:
+	java BMPgram <inputFile> [-o <outputFile>] [actions...]
+	
+	* <inputFile> (obligatory) - the input .BMP file
+	* [-o <outputFile>] (optional) - you can specify an output file. 
+        Default value is "output.bmp"
+	* [actions...] - a list of actions applied for the image. 
+        Actions will be applied in the given order. 
+        Action can be one of the following:
+    		^ monochrome 
+                # makes an image monochrome
+            ^ median <regionHeight> <regionWidth> 
+                # applies median filter with rectangle region. 
+                # <regionHeight> and <regionWidth> are dimensions 
+                # of the window in pixels
+            ^ gaussian3x3
+                # applies gaussian 3x3 filter
+            ^ gaussian5x5
+                # applies gaussian 5x5 filter
+            ^ sobelX
+                # applies sobelX filter
+            ^ sobelY
+                # applies sobelY filter
+            ^ sobel
+                # applies sobel filter
+            ^ scharrX
+                # applies sobelX filter
+            ^ scharrY
+                # applies sobelY filter
+            ^ scharr
+                # applies sobel filter
+
+Examples of usage:
+    java BMPgram bird.bmp sobel gaussian5x5 monochrome
+    java BMPgram bird.bmp -o new_bird.bmp scharrY median 3 11
+    java BMPgram logo.bmp -o logo_copy.bmp
+        # no actions will be applies so the file will be just copied to the 
+        # specified output file 
+    java BMPgram logo.bmp median 1 11 scharrX
+    java BMPgram logo.bmp median 11 1 scharrY
