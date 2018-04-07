@@ -7,90 +7,77 @@ namespace HashTable
 	{
 		#region constants
 		private const float IncreaseMultiplier = 1.5f;
-		private const int DefaultTableSize = 64;
-		private const int DefaultChainSize = 16;
 
+        private const int DefaultChainSize = 16;
+        private const int MinAdmittedChainSize = 8;
+        private const int MaxAdmittedChainSize = 2048;
+
+        private const int DefaultTableSize = 64;
 		private const int MinAdmittedTableSize = 4;
 		private const int MaxAdmittedTableSize = 32768;
-		private const int MinAdmittedChainSize = 8;
-		private const int MaxAdmittedChainSize = 2048;
 		#endregion
 
 		#region variables
 		private HashTableChain<T>[] chains;
 		private int tableSize;
-		private int maxChainSize;
-		#endregion
+        private int maxChainSize;
+        #endregion
 
-		#region constructors
-		/// <summary>
-		/// Creates HashTable
-		/// </summary>
-		/// <param name="tableSize">amount of chains in table</param>
-		/// <param name="maxChainSize">max amount of elements in chain</param>
-		public HashTable(int _tableSize, int _maxChainSize)
+        #region constructors
+        /// <summary>
+        /// Creates HashTable
+        /// </summary>
+        /// <param name="tableSize">amount of chains in table</param>
+        /// <param name="maxChainSize">max amount of elements in chain</param>
+        public HashTable(int tableSize, int maxChainSize)
 		{
-			if (_tableSize < MinAdmittedTableSize)
+			if (tableSize < MinAdmittedTableSize)
 			{
-				tableSize = MinAdmittedTableSize;
+				this.tableSize = MinAdmittedTableSize;
 			}
-			else if (_tableSize > MaxAdmittedTableSize)
+			else if (tableSize > MaxAdmittedTableSize)
 			{
-				tableSize = MaxAdmittedTableSize;
-			}
-			else
-			{
-				tableSize = _tableSize;
-			}
-
-			if (_maxChainSize < MinAdmittedChainSize)
-			{
-				maxChainSize = MinAdmittedChainSize;
-			}
-			else if (_maxChainSize > MaxAdmittedChainSize)
-			{
-				maxChainSize = MaxAdmittedChainSize;
+                this.tableSize = MaxAdmittedTableSize;
 			}
 			else
 			{
-				maxChainSize = _maxChainSize;
+                this.tableSize = tableSize;
 			}
 
 			chains = new HashTableChain<T>[tableSize];
 
 			for (int i = 0; i < tableSize; i++)
 			{
-				chains[i] = new HashTableChain<T>(maxChainSize);
+				chains[i] = new HashTableChain<T>();
 			}
 
-		}
+            this.maxChainSize = maxChainSize;
+        }
 
-		/// <summary>
-		/// Creates HashTable with default size of chains
-		/// </summary>
-		/// <param name="tableSize">amount of chains in table</param>
-		public HashTable(int tableSize) : this(tableSize, DefaultChainSize) { }
+        /// <summary>
+        /// Creates HashTable with default max chain size
+        /// </summary>
+        /// <param name="tableSize">amount of chains in table</param>
+        public HashTable(int tableSize) : this(tableSize, DefaultChainSize) { }
 
-		/// <summary>
-		/// Creates HashTable with default sizes of table and chains
-		/// </summary>
-		/// <param name="tableSize">amount of chains in table</param>
-		/// <param name="chainSize">amount of elements in chain</param>
-		public HashTable() : this(DefaultTableSize, DefaultChainSize) { }
-		#endregion
+        /// <summary>
+        /// Creates HashTable with default table size and max chain size
+        /// </summary>
+        public HashTable() : this(DefaultTableSize, DefaultChainSize) { }
+        #endregion
 
-		#region public methods
-		/// <summary>
-		/// Creates HashTable with default sizes of table and chains
-		/// </summary>
-		/// <param name="tableSize">amount of chains in table</param>
-		/// <param name="chainSize">amount of elements in chain</param>
-		public void Add(string key, T value)
+        #region public methods
+        /// <summary>
+        /// Adds element to HashTable
+        /// </summary>
+        /// <param name="key">element's key</param>
+        /// <param name="value">element's value</param>
+        public void Add(string key, T value)
 		{
 			HashTableElement<T> newElement = new HashTableElement<T>(key, value);
 			HashTableChain<T> chain = chains[Hash(key)];
 
-			chain.AddElement(newElement);
+			chain.Add(newElement);
 			if (chain.ChainSize >= maxChainSize)
 			{
 				Rebalance();
@@ -104,7 +91,7 @@ namespace HashTable
 		public void Remove(string key)
 		{
 			HashTableChain<T> chain = chains[Hash(key)];
-			chain.ShiftElements(key);
+			chain.Remove(key);
 		}
 
 		/// <summary>
@@ -114,7 +101,7 @@ namespace HashTable
 		/// <param name="value">found value</param>
 		public bool Find(string key, out T value)
 		{
-			HashTableElement<T> element = chains[Hash(key)].FindElement(key);
+			HashTableElement<T> element = chains[Hash(key)].Find(key);
 			if (element != null)
 			{
 				value = element.Value;
@@ -172,7 +159,7 @@ namespace HashTable
 			HashTableChain<T>[] temp = new HashTableChain<T>[tableSize];
 			for (int i = 0; i < tableSize; i++)
 			{
-				temp[i] = new HashTableChain<T>(maxChainSize);
+				temp[i] = new HashTableChain<T>();
 			}
 
 			for (int i = 0; i < prevCount; i++)
@@ -187,7 +174,7 @@ namespace HashTable
 					int hash = Hash(sourceChain[j].Key);
 
 					// add element to new chain with recalculated hash key
-					temp[hash].AddElement(sourceChain[j]);
+					temp[hash].Add(sourceChain[j]);
 				}
 			}
 

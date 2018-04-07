@@ -3,95 +3,134 @@ using System.Collections.Generic;
 
 namespace HashTable
 {
-	internal class HashTableChain<T>
-	{
-		#region variables
-		private HashTableElement<T>[] elements;
-		internal int ChainSize
-		{
-			get;
-			private set;
-		}
+    internal class HashTableChain<T>
+    {
+        #region fields
+        private HashTableElement<T> rootElement;
+        private int chainSize;
+        #endregion
 
-		internal HashTableElement<T> this[int i]
-		{
-			get
-			{
-				if (i >= 0 && i < ChainSize)
-				{
-					return elements[i];
-				}
+        #region properties
+        internal int ChainSize
+        {
+            get
+            {
+                return chainSize;
+            }
+        }
 
-				return null;
-			}
-		}
-		#endregion
+        internal HashTableElement<T> this[int index]
+        {
+            get
+            {
+                if (index >= 0 && index < chainSize)
+                {
+                    HashTableElement<T> current = rootElement;
 
-		#region constructor
-		internal HashTableChain(int maxChainSize)
-		{
-			elements = new HashTableElement<T>[maxChainSize];
-			ChainSize = 0;
-		}
-		#endregion
+                    for (int i = 0; i < index; i++)
+                    {
+                        current = current.Next;
+                    }
 
-		#region methods
-		internal void AddElement(HashTableElement<T> element)
-		{
-			elements[ChainSize] = element;
-			ChainSize++;
-		}
+                    return current;
+                }
 
-		internal HashTableElement<T> FindElement(string key)
-		{
-			for (int i = 0; i < ChainSize; i++)
-			{
-				HashTableElement<T> element = elements[i];
-				if (element.Key == key)
-				{
-					return element;
-				}
-			}
+                return null;
+            }
+        }
+        #endregion
 
-			return null;
-		}
+        #region constructor
+        internal HashTableChain()
+        {
+            chainSize = 0;
+        }
+        #endregion
 
-		internal void ShiftElements(string key)
-		{
-			int index;
+        #region methods
+        internal void Add(HashTableElement<T> element)
+        {
+            chainSize++;
 
-			if (FindElementIndex(key, out index))
-			{
-				// destroy element with index
-				elements[index] = null;
+            if (rootElement == null)
+            {
+                rootElement = element;
+                return;
+            }
 
-				// shift elements are after index
-				for (int i = index; i < ChainSize - 1; i++)
-				{
-					elements[i] = elements[i + 1];
-				}
+            HashTableElement<T> current = rootElement;
 
-				// destroy last element
-				elements[ChainSize] = null;
+            while (current.Next != null)
+            {
+                current = current.Next;
+            }
 
-				ChainSize--;
-			}
-		}
+            current.Next = element;
+        }
 
-		private bool FindElementIndex(string key, out int index)
-		{
-			for (int i = 0; i < ChainSize; i++)
-			{
-				if (elements[i].Key == key)
-				{
-					index = i;
-					return true;
-				}
-			}
+        internal HashTableElement<T> Find(string key)
+        {
+            if (rootElement == null)
+            {
+                return null;
+            }
 
-			index = -1;
-			return false;
-		}
-		#endregion
-	}
+            if (rootElement.Key == key)
+            {
+                return rootElement;
+            }
+
+            HashTableElement<T> current = rootElement;
+
+            while (current.Next != null)
+            {
+                if (current.Key == key)
+                {
+                    return current;
+                }
+
+                current = current.Next;
+            }
+
+            return null;
+        }
+
+        // remove element and fix links
+        internal void Remove(string key)
+        {
+            if (rootElement == null)
+            {
+                return;
+            }
+
+            if (rootElement.Key == key)
+            {
+                if (rootElement.Next != null)
+                {
+                    rootElement = rootElement.Next;
+                }
+                else
+                {
+                    rootElement = null;
+                }
+            }
+
+            HashTableElement<T> current = rootElement;
+
+            while (current.Next != null)
+            {
+                if (current.Next.Key == key)
+                {
+                    current.Next = current.Next.Next;
+                    chainSize--;
+
+                    return;
+                }
+
+                current = current.Next;
+            }
+
+            #endregion
+        }
+    }
 }

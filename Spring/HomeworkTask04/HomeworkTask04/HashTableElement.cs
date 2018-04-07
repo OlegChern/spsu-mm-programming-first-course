@@ -5,22 +5,47 @@ namespace HashTable
 {
 	internal class HashTableElement<T>
 	{
-		internal string Key
+        #region fields
+        private string key;
+        private T value;
+        private HashTableElement<T> next;
+        #endregion
+
+        #region properties
+        internal string Key
 		{
-			get;
-			private set;
+			get
+            {
+                return key;
+            }
 		}
 
 		internal T Value
 		{
-			get;
-			private set;
+			get
+            {
+                return value;
+            }
 		}
 
-		internal HashTableElement(string key, T value)
+        internal HashTableElement<T> Next
+        {
+            get
+            {
+                return next;
+            }
+            set
+            {
+                next = value;
+            }
+        }
+        #endregion
+
+        internal HashTableElement(string key, T value)
 		{
-			Key = key;
-			Value = value;
+			this.key = key;
+            this.value = value;
+            next = null;
 		}
 	}
 }

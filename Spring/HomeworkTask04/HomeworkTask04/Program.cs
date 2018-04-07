@@ -12,7 +12,7 @@ namespace HomeworkTask04
 			Console.WriteLine("Hash table test.");
 			Console.WriteLine("Collision resolution: separate chaining with list head cells.");
 
-			HashTable<int> table = new HashTable<int>(4, 2);
+			HashTable<int> table = new HashTable<int>(4);
 
 			Console.WriteLine("\nAdding elements...");
 			// adding test
