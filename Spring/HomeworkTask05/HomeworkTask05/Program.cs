@@ -6,7 +6,7 @@ namespace Chat
 	{
 		static void Main()
 		{
-            UserInterface.ShowTutorial();
+            		UserInterface.ShowTutorial();
 
 			Peer localPeer = new Peer();
 			localPeer.Start();
