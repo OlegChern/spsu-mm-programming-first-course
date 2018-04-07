@@ -9,13 +9,13 @@ import java.util.function.BiFunction;
 
 public class BMPgram {
 
-    private static final Operator gaussian3x3Operator = new Operator(new double[][]{
+    private static final Operator GAUSSIAN_3X3_OPERATOR = new Operator(new double[][]{
             {1.0 / 16, 2.0 / 16, 1.0 / 16},
             {2.0 / 16, 4.0 / 16, 2.0 / 16},
             {1.0 / 16, 2.0 / 16, 1.0 / 16}
     });
 
-    private static final Operator gaussian5x5Operator = new Operator(new double[][]{
+    private static final Operator GAUSSIAN_5X5_OPERATOR = new Operator(new double[][]{
             {1.0 / 273, 4.0 / 273, 7.0 / 273, 4.0 / 273, 1.0 / 271},
             {4.0 / 273, 16.0 / 273, 26.0 / 273, 16.0 / 273, 4.0 / 273},
             {7.0 / 273, 26.0 / 273, 41.0 / 273, 26.0 / 273, 7.0 / 273},
@@ -23,31 +23,31 @@ public class BMPgram {
             {1.0 / 273, 4.0 / 273, 7.0 / 273, 4.0 / 273, 1.0 / 271}
     });
 
-    private static final Operator sobelXOperator = new Operator(new double[][]{
+    private static final Operator SOBEL_X_OPERATOR = new Operator(new double[][]{
             {-1, 0, 1},
             {-2, 0, 2},
             {-1, 0, 1}
     });
 
-    private static final Operator sobelYOperator = new Operator(new double[][]{
+    private static final Operator SOBEL_Y_OPERATOR = new Operator(new double[][]{
             {-1, -2, -1},
             {0, 0, 0},
             {1, 2, 1}
     });
 
-    private static final Operator scharrXOperator = new Operator(new double[][]{
+    private static final Operator SCHARR_X_OPERATOR = new Operator(new double[][]{
             {3, 0, -3},
             {10, 0, -10},
             {3, 0, -3}
     });
 
-    private static final Operator scharrYOperator = new Operator(new double[][]{
+    private static final Operator SCHARR_Y_OPERATOR = new Operator(new double[][]{
             {3, 10, 3},
             {0, 0, 0},
             {-3, -10, -3}
     });
 
-    private static final BiFunction<Pixel, Pixel, Pixel> rootMeanSquare = (p1, p2) -> {
+    private static final BiFunction<Pixel, Pixel, Pixel> ROOT_MEAN_SQUARE = (p1, p2) -> {
         if (p1.getNumberOfChannels() != p2.getNumberOfChannels()) {
             throw new InvalidParameterException("Pixel dimensions mismatch");
         }
@@ -96,28 +96,28 @@ public class BMPgram {
                         argPos += 2;
                         break;
                     case "gaussian3x3":
-                        image.applyFilter(gaussian3x3Operator);
+                        image.applyFilter(GAUSSIAN_3X3_OPERATOR);
                         break;
                     case "gaussian5x5":
-                        image.applyFilter(gaussian5x5Operator);
+                        image.applyFilter(GAUSSIAN_5X5_OPERATOR);
                         break;
                     case "sobelX":
-                        image.applyFilter(sobelXOperator);
+                        image.applyFilter(SOBEL_X_OPERATOR);
                         break;
                     case "sobelY":
-                        image.applyFilter(sobelYOperator);
+                        image.applyFilter(SOBEL_Y_OPERATOR);
                         break;
                     case "sobel":
-                        image.applyFiltersComposition(sobelXOperator, sobelYOperator, rootMeanSquare);
+                        image.applyFiltersComposition(SOBEL_X_OPERATOR, SOBEL_Y_OPERATOR, ROOT_MEAN_SQUARE);
                         break;
                     case "scharrX":
-                        image.applyFilter(scharrXOperator);
+                        image.applyFilter(SCHARR_X_OPERATOR);
                         break;
                     case "scharrY":
-                        image.applyFilter(scharrYOperator);
+                        image.applyFilter(SCHARR_Y_OPERATOR);
                         break;
                     case "scharr":
-                        image.applyFiltersComposition(scharrXOperator, scharrYOperator, rootMeanSquare);
+                        image.applyFiltersComposition(SCHARR_X_OPERATOR, SCHARR_Y_OPERATOR, ROOT_MEAN_SQUARE);
                         break;
                     default:
                         System.out.println("Unrecognized option: " + args[argPos]);
