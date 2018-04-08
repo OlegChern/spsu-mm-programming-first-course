@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Task5
 {
@@ -10,42 +13,49 @@ namespace Task5
     {
         public const int ListeningPort = 11000;
 
+        public const int BufferSize = 1024;
+
         public Client()
         {
-            incomingConnections = new List<Socket>();
+            IncomingConnections = new List<Socket>();
         }
 
-        #region private fields
+        #region private members
 
-        volatile Socket listeningSocet;
-        volatile IList<Socket> incomingConnections;
-        volatile Socket outcomingConnection;
+        Socket listeningSocet;
+        Socket outcomingConnection;
+        IList<Socket> IncomingConnections { get; }
 
-        #endregion
+        static async Task<string> ReceiveMessageFrom(Socket socket)
+        {
+            // Never receives more than BufferSize
+            byte[] array = new byte[BufferSize];
+            var segment = new ArraySegment<byte>(array);
+
+            int bytesRead = await socket.ReceiveAsync(segment, SocketFlags.None);
+
+            return Encoding.Unicode.GetString(array, 0, bytesRead);
+        }
+
+        #endregion private members
 
         #region interface properties
 
-        public int IncomingConnectionsCount
-        {
-            get
-            {
-                lock (incomingConnections)
-                {
-                    return incomingConnections.Count;
-                }
-            }
-        }
+        public int IncomingConnectionsCount => IncomingConnections.Count;
 
         public bool HasOutcomingConnection => outcomingConnection != null;
 
         public bool IsListening => listeningSocet != null;
+
+        public string OutcomingConnectionIp { get; private set; } = "None";
+
+        public bool HasConnections => HasOutcomingConnection || IncomingConnectionsCount > 0;
 
         #endregion interface properties
 
         #region interface methods
 
         // TODO: handle all kinds of exceptions here
-        // TODO: do actual callback handling, not just accept inputs
 
         public async Task StartListening()
         {
@@ -89,10 +99,13 @@ namespace Task5
                     return;
                 }
 
-                // SocketException is not handled
-                lock (incomingConnections)
+                IncomingConnections.Add(handler);
+                MainWindow.Instance.ConnectiosScreen.Text =
+                    $"Connections: {IncomingConnectionsCount + (HasOutcomingConnection ? 1 : 0)}";
+                if (SettingsWindow.HasInstance)
                 {
-                    incomingConnections.Add(handler);
+                    SettingsWindow.Instance.IncomingConnectionsScreen.Text =
+                        $"Incoming connections: {IncomingConnectionsCount}";
                 }
             }
         }
@@ -112,15 +125,15 @@ namespace Task5
 
         public void TerminateIncomingConnections()
         {
-            lock (incomingConnections)
+            lock (IncomingConnections)
             {
-                foreach (var socket in incomingConnections)
+                foreach (var socket in IncomingConnections)
                 {
                     socket.Shutdown(SocketShutdown.Both);
                     socket.Close();
                 }
 
-                incomingConnections.Clear();
+                IncomingConnections.Clear();
             }
         }
 
@@ -142,7 +155,11 @@ namespace Task5
             // Connect to the remote endpoint. 
             await client.ConnectAsync(remoteEp);
 
+            OutcomingConnectionIp = ip;
             outcomingConnection = client;
+
+            // This action should terminate current connection if loops are present
+            await Send(OutcomingConnectionIp);
         }
 
         public void Disconnect()
@@ -155,27 +172,58 @@ namespace Task5
             outcomingConnection.Shutdown(SocketShutdown.Both);
             outcomingConnection.Close();
             outcomingConnection = null;
+            OutcomingConnectionIp = "None";
         }
 
-        // TODO: assert that no loops appeared in network
-        public async Task Send(string message)
+        public Task Send(string message)
+        {
+            return Send(message, null);
+        }
+
+        public async Task Send(string message, Socket ignore)
         {
             if (string.IsNullOrWhiteSpace(message))
             {
                 throw new ArgumentException(nameof(message));
             }
 
-            if (!HasOutcomingConnection)
+            if (!HasConnections)
             {
-                throw new InvalidOperationException("Should connect before sending messages.");
+                throw new InvalidOperationException("Should get connections before sending messages.");
             }
 
-            throw new NotImplementedException();
+            var data = new ArraySegment<byte>(Encoding.UTF8.GetBytes(message), 0, BufferSize);
+
+            if (HasOutcomingConnection && outcomingConnection != ignore)
+            {
+                await outcomingConnection.SendAsync(data, 0);
+            }
+
+            foreach (var socket in IncomingConnections)
+            {
+                if (socket != ignore)
+                {
+                    await socket.SendAsync(data, 0);
+                }
+            }
         }
 
-        public async Task Send(string message, Socket ignore)
+        public IEnumerable<Task<string>> Receive()
         {
-            throw new NotImplementedException();
+            if (!HasConnections)
+            {
+                yield break;
+            }
+
+            if (HasOutcomingConnection)
+            {
+                yield return ReceiveMessageFrom(outcomingConnection);
+            }
+
+            foreach (var socket in IncomingConnections)
+            {
+                yield return ReceiveMessageFrom(socket);
+            }
         }
 
         #endregion interface methods

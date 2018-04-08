@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace Task5
@@ -8,8 +9,12 @@ namespace Task5
         int IncomingConnectionsCount { get; }
 
         bool HasOutcomingConnection { get; }
+        
+        string OutcomingConnectionIp { get; }
 
         bool IsListening { get; }
+        
+        bool HasConnections { get; }
 
         /// <summary>
         /// Begins accepting incoming connections
@@ -30,7 +35,7 @@ namespace Task5
         /// <summary>
         /// Sends message to all connected devices
         /// </summary>
-        /// <param name="message">Text to be sent</param
+        /// <param name="message">Text to be sent</param>
         Task Send(string message);
 
         /// <summary>
@@ -39,5 +44,13 @@ namespace Task5
         /// <param name="message">Text to be sent</param>
         /// <param name="ignore">Connection with device to be ignored</param>
         Task Send(string message, Socket ignore);
+
+        /// <summary>
+        /// Receives messages from all connected devices
+        /// </summary>
+        /// <returns>
+        /// List of tasks returning messages
+        /// </returns>
+        IEnumerable<Task<string>> Receive();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
@@ -10,8 +11,10 @@ namespace Task5
     public class FakeClient : IClient
     {
         public int IncomingConnectionsCount { get; private set; }
-        public bool HasOutcomingConnection { get; private set; }
+        public bool HasOutcomingConnection => OutcomingConnectionIp != null;
         public bool IsListening { get; private set; }
+        public string OutcomingConnectionIp { get; private set; }
+        public bool HasConnections => HasOutcomingConnection || IncomingConnectionsCount > 0;
 
         public Task StartListening()
         {
@@ -21,7 +24,7 @@ namespace Task5
             }
 
             IsListening = true;
-            return null;
+            return Task.Run(() => { });
         }
 
         public void StopListening()
@@ -46,8 +49,8 @@ namespace Task5
                 throw new InvalidOperationException("Should disconnect before estabinishing another connection.");
             }
 
-            HasOutcomingConnection = true;
-            return null;
+            OutcomingConnectionIp = ip;
+            return Task.Run(() => { });
         }
 
         public void Disconnect()
@@ -57,7 +60,7 @@ namespace Task5
                 throw new InvalidOperationException("Should connect before disconnecting.");
             }
 
-            HasOutcomingConnection = false;
+            OutcomingConnectionIp = null;
         }
 
         public Task Send(string message)
@@ -67,7 +70,7 @@ namespace Task5
                 throw new InvalidOperationException("");
             }
 
-            return null;
+            return Task.Run(() => { });
         }
 
         public Task Send(string message, Socket ignore)
@@ -83,7 +86,12 @@ namespace Task5
             }
 
             // Now ok, I sent it
-            return null;
+            return Task.Run(() => { });
+        }
+
+        public IEnumerable<Task<string>> Receive()
+        {
+            yield break;
         }
     }
 }

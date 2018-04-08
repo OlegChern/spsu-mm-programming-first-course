@@ -1,17 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Net;
+using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Task5
 {
@@ -22,80 +13,158 @@ namespace Task5
     /// </summary>
     public sealed partial class MainWindow : Window
     {
+        public const int TimerInterval = 60;
+
         static MainWindow instance;
 
-        public static MainWindow Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new MainWindow();
-                }
-                return instance;
-            }
-        }
+        static string ipAddress;
 
-        IClient client;
+        Timer Timer { get; set; }
+
+        public static MainWindow Instance => instance ?? (instance = new MainWindow());
+
+        internal IClient Client { get; }
+
+        static string IpAddress =>
+            ipAddress ?? (ipAddress = Dns.GetHostAddresses(Dns.GetHostName())[0].ToString());
 
         MainWindow()
         {
             InitializeComponent();
 
-            // TODO: replace with actual client
-            client = new FakeClient();
+            Client = new Client();
 
             try
             {
-                client.StartListening();
+                // Ok, let's just hope it executes quicly enough
+                Client.StartListening();
             }
             catch (Exception)
             {
-                MessageBox.Show($"Cannot access port {Client.ListeningPort}", "Error");
+                MessageBox.Show($"Cannot access port {Task5.Client.ListeningPort}", "Error");
+                Close();
             }
 
-            ExitApplicationButton.Click += OnExitClicked;
+            ExitApplicationButton.Click += (sender, args) => Close();
 
-            SettingsButton.Click += OnSettingsClicked;
+            Closing += OnClose;
 
-            SendButton.Click += OnSendClicked;
+            InputBox.TextChanged += (sender, args) =>
+                SendButton.IsEnabled = Client.HasConnections && !string.IsNullOrEmpty(InputBox.Text);
+
+            SettingsButton.Click += (sender, args) => SettingsWindow.Instance.Show();
+
+            SendButton.Click += OnSendButtonOnClick;
+            
+            Timer = new Timer(Invalidate, null, TimerInterval, TimerInterval);
         }
 
         #region callbacks
 
-        void OnExitClicked(object sender, RoutedEventArgs args)
+        void OnSendButtonOnClick(object sender, RoutedEventArgs args)
         {
-            if (client.IsListening)
+            string message = InputBox.Text;
+            InputBox.Text = "";
+            try
             {
-                client.StopListening();
+                Client.Send(message);
             }
-            if (client.IncomingConnectionsCount != 0)
+            catch (Exception e)
             {
-                client.TerminateIncomingConnections();
+                MessageBox.Show(e.ToString(), "Error");
+                return;
             }
-            if (client.HasOutcomingConnection)
-            {
-                client.Disconnect();
-            }
-            Close();
+
+            ChatScreen.Text += Environment.NewLine;
+            ChatScreen.Text += message;
         }
 
-        void OnSettingsClicked(object sender, RoutedEventArgs args)
+        void OnClose(object sender, CancelEventArgs args)
         {
-            // TODO: verify this singleton works correctly
-            SettingsWindow.Instance.Show();
+            // Yeah, ignoring all exceptions here, shame on me
+            try
+            {
+                Timer.Dispose();
+            }
+            catch (Exception)
+            {
+                // ignore
+            }
+            
+            try
+            {
+                Client.StopListening();
+            }
+            catch (Exception)
+            {
+                // ignore
+            }
+
+            try
+            {
+                Client.TerminateIncomingConnections();
+            }
+            catch (Exception)
+            {
+                // ignore
+            }
+
+            try
+            {
+                Client.Disconnect();
+            }
+            catch (Exception)
+            {
+                // ignore
+            }
+
+            if (SettingsWindow.HasInstance)
+            {
+                SettingsWindow.Instance.Close();
+            }
+
+            if (ConnectWindow.HasInstance)
+            {
+                ConnectWindow.Instance.Close();
+            }
+
+            instance = null;
         }
 
-        void OnSendClicked(object sender, RoutedEventArgs args)
+        async void Invalidate(object arg)
         {
+            var messageTasks = Client.Receive();
+            foreach (var messageTask in messageTasks)
+            {
+                string message = await messageTask;
+                if (string.IsNullOrWhiteSpace(message))
+                {
+                    continue;
+                }
 
+                if (Client.HasOutcomingConnection && message == IpAddress)
+                {
+                    Client.Disconnect();
+                    ConnectiosScreen.Text = $"Connections: {Client.IncomingConnectionsCount}";
+                    if (SettingsWindow.HasInstance)
+                    {
+                        SettingsWindow.Instance.OutcomingConnectionsScreen.Text =
+                            $"OutcomingConnection: {Client.OutcomingConnectionIp}";
+                        SettingsWindow.Instance.ConnectButton.IsEnabled = true;
+                        SettingsWindow.Instance.DisconnectButton.IsEnabled = false;
+                    }
+
+                    if (!Client.HasConnections)
+                    {
+                        SendButton.IsEnabled = false;
+                    }
+                }
+
+                ChatScreen.Text += Environment.NewLine;
+                ChatScreen.Text += message;
+            }
         }
 
         #endregion callbacks
-
-        void Send()
-        {
-
-        }
     }
 }
