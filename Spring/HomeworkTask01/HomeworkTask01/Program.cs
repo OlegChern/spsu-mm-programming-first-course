@@ -3,7 +3,17 @@
 namespace HomeworkTask01
 {
 	class Program
-	{
+    {
+        // Enter: 
+        // [source path] [filter name] [target path]
+
+        // Available filters:
+        // - Gauss
+		// - SobelX
+		// - SobelY
+		// - GrayScale
+		// - Average
+
 		private static void Main(string[] args)
 		{
 			try
@@ -15,7 +25,9 @@ namespace HomeworkTask01
 
 				try
 				{
-					BMP bmp = new BMP(args[0]);
+					BMP bmp = new BMP();
+                    bmp.Load(args[0]);
+
 					BMPFilters.Type type;
 
 					switch (args[1])
@@ -53,36 +65,18 @@ namespace HomeworkTask01
 
 					BMPFilters.ProcessBMP(bmp, type);
 
-					bmp.Create(args[2]);
+					bmp.Copy(args[2]);
 				}
 				catch (ArgumentException exception)
 				{
 					Console.WriteLine('\n' + exception.Message + '\n');
-					TryAgain();
 				}
 
 			}
 			catch (ArgumentException exception)
 			{
 				Console.WriteLine('\n' + exception.Message + '\n');
-				TryAgain();
 			}
-		}
-
-		private static void TryAgain()
-		{
-			Console.WriteLine("Please enter: [source path] [filter name] [target path]");
-			Console.WriteLine("Available filters:");
-			Console.WriteLine("- Gauss");
-			Console.WriteLine("- SobelX");
-			Console.WriteLine("- SobelY");
-			Console.WriteLine("- GrayScale");
-			Console.WriteLine("- Average");
-
-			string str = Console.ReadLine();
-			string[] words = str.Split(' ');
-
-			Main(words);
 		}
 	}
 }

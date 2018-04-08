@@ -31,125 +31,138 @@ namespace HomeworkTask01
 		}
 		#endregion
 
-		#region private properties
-		private BinaryReader binary;
+		#region fields
 		private BitmapFileHeader fileHeader;
 		private BitmapInfoHeader infoHeader;
-		private Pixel[,] pixelArray { get; }
+
+        private uint width;
+        private uint height;
+
+        private Pixel[,] pixelArray;
 		#endregion
 
-		#region private properties
+		#region properties
+        // vertical is x, horizontal is y
 		public Pixel this[long x, long y]
 		{
 			get
 			{
-				return pixelArray[x, y];
+                if (x >= 0 && x < height && y >= 0 && y < width)
+                {
+                    return pixelArray[x, y];
+                }
+
+                return new Pixel { Red = 0, Green = 0, Blue = 0 };
 			}
 			set
-			{
-				pixelArray[x, y] = value;
+            {
+                if (x >= 0 && x < height && y >= 0 && y < width)
+                {
+                    pixelArray[x, y] = value;
+                }
 			}
 		}
+
 		public uint Width
 		{
 			get
 			{
-				return infoHeader.Width;
+				return width;
 			}
 		}
+
 		public uint Height
 		{
 			get
 			{
-				return infoHeader.Height;
+				return height;
 			}
 		}
-		#endregion
+        #endregion
 
-		#region constructor
-		/// <summary>
-		/// Reads BMP file
-		/// </summary>
-		/// <param name="sourcePath">path to file</param>
-		/// <returns>BMP file</returns>
-		public BMP(string sourcePath)
+        #region public
+        /// <summary>
+        /// Reads BMP file
+        /// </summary>
+        /// <param name="sourcePath">path to file</param>
+        /// <returns>BMP file</returns>
+        public BMP()
+        {
+            fileHeader = new BitmapFileHeader();
+            infoHeader = new BitmapInfoHeader();
+        }
+
+        /// <summary>
+        /// Loads BMP file
+        /// </summary>
+        /// <param name="sourcePath">path to file</param>
+        /// <returns>BMP file</returns>
+        public void Load(string sourcePath)
+        {
+            using (BinaryReader reader = new BinaryReader(File.OpenRead(sourcePath)))
+            {
+                if (!ReadToFileHeader(reader))
+                {
+                    throw new ArgumentException("Wrong file header size!");
+                }
+
+                if (!ReadToInfoHeader(reader))
+                {
+                    throw new ArgumentException("Wrong info header size!");
+                }
+
+                width = infoHeader.Width;
+                height = infoHeader.Height;
+
+                pixelArray = new Pixel[height, width];
+
+                ReadPixelData(reader);
+            }
+        }
+
+        /// <summary>
+        /// Creates new copy of BMP
+        /// </summary>
+        /// <param name="targetPath">target path</param>
+        public void Copy(string targetPath)
 		{
 			try
 			{
-				binary = new BinaryReader(File.OpenRead(sourcePath));
-			}
-			catch
-			{
-				throw new ArgumentException("Can't read file!");
-			}
-
-			if (!ReadToFileHeader())
-			{
-				throw new ArgumentException("Wrong file header size!");
-			}
-
-			if (!ReadToInfoHeader())
-			{
-				throw new ArgumentException("Wrong info header size!");
-			}
-
-			pixelArray = new Pixel[infoHeader.Height, infoHeader.Width];
-
-			ReadPixelData();
-		}
-
-		~BMP()
-		{
-			if (binary != null)
-			{
-				binary.Close();
-			}
-		}
-		#endregion
-
-		#region writers
-		/// <summary>
-		/// Creates BMP file
-		/// </summary>
-		/// <param name="targetPath">target path</param>
-		public void Create(string targetPath)
-		{
-			try
-			{
-				BinaryWriter writer = new BinaryWriter(File.Create(targetPath));
-				WritePixelData(writer);
+				WritePixelData(targetPath);
 			}
 			catch
 			{
 				throw new ArgumentException("Can't create file!");
 			}
 		}
+        #endregion
 
-		private void WritePixelData(BinaryWriter writer)
+        #region writers
+        private void WritePixelData(string targetPath)
 		{
-			WriteFromFileHeader(writer);
-			WriteFromInfoHeader(writer);
+            using (BinaryWriter writer = new BinaryWriter(File.Create(targetPath)))
+            {
+                WriteFromFileHeader(writer);
+                WriteFromInfoHeader(writer);
 
-			int width = (int)infoHeader.Width;
-			int height = (int)infoHeader.Height;
+                int pixelSize = infoHeader.BitCount / 8; // bytes per pixel
+                int padSize = (4 - ((int)width * pixelSize) % 4) % 4; // padding after line
 
-			int pixelSize = infoHeader.BitCount / 8; // bytes per pixel
-			int padSize = (4 - (width * pixelSize) % 4) % 4; // padding after line
+                byte[] padding = { 0, 0, 0, 0 };
 
-			byte[] padding = { 0, 0, 0, 0 };
+                for (int x = 0; x < height; x++)
+                {
+                    for (int y = 0; y < width; y++)
+                    {
+                        // bgr, not rgb					
+                        writer.Write(pixelArray[x, y].Blue);
+                        writer.Write(pixelArray[x, y].Green);
+                        writer.Write(pixelArray[x, y].Red);
+                    }
 
-			for (int x = 0; x < height; x++)
-			{
-				for (int y = 0; y < width; y++)
-				{
-					// bgr, not rgb					
-					writer.Write(pixelArray[x, y].Blue);
-					writer.Write(pixelArray[x, y].Green);
-					writer.Write(pixelArray[x, y].Red);
-				}
-
-				writer.Write(padding, 0, padSize);
-			}
+                    writer.Write(padding, 0, padSize);
+                }
+            }
 		}
 
 		private void WriteFromFileHeader(BinaryWriter writer)
@@ -178,13 +191,10 @@ namespace HomeworkTask01
 		#endregion
 
 		#region readers
-		private void ReadPixelData()
+		private void ReadPixelData(BinaryReader reader)
 		{
-			int width = (int)infoHeader.Width;
-			int height = (int)infoHeader.Height;
-
 			int pixelSize = infoHeader.BitCount / 8; // bytes per pixel
-			int padSize = (4 - (width * pixelSize) % 4) % 4; // padding after line
+			int padSize = (4 - ((int)width * pixelSize) % 4) % 4; // padding after line
 
 			for (int x = 0; x < height; x++)
 			{
@@ -192,7 +202,7 @@ namespace HomeworkTask01
 				{
 					byte[] buffer = new byte[pixelSize];
 
-					buffer = binary.ReadBytes(pixelSize);
+					buffer = reader.ReadBytes(pixelSize);
 
 					// bgr, not rgb					
 					pixelArray[x, y].Red = buffer[2];
@@ -200,38 +210,34 @@ namespace HomeworkTask01
 					pixelArray[x, y].Blue = buffer[0];
 				}
 
-				binary.ReadBytes(padSize);
+                reader.ReadBytes(padSize);
 			}
 		}
 
-		private bool ReadToFileHeader()
+		private bool ReadToFileHeader(BinaryReader reader)
 		{
-			fileHeader = new BitmapFileHeader();
-
-			fileHeader.Type = binary.ReadUInt16();
-			fileHeader.Size = binary.ReadUInt32();
-			fileHeader.Reserved1 = binary.ReadUInt16();
-			fileHeader.Reserved2 = binary.ReadUInt16();
-			fileHeader.OffBits = binary.ReadUInt32();
+			fileHeader.Type = reader.ReadUInt16();
+			fileHeader.Size = reader.ReadUInt32();
+			fileHeader.Reserved1 = reader.ReadUInt16();
+			fileHeader.Reserved2 = reader.ReadUInt16();
+			fileHeader.OffBits = reader.ReadUInt32();
 
 			return fileHeader.Type == 0x4D42;
 		}
 
-		private bool ReadToInfoHeader()
-		{
-			infoHeader = new BitmapInfoHeader();
-
-			infoHeader.Size = binary.ReadUInt32();
-			infoHeader.Width = binary.ReadUInt32();
-			infoHeader.Height = binary.ReadUInt32();
-			infoHeader.Planes = binary.ReadUInt16();
-			infoHeader.BitCount = binary.ReadUInt16();
-			infoHeader.Compression = binary.ReadUInt32();
-			infoHeader.SizeImage = binary.ReadUInt32();
-			infoHeader.XPelsPerMeter = binary.ReadUInt32();
-			infoHeader.YPelsPerMeter = binary.ReadUInt32();
-			infoHeader.ClrUsed = binary.ReadUInt32();
-			infoHeader.ClrImportant = binary.ReadUInt32();
+		private bool ReadToInfoHeader(BinaryReader reader)
+        {
+			infoHeader.Size = reader.ReadUInt32();
+			infoHeader.Width = reader.ReadUInt32();
+			infoHeader.Height = reader.ReadUInt32();
+			infoHeader.Planes = reader.ReadUInt16();
+			infoHeader.BitCount = reader.ReadUInt16();
+			infoHeader.Compression = reader.ReadUInt32();
+			infoHeader.SizeImage = reader.ReadUInt32();
+			infoHeader.XPelsPerMeter = reader.ReadUInt32();
+			infoHeader.YPelsPerMeter = reader.ReadUInt32();
+			infoHeader.ClrUsed = reader.ReadUInt32();
+			infoHeader.ClrImportant = reader.ReadUInt32();
 
 			return infoHeader.Size == 0x28;
 		}
