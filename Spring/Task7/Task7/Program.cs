@@ -8,9 +8,7 @@ namespace Task7
     {
         static void Main()
         {
-            IList<int> list = new int[12];
-            list.Add(123);
-            Console.WriteLine("Hello, world!");
+            Console.WriteLine("See Task7/WeakHashTableTests/WeakHashTableTests.cs");
         }
     }
 }
