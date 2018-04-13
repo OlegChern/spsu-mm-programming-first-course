@@ -2,7 +2,7 @@
 
 namespace Task_2
 {
-    internal sealed class BlitzenMTLS : Tank
+    internal class BlitzenMTLS : Tank
     {
         public override void GetInfo()
         {

@@ -2,7 +2,7 @@
 
 namespace Task_2
 {
-    class AMXChasseurDeChars : Tank
+    internal class AMXChasseurDeChars : Tank
     {
         public override void GetInfo()
         {
