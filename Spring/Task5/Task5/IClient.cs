@@ -13,13 +13,15 @@ namespace Task5
         string OutcomingConnectionIp { get; }
 
         bool IsListening { get; }
+
+        int ListeningPort { get; }
         
         bool HasConnections { get; }
 
         /// <summary>
         /// Begins accepting incoming connections
         /// </summary>
-        Task StartListening();
+        Task StartListening(int port);
 
         /// <summary>
         /// Stops accepting incoming connections
@@ -28,7 +30,7 @@ namespace Task5
 
         void TerminateIncomingConnections();
 
-        Task Connect(string ip);
+        Task Connect(string ip, int port);
 
         void Disconnect();
 
@@ -38,6 +40,8 @@ namespace Task5
         /// <param name="message">Text to be sent</param>
         Task Send(string message);
 
+        Task Send(MessageData data);
+        
         /// <summary>
         /// Sends message to all connected devices but for one
         /// </summary>
@@ -51,6 +55,6 @@ namespace Task5
         /// <returns>
         /// List of tasks returning messages
         /// </returns>
-        IEnumerable<Task<string>> Receive();
+        Task<List<MessageData>> Receive();
     }
 }

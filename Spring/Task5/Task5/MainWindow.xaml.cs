@@ -1,4 +1,12 @@
-﻿using System;
+﻿// В какой-то момент я осознал,
+// что эта программа не слишком хороша.
+// Все классы в ней очень тесно переплетены,
+// удобные механизмы событий,
+// которые здесь были бы очень к месту,
+// не используются, да и протестировать
+// можно только всё сразу, да и то руками...
+
+using System;
 using System.ComponentModel;
 using System.Net;
 using System.Threading;
@@ -13,37 +21,25 @@ namespace Task5
     /// </summary>
     public sealed partial class MainWindow : Window
     {
-        public const int TimerInterval = 60;
+        const int TimerInterval = 60;
 
         static MainWindow instance;
 
         static string ipAddress;
 
-        Timer Timer { get; set; }
+        Timer Timer { get; }
 
         public static MainWindow Instance => instance ?? (instance = new MainWindow());
 
         internal IClient Client { get; }
 
-        static string IpAddress =>
-            ipAddress ?? (ipAddress = Dns.GetHostAddresses(Dns.GetHostName())[0].ToString());
+        static string IpAddress => ipAddress ?? (ipAddress = Dns.GetHostAddresses(Dns.GetHostName())[0].ToString());
 
         MainWindow()
         {
             InitializeComponent();
 
             Client = new Client();
-
-            try
-            {
-                // Ok, let's just hope it executes quicly enough
-                Client.StartListening();
-            }
-            catch (Exception)
-            {
-                MessageBox.Show($"Cannot access port {Task5.Client.ListeningPort}", "Error");
-                Close();
-            }
 
             ExitApplicationButton.Click += (sender, args) => Close();
 
@@ -55,15 +51,15 @@ namespace Task5
             SettingsButton.Click += (sender, args) => SettingsWindow.Instance.Show();
 
             SendButton.Click += OnSendButtonOnClick;
-            
-            Timer = new Timer(Invalidate, null, TimerInterval, TimerInterval);
+
+            Timer = new Timer(obj => Dispatcher.Invoke(Invalidate), null, TimerInterval, TimerInterval);
         }
 
         #region callbacks
 
         void OnSendButtonOnClick(object sender, RoutedEventArgs args)
         {
-            string message = InputBox.Text;
+            string message = $"[{Title}] {InputBox.Text}";
             InputBox.Text = "";
             try
             {
@@ -81,41 +77,21 @@ namespace Task5
 
         void OnClose(object sender, CancelEventArgs args)
         {
-            // Yeah, ignoring all exceptions here, shame on me
-            try
-            {
-                Timer.Dispose();
-            }
-            catch (Exception)
-            {
-                // ignore
-            }
-            
-            try
+            Timer.Dispose();
+
+            if (Client.IsListening)
             {
                 Client.StopListening();
             }
-            catch (Exception)
-            {
-                // ignore
-            }
 
-            try
+            if (Client.IncomingConnectionsCount != 0)
             {
                 Client.TerminateIncomingConnections();
             }
-            catch (Exception)
-            {
-                // ignore
-            }
 
-            try
+            if (Client.HasOutcomingConnection)
             {
                 Client.Disconnect();
-            }
-            catch (Exception)
-            {
-                // ignore
             }
 
             if (SettingsWindow.HasInstance)
@@ -128,21 +104,26 @@ namespace Task5
                 ConnectWindow.Instance.Close();
             }
 
+            if (StartListeningWindow.HasInstance)
+            {
+                StartListeningWindow.Instance.Close();
+            }
+
             instance = null;
         }
 
-        async void Invalidate(object arg)
+        async void Invalidate()
         {
-            var messageTasks = Client.Receive();
-            foreach (var messageTask in messageTasks)
+            var messagesData = await Client.Receive();
+
+            foreach (var data in messagesData)
             {
-                string message = await messageTask;
-                if (string.IsNullOrWhiteSpace(message))
+                if (string.IsNullOrWhiteSpace(data.Message))
                 {
                     continue;
                 }
 
-                if (Client.HasOutcomingConnection && message == IpAddress)
+                if (Client.HasOutcomingConnection && data.Message == IpAddress)
                 {
                     Client.Disconnect();
                     ConnectiosScreen.Text = $"Connections: {Client.IncomingConnectionsCount}";
@@ -161,7 +142,9 @@ namespace Task5
                 }
 
                 ChatScreen.Text += Environment.NewLine;
-                ChatScreen.Text += message;
+                ChatScreen.Text += data.Message;
+
+                await Client.Send(data);
             }
         }
 

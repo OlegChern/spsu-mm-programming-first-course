@@ -11,7 +11,7 @@ namespace Task5
 {
     sealed class Client : IClient
     {
-        public const int ListeningPort = 11000;
+        public static int DefaultListeningPort => 11000;
 
         public const int BufferSize = 1024;
 
@@ -34,7 +34,7 @@ namespace Task5
 
             int bytesRead = await socket.ReceiveAsync(segment, SocketFlags.None);
 
-            return Encoding.Unicode.GetString(array, 0, bytesRead);
+            return bytesRead == 0 ? string.Empty : Encoding.Unicode.GetString(array, 0, bytesRead);
         }
 
         #endregion private members
@@ -47,6 +47,8 @@ namespace Task5
 
         public bool IsListening => listeningSocet != null;
 
+        public int ListeningPort { get; private set; } = -1;
+
         public string OutcomingConnectionIp { get; private set; } = "None";
 
         public bool HasConnections => HasOutcomingConnection || IncomingConnectionsCount > 0;
@@ -55,9 +57,7 @@ namespace Task5
 
         #region interface methods
 
-        // TODO: handle all kinds of exceptions here
-
-        public async Task StartListening()
+        public async Task StartListening(int port)
         {
             if (IsListening)
             {
@@ -67,7 +67,7 @@ namespace Task5
             // Establish the local endpoint for the socket.    
             var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             var ipAddress = ipHostInfo.AddressList[0];
-            var localEndPoint = new IPEndPoint(ipAddress, ListeningPort);
+            var localEndPoint = new IPEndPoint(ipAddress, port);
 
             // Create a TCP/IP socket.  
             var listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -79,6 +79,7 @@ namespace Task5
             // I'm not sure about thread-safety of this assignment.
             // Let's just hope code above executes quickly enough to prevent problems
             listeningSocet = listener;
+            ListeningPort = port;
 
             // Listen for connections
             while (true)
@@ -117,10 +118,18 @@ namespace Task5
                 throw new InvalidOperationException("Should start listening before stopping.");
             }
 
-            listeningSocet.Shutdown(SocketShutdown.Both);
-            listeningSocet.Close();
-            // Close() calls IDisposable.Dispose() internally
+            try
+            {
+                listeningSocet.Close();
+                // Close() calls IDisposable.Dispose() internally
+            }
+            catch (SocketException e)
+            {
+                // Ignore
+                MessageBox.Show(e.ErrorCode.ToString());
+            }
             listeningSocet = null;
+            ListeningPort = -1;
         }
 
         public void TerminateIncomingConnections()
@@ -137,7 +146,7 @@ namespace Task5
             }
         }
 
-        public async Task Connect(string ip)
+        public async Task Connect(string ip, int port)
         {
             if (HasOutcomingConnection)
             {
@@ -147,7 +156,7 @@ namespace Task5
             // Establish the remote endpoint for the socket.    
             var ipHostInfo = Dns.GetHostEntry(ip);
             var ipAddress = ipHostInfo.AddressList[0];
-            var remoteEp = new IPEndPoint(ipAddress, ListeningPort);
+            var remoteEp = new IPEndPoint(ipAddress, port);
 
             // Create a TCP/IP socket.  
             var client = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -180,6 +189,11 @@ namespace Task5
             return Send(message, null);
         }
 
+        public Task Send(MessageData data)
+        {
+            return Send(data.Message, data.Socket);
+        }
+
         public async Task Send(string message, Socket ignore)
         {
             if (string.IsNullOrWhiteSpace(message))
@@ -192,11 +206,11 @@ namespace Task5
                 throw new InvalidOperationException("Should get connections before sending messages.");
             }
 
-            var data = new ArraySegment<byte>(Encoding.UTF8.GetBytes(message), 0, BufferSize);
+            var data = new ArraySegment<byte>(Encoding.Unicode.GetBytes(message));
 
             if (HasOutcomingConnection && outcomingConnection != ignore)
             {
-                await outcomingConnection.SendAsync(data, 0);
+                await outcomingConnection.SendAsync(data, SocketFlags.None);
             }
 
             foreach (var socket in IncomingConnections)
@@ -208,22 +222,30 @@ namespace Task5
             }
         }
 
-        public IEnumerable<Task<string>> Receive()
+        public async Task<List<MessageData>> Receive()
         {
-            if (!HasConnections)
-            {
-                yield break;
-            }
-
+            var result = new List<MessageData>();
+            
             if (HasOutcomingConnection)
             {
-                yield return ReceiveMessageFrom(outcomingConnection);
+                string message = await ReceiveMessageFrom(outcomingConnection);
+                if (!string.IsNullOrEmpty(message))
+                {
+                    result.Add(new MessageData(message, outcomingConnection));
+                }
             }
 
             foreach (var socket in IncomingConnections)
             {
-                yield return ReceiveMessageFrom(socket);
+                string message = await ReceiveMessageFrom(socket);
+
+                if (!string.IsNullOrEmpty(message))
+                {
+                    result.Add(new MessageData(message, socket));
+                }
             }
+
+            return result;
         }
 
         #endregion interface methods

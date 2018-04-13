@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.ComponentModel;
+using System.Net;
 using System.Net.Sockets;
 using System.Windows;
 
@@ -30,7 +31,11 @@ namespace Task5
 
             DoneButton.Click += (sender, args) => Close();
 
-            Closing += (sender, cancelEventArgs) => instance = null;
+            Closing += OnClose;
+
+            StartListeningButton.Click += (sender, args) => StartListeningWindow.Instance.Show();
+
+            StopListeningButton.Click += OnStopListeningClicked;
         }
 
         void InitializeInformation()
@@ -38,14 +43,21 @@ namespace Task5
             InitializeIpAddress();
 
             var client = MainWindow.Instance.Client;
-            
+
+            ListeningPortScreen.Text =
+                $"Listening Port: {(client.ListeningPort >= 0 ? client.ListeningPort.ToString() : "None")}";
+
             IncomingConnectionsScreen.Text = $"Incoming connections: {client.IncomingConnectionsCount}";
 
-            OutcomingConnectionsScreen.Text = $"Outcoming connection: {client.OutcomingConnectionIp ?? "none"}";
+            OutcomingConnectionsScreen.Text = $"Outcoming connection: {client.OutcomingConnectionIp ?? "None"}";
 
             DisconnectButton.IsEnabled = client.HasOutcomingConnection;
 
             ConnectButton.IsEnabled = !client.HasOutcomingConnection;
+
+            StartListeningButton.IsEnabled = !client.IsListening;
+
+            StopListeningButton.IsEnabled = client.IsListening;
         }
         
         void InitializeIpAddress()
@@ -73,8 +85,20 @@ namespace Task5
             MainWindow.Instance.Close();
         }
 
-
         #region callbacks
+
+        void OnClose(object sender, CancelEventArgs args)
+        {
+            instance = null;
+            if (ConnectWindow.HasInstance)
+            {
+                ConnectWindow.Instance.Close();
+            }
+            if (StartListeningWindow.HasInstance)
+            {
+                StartListeningWindow.Instance.Close();
+            }
+        }
 
         void OnDisconnectClicked(object sender, RoutedEventArgs args)
         {
@@ -87,6 +111,14 @@ namespace Task5
             main.SendButton.IsEnabled = false;
         }
 
-        #endregion
+        void OnStopListeningClicked(object sender, RoutedEventArgs args)
+        {
+            MainWindow.Instance.Client.StopListening();
+            StopListeningButton.IsEnabled = false;
+            StartListeningButton.IsEnabled = true;
+            ListeningPortScreen.Text = "Listening Port: None";
+        }
+
+        #endregion callbacks
     }
 }

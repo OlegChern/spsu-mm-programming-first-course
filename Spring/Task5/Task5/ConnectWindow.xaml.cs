@@ -36,16 +36,22 @@ namespace Task5
             DoneButton.IsEnabled = false;
             CancelButton.IsEnabled = false;
             IpInputBox.IsEnabled = false;
+            PortInputBox.IsEnabled = false;
             try
             {
-                await MainWindow.Instance.Client.Connect(IpInputBox.Text);
+                int port =
+                    string.IsNullOrEmpty(PortInputBox.Text)
+                        ? Client.DefaultListeningPort
+                        : int.Parse(PortInputBox.Text);
+                await MainWindow.Instance.Client.Connect(IpInputBox.Text, port);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                MessageBox.Show("Could not connect", "Error");
+                MessageBox.Show(e.ToString(), "Error");
                 DoneButton.IsEnabled = true;
                 CancelButton.IsEnabled = true;
                 IpInputBox.IsEnabled = true;
+                PortInputBox.IsEnabled = true;
                 return;
             }
 
@@ -54,9 +60,10 @@ namespace Task5
             settings.DisconnectButton.IsEnabled = true;
             settings.OutcomingConnectionsScreen.Text =
                 $"Outcoming connection: {MainWindow.Instance.Client.OutcomingConnectionIp}";
-            
+
             var main = MainWindow.Instance;
             main.SendButton.IsEnabled = !string.IsNullOrEmpty(main.InputBox.Text);
+            main.ConnectiosScreen.Text = $"Connections: {main.Client.IncomingConnectionsCount + 1}";
             Close();
         }
 
