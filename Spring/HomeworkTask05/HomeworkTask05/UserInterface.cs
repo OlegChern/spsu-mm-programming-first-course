@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Text;
-using System.Threading;
 using System.Net;
-using System.Net.Sockets;
 
 namespace Chat
 {
@@ -17,7 +14,7 @@ namespace Chat
             Console.WriteLine("  /d      - to disconnect");
             Console.WriteLine("  /q      - to exit\n");
         }
-        
+
         public static void ShowException(Exception exception, string from)
         {
             Console.WriteLine(">> " + from + " " + exception.GetType().ToString() + ": " + exception.Message);
@@ -80,7 +77,7 @@ namespace Chat
             }
 
             int port;
-            if (!int.TryParse(splitted[splitted.Length-1], out port))
+            if (!int.TryParse(splitted[splitted.Length - 1], out port))
             {
                 ShowSpecification("Wrong IP address!");
                 return false;

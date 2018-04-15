@@ -7,8 +7,8 @@ using System.Net.Sockets;
 
 namespace Chat
 {
-	class Peer
-	{
+    class Peer
+    {
         #region enums
         public enum DataType
         {
@@ -22,25 +22,25 @@ namespace Chat
 
         #region constants
         private const int MessageLength = 256;
-		#endregion
+        #endregion
 
-		#region private fields
-		private string name;
+        #region private fields
+        private string name;
         private bool isRunning;
 
         Socket receiver;
-		private Thread receivingThread;
+        private Thread receivingThread;
 
         private IPEndPoint localEp = null;
         private List<IPEndPoint> connectedEp = new List<IPEndPoint>();
-		#endregion
+        #endregion
 
-		#region public methods
-		/// <summary>
-		/// Creates new peer
-		/// </summary>
-		public Peer()
-		{
+        #region public methods
+        /// <summary>
+        /// Creates new peer
+        /// </summary>
+        public Peer()
+        {
             name = UserInterface.GetName();
         }
 
@@ -48,22 +48,22 @@ namespace Chat
         /// Startes sending and receiving
         /// </summary>
         public void Start()
-		{
-			isRunning = true;
+        {
+            isRunning = true;
 
             InitReceiver();
             UserInterface.ShowSpecification("Peer started");
 
             InitSender();
-		}
-		#endregion
+        }
+        #endregion
 
-		#region main methods 
+        #region main methods 
         #region receiving
         private void InitReceiver()
-		{
+        {
             receiver = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            
+
             // get local endpoint
             {
                 IPEndPoint temp = null;
@@ -107,12 +107,12 @@ namespace Chat
 
             // additional thread for receiving messages
             receivingThread = new Thread(new ThreadStart(ReceiveLoop));
-			receivingThread.IsBackground = true;
-			receivingThread.Start();
-		}
+            receivingThread.IsBackground = true;
+            receivingThread.Start();
+        }
 
         private void ReceiveLoop()
-		{
+        {
             try
             {
                 receiver.Listen(16);
@@ -231,9 +231,9 @@ namespace Chat
         }
 
         private void SendLoop()
-		{
-			while (isRunning)
-			{
+        {
+            while (isRunning)
+            {
                 string message = UserInterface.GetMessage();
 
                 if (message.Length == 0)
@@ -254,9 +254,9 @@ namespace Chat
 
         // send message to all
         private void Send(string message, DataType type)
-		{
-			try
-			{
+        {
+            try
+            {
                 // using first byte as message type
                 byte[] temp = Encoding.ASCII.GetBytes(message);
                 int tempLength = temp.Length;
@@ -267,9 +267,9 @@ namespace Chat
                 Array.Copy(temp, 0, data, 1, tempLength);
 
                 Send(data);
-			}
+            }
             catch (Exception exception)
-			{
+            {
                 UserInterface.ShowException(exception);
             }
         }
@@ -404,7 +404,7 @@ namespace Chat
             {
                 if (message[0] == '/')
                 {
-                    switch(message[1])
+                    switch (message[1])
                     {
                         case 'c':
                             {
@@ -443,7 +443,7 @@ namespace Chat
             return false;
         }
 
-        public static bool GetEndPoint(string message, out IPEndPoint ep)
+        private bool GetEndPoint(string message, out IPEndPoint ep)
         {
             ep = null;
 
@@ -495,9 +495,9 @@ namespace Chat
 
         #region freeing memory
         ~Peer()
-		{
-			Free();
-		}
+        {
+            Free();
+        }
 
         private void Free()
         {
