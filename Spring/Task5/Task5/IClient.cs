@@ -1,11 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace Task5
 {
-    interface IClient
+    interface IClient: IDisposable
     {
+        event Action<string> MessageReceived;
+        event Action AutoDisconnected;
+        
         int IncomingConnectionsCount { get; }
 
         bool HasOutcomingConnection { get; }
@@ -18,6 +22,8 @@ namespace Task5
         
         bool HasConnections { get; }
 
+        void StartTimer();
+        
         /// <summary>
         /// Begins accepting incoming connections
         /// </summary>
@@ -55,6 +61,6 @@ namespace Task5
         /// <returns>
         /// List of tasks returning messages
         /// </returns>
-        Task<List<MessageData>> Receive();
+        List<MessageData> Receive();
     }
 }

@@ -1,11 +1,14 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace Task5
 {
@@ -13,26 +16,34 @@ namespace Task5
     {
         public static int DefaultListeningPort => 11000;
 
-        public const int BufferSize = 1024;
+        const int BufferSize = 1024;
+        const int TimerInterval = 15000;
 
         public Client()
         {
             IncomingConnections = new List<Socket>();
         }
 
+        public event Action<string> MessageReceived;
+        public event Action AutoDisconnected;
+        
         #region private members
 
         Socket listeningSocet;
         Socket outcomingConnection;
         IList<Socket> IncomingConnections { get; }
+        Timer timer;
+        
+        static string ipAddress;
+        
+        static string IpAddress => ipAddress ?? (ipAddress = Dns.GetHostAddresses(Dns.GetHostName())[0].ToString());
 
-        static async Task<string> ReceiveMessageFrom(Socket socket)
+        static string ReceiveMessageFrom(Socket socket)
         {
             // Never receives more than BufferSize
             byte[] array = new byte[BufferSize];
-            var segment = new ArraySegment<byte>(array);
 
-            int bytesRead = await socket.ReceiveAsync(segment, SocketFlags.None);
+            int bytesRead = socket.Receive(array, SocketFlags.None);
 
             return bytesRead == 0 ? string.Empty : Encoding.Unicode.GetString(array, 0, bytesRead);
         }
@@ -57,6 +68,11 @@ namespace Task5
 
         #region interface methods
 
+        public void StartTimer()
+        {
+            timer = new Timer(obj => Invalidate(), null, TimerInterval, TimerInterval);
+        }
+        
         public async Task StartListening(int port)
         {
             if (IsListening)
@@ -222,32 +238,67 @@ namespace Task5
             }
         }
 
-        public async Task<List<MessageData>> Receive()
+        public List<MessageData> Receive()
         {
             var result = new List<MessageData>();
             
             if (HasOutcomingConnection)
             {
-                string message = await ReceiveMessageFrom(outcomingConnection);
+                string message = ReceiveMessageFrom(outcomingConnection);
                 if (!string.IsNullOrEmpty(message))
                 {
                     result.Add(new MessageData(message, outcomingConnection));
                 }
             }
 
-            foreach (var socket in IncomingConnections)
-            {
-                string message = await ReceiveMessageFrom(socket);
-
-                if (!string.IsNullOrEmpty(message))
-                {
-                    result.Add(new MessageData(message, socket));
-                }
-            }
+            result.AddRange(
+                from socket in IncomingConnections
+                let message = ReceiveMessageFrom(socket)
+                where !string.IsNullOrEmpty(message)
+                select new MessageData(message, socket)
+            );
 
             return result;
         }
 
         #endregion interface methods
+
+        public void Dispose()
+        {
+            timer?.Dispose();
+            
+            if (IsListening)
+            {
+                StopListening();
+            }
+
+            if (IncomingConnectionsCount != 0)
+            {
+                TerminateIncomingConnections();
+            }
+
+            if (HasOutcomingConnection)
+            {
+                Disconnect();
+            }
+        }
+        
+        async void Invalidate()
+        {
+            var messagesData = Receive();
+
+            foreach (var data in messagesData)
+            {
+                if (HasOutcomingConnection && data.Message == IpAddress)
+                {
+                    Disconnect();
+                    AutoDisconnected?.Invoke();
+                }
+                
+                MessageReceived?.Invoke(data.Message);
+                
+                await Send(data);
+            }
+        }
     }
 }
