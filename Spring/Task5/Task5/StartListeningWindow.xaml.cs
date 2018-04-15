@@ -49,10 +49,14 @@ namespace Task5
             var settings = SettingsWindow.Instance;
 
             client.StartListening(int.Parse(PortInputBox.Text));
-            settings.ListeningPortScreen.Text = $"Listening Port: {client.ListeningPort}";
-            settings.StartListeningButton.IsEnabled = false;
-            settings.StopListeningButton.IsEnabled = true;
-            Close();
+            
+            if (client.IsListening)
+            {
+                settings.ListeningPortScreen.Text = $"Listening Port: {client.ListeningPort}";
+                settings.StartListeningButton.IsEnabled = false;
+                settings.StopListeningButton.IsEnabled = true;
+                Close();
+            }
         }
 
         #endregion callbacks

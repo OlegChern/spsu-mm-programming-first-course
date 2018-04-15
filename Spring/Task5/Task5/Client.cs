@@ -111,7 +111,16 @@ namespace Task5
             var listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
             // Bind the socket to the local endpoint
-            listener.Bind(localEndPoint);
+            try
+            {
+                listener.Bind(localEndPoint);
+            }
+            catch
+            {
+                MessageBox.Show("Could not occupy port");
+                return;
+            }
+            
             listener.Listen(100);
 
             // I'm not sure about thread-safety of this assignment.
@@ -157,7 +166,14 @@ namespace Task5
                 throw new InvalidOperationException("Should start listening before stopping.");
             }
 
-            listeningSocet.Close();
+            try
+            {
+                listeningSocet.Close();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString(), "Error");
+            }
 
             listeningSocet = null;
             ListeningPort = -1;
