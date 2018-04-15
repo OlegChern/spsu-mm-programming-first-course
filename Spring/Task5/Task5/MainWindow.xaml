@@ -56,20 +56,22 @@
             Grid.Column="4"
             Grid.Row="0"
             Grid.ColumnSpan="2"
-            Name="ExitApplicationButton" >
+            Name="ExitApplicationButton">
             Exit
         </Button>
 
-        <TextBlock
-            Style="{StaticResource TextStyle}"
+        <ScrollViewer
             Grid.Column="0"
             Grid.Row="1"
             Grid.ColumnSpan="6"
-            Grid.RowSpan="5"
-            TextAlignment="Left"
-            Name="ChatScreen">
-            Welcome!
-        </TextBlock>
+            Grid.RowSpan="5">
+            <TextBlock
+                Style="{StaticResource TextStyle}"
+                TextAlignment="Left"
+                Name="ChatScreen">
+                Welcome!
+            </TextBlock>
+        </ScrollViewer>
 
         <TextBox
             Grid.Column="0"
@@ -77,10 +79,10 @@
             Grid.ColumnSpan="4"
             Margin="4"
             Background="{StaticResource BaseBackground}"
-            Foreground="{StaticResource BaseTextColor}" 
+            Foreground="{StaticResource BaseTextColor}"
             FontSize="16"
             Name="InputBox"
-            VerticalContentAlignment="Center"/>
+            VerticalContentAlignment="Center" />
 
         <Button
             Grid.Column="4"

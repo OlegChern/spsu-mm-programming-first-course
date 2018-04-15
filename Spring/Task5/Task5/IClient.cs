@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Task5
 {
-    interface IClient: IDisposable
+    interface IClient
     {
         event Action<string> MessageReceived;
         event Action AutoDisconnected;
@@ -22,8 +22,6 @@ namespace Task5
         
         bool HasConnections { get; }
 
-        void StartTimer();
-        
         /// <summary>
         /// Begins accepting incoming connections
         /// </summary>
@@ -54,13 +52,5 @@ namespace Task5
         /// <param name="message">Text to be sent</param>
         /// <param name="ignore">Connection with device to be ignored</param>
         Task Send(string message, Socket ignore);
-
-        /// <summary>
-        /// Receives messages from all connected devices
-        /// </summary>
-        /// <returns>
-        /// List of tasks returning messages
-        /// </returns>
-        List<MessageData> Receive();
     }
 }

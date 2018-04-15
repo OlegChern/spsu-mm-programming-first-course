@@ -1,7 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Net;
-using System.Threading;
 using System.Windows;
 
 namespace Task5
@@ -36,8 +34,6 @@ namespace Task5
 
             SendButton.Click += OnSendButtonOnClick;
 
-            Client.StartTimer();
-
             Client.MessageReceived += s => Dispatcher.Invoke(() => ChatScreen.Text += $"{Environment.NewLine}{s}");
 
             Client.AutoDisconnected += () =>
@@ -66,7 +62,20 @@ namespace Task5
 
         void OnClose(object sender, CancelEventArgs args)
         {
-            Client.Dispose();
+            if (Client.IsListening)
+            {
+                Client.StopListening();
+            }
+
+            if (Client.IncomingConnectionsCount != 0)
+            {
+                Client.TerminateIncomingConnections();
+            }
+
+            if (Client.HasOutcomingConnection)
+            {
+                Client.Disconnect();
+            }
 
             if (SettingsWindow.HasInstance)
             {

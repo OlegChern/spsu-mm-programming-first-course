@@ -1,14 +1,11 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics.Contracts;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace Task5
 {
@@ -17,7 +14,6 @@ namespace Task5
         public static int DefaultListeningPort => 11000;
 
         const int BufferSize = 1024;
-        const int TimerInterval = 15000;
 
         public Client()
         {
@@ -26,26 +22,57 @@ namespace Task5
 
         public event Action<string> MessageReceived;
         public event Action AutoDisconnected;
-        
+
         #region private members
 
         Socket listeningSocet;
         Socket outcomingConnection;
         IList<Socket> IncomingConnections { get; }
-        Timer timer;
-        
-        static string ipAddress;
-        
-        static string IpAddress => ipAddress ?? (ipAddress = Dns.GetHostAddresses(Dns.GetHostName())[0].ToString());
 
-        static string ReceiveMessageFrom(Socket socket)
+        string IpAddressMessage => outcomingConnection?.LocalEndPoint?.ToString();
+
+        async void StartReceivingMessages(Socket socket)
         {
-            // Never receives more than BufferSize
             byte[] array = new byte[BufferSize];
+            var segment = new ArraySegment<byte>(array);
 
-            int bytesRead = socket.Receive(array, SocketFlags.None);
+            while (true)
+            {
+                if (!socket.Connected)
+                {
+                    IncomingConnections.Remove(socket);
+                    return;
+                }
 
-            return bytesRead == 0 ? string.Empty : Encoding.Unicode.GetString(array, 0, bytesRead);
+                int bytesRead;
+                try
+                {
+                    bytesRead = await socket.ReceiveAsync(segment, SocketFlags.None);
+                }
+                catch
+                {
+                    MessageBox.Show("One of devices must have been disconnected", "Error reading data");
+                    IncomingConnections.Remove(socket);
+                    return;
+                }
+
+                string message = Encoding.Unicode.GetString(array, 0, bytesRead);
+
+                if (string.IsNullOrWhiteSpace(message))
+                {
+                    continue;
+                }
+
+                if (message == IpAddressMessage)
+                {
+                    Disconnect();
+                    AutoDisconnected?.Invoke();
+                    continue;
+                }
+
+                MessageReceived?.Invoke(message);
+                await Send(message, socket);
+            }
         }
 
         #endregion private members
@@ -68,11 +95,6 @@ namespace Task5
 
         #region interface methods
 
-        public void StartTimer()
-        {
-            timer = new Timer(obj => Invalidate(), null, TimerInterval, TimerInterval);
-        }
-        
         public async Task StartListening(int port)
         {
             if (IsListening)
@@ -110,6 +132,7 @@ namespace Task5
                 try
                 {
                     handler = await listeningSocet.AcceptAsync();
+                    StartReceivingMessages(handler);
                 }
                 catch (ObjectDisposedException)
                 {
@@ -134,16 +157,8 @@ namespace Task5
                 throw new InvalidOperationException("Should start listening before stopping.");
             }
 
-            try
-            {
-                listeningSocet.Close();
-                // Close() calls IDisposable.Dispose() internally
-            }
-            catch (SocketException e)
-            {
-                // Ignore
-                MessageBox.Show(e.ErrorCode.ToString());
-            }
+            listeningSocet.Close();
+
             listeningSocet = null;
             ListeningPort = -1;
         }
@@ -184,7 +199,9 @@ namespace Task5
             outcomingConnection = client;
 
             // This action should terminate current connection if loops are present
-            await Send(OutcomingConnectionIp);
+            await Send(IpAddressMessage);
+
+            StartReceivingMessages(client);
         }
 
         public void Disconnect()
@@ -238,67 +255,6 @@ namespace Task5
             }
         }
 
-        public List<MessageData> Receive()
-        {
-            var result = new List<MessageData>();
-            
-            if (HasOutcomingConnection)
-            {
-                string message = ReceiveMessageFrom(outcomingConnection);
-                if (!string.IsNullOrEmpty(message))
-                {
-                    result.Add(new MessageData(message, outcomingConnection));
-                }
-            }
-
-            result.AddRange(
-                from socket in IncomingConnections
-                let message = ReceiveMessageFrom(socket)
-                where !string.IsNullOrEmpty(message)
-                select new MessageData(message, socket)
-            );
-
-            return result;
-        }
-
         #endregion interface methods
-
-        public void Dispose()
-        {
-            timer?.Dispose();
-            
-            if (IsListening)
-            {
-                StopListening();
-            }
-
-            if (IncomingConnectionsCount != 0)
-            {
-                TerminateIncomingConnections();
-            }
-
-            if (HasOutcomingConnection)
-            {
-                Disconnect();
-            }
-        }
-        
-        async void Invalidate()
-        {
-            var messagesData = Receive();
-
-            foreach (var data in messagesData)
-            {
-                if (HasOutcomingConnection && data.Message == IpAddress)
-                {
-                    Disconnect();
-                    AutoDisconnected?.Invoke();
-                }
-                
-                MessageReceived?.Invoke(data.Message);
-                
-                await Send(data);
-            }
-        }
     }
 }
