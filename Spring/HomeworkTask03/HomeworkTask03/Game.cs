@@ -1,24 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BlackJack
+﻿namespace BlackJack
 {
     class Game
     {
         #region constants
-        private const int DefaultBotMoney = 300;
+        private const float blackjackMultiplier = 1.5f;
         #endregion
 
         #region fields
         private Deck deck;
         private Player[] players;
 
-        private Card[] dealerCards = new Card[2];
+        private Dealer dealer;
 
         private static Game instance;
+        #endregion
+
+        #region properties
+        public static Game Instance
+        {
+            get
+            {
+                return instance;
+            }
+        }
+
+        public int DealerCardValue
+        {
+            get
+            {
+                int dealerCardValue = GetCardValue(dealer.Card);
+                dealerCardValue = dealerCardValue != 1 ? dealerCardValue : 11;
+
+                return dealerCardValue;
+            }
+        }
         #endregion
 
         #region constructor
@@ -32,59 +47,85 @@ namespace BlackJack
         #endregion
 
         #region game logic
+        /// <summary>
+        /// Start the game
+        /// </summary>
         public void Start()
         {
-            // 0 is dealer's index
-            dealerCards[0] = GetCard();
-            dealerCards[1] = GetCard();
+            dealer = new Dealer();
+            dealer.Start();
 
-            if (dealerCards[0] != Card.Ace)
+            for (int i = 0; i < players.Length; i++)
             {
-                // every player take 2 cards
-                for (int i = 0; i < players.Length; i++)
-                {
-                    players[i] = new Bot(this, DefaultBotMoney);
-                }
+                players[i].Start();
+            }
 
-                Update();
-            }
-            else
-            {
-                // todo
-            }
+            Update();
         }
 
+        // game loop
         private void Update()
         {
-            bool updatable = true;
-
-            do
+            while (true)
             {
-                updatable = false;
+                bool updatable = false;
 
                 foreach (Player player in players)
                 {
-                    if (!player.IsFinished)
-                    {
-                        player.Update();
-                        updatable = true;
-                    }
+                    updatable |= player.Update();
                 }
-            } while (updatable);
+
+                if (!updatable)
+                {
+                    break;
+                }
+            }
+
+            // dealer's decisions
+            while (dealer.Update()) { }
+
+            Finish();
         }
 
-        public void Stop()
+        private void Finish()
         {
-
+            foreach (Player player in players)
+            {
+                if (player.Lost)
+                {
+                    player.Lose();
+                }
+                else if (player.BlackJack)
+                {
+                    player.Win(blackjackMultiplier);
+                }
+                else if (dealer.Lost)
+                {
+                    player.Win();
+                }
+                else if (dealer.CardsSum < player.CardsSum)
+                {
+                    player.Win();
+                }
+            }
         }
         #endregion
 
-        #region public methods
+        #region cards methods
+        /// <summary>
+        /// Get one card from the deck
+        /// </summary>
+        /// <returns></returns>
         public Card GetCard()
         {
             return deck.Pop();
         }
 
+        /// <summary>
+        /// Get value of the card
+        /// </summary>
+        /// <param name="card">card to get value</param>
+        /// <returns></returns>
         public static int GetCardValue(Card card)
         {
             switch (card)
@@ -94,6 +135,28 @@ namespace BlackJack
                 case Card.Jack:
                 case Card.Ten:
                     return 10;
+                default:
+                    return (int)card;
+            }
+        }
+
+        /// <summary>
+        /// Get value of the card
+        /// </summary>
+        /// <param name="card">card to get value</param>
+        /// <param name="cardsSum">sum of cards to calculate ace value</param>
+        /// <returns></returns>
+        public static int GetCardValue(Card card, int cardsSum)
+        {
+            switch (card)
+            {
+                case Card.King:
+                case Card.Queen:
+                case Card.Jack:
+                case Card.Ten:
+                    return 10;
+                case Card.Ace:
+                    return cardsSum + 11 > 21 ? 1 : 11;
                 default:
                     return (int)card;
             }
