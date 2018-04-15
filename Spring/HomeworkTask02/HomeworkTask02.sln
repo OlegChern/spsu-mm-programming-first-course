@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeworkTask02", "HomeworkTask02\HomeworkTask02.csproj", "{DA23A468-D1A4-4933-815C-CBE9F91E64FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IceCreamLibrary", "IceCream\IceCreamLibrary.csproj", "{60639EE3-A28F-44C1-A3F4-D25BD8D267FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IceCreamImplementation", "IceCreamImplementation\IceCreamImplementation.csproj", "{B8358E55-84EA-4B20-920B-4D5AF109C8F9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DA23A468-D1A4-4933-815C-CBE9F91E64FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA23A468-D1A4-4933-815C-CBE9F91E64FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA23A468-D1A4-4933-815C-CBE9F91E64FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA23A468-D1A4-4933-815C-CBE9F91E64FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60639EE3-A28F-44C1-A3F4-D25BD8D267FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60639EE3-A28F-44C1-A3F4-D25BD8D267FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60639EE3-A28F-44C1-A3F4-D25BD8D267FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60639EE3-A28F-44C1-A3F4-D25BD8D267FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8358E55-84EA-4B20-920B-4D5AF109C8F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8358E55-84EA-4B20-920B-4D5AF109C8F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8358E55-84EA-4B20-920B-4D5AF109C8F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8358E55-84EA-4B20-920B-4D5AF109C8F9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
