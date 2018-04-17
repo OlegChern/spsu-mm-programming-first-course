@@ -36,8 +36,11 @@ namespace Math
 
         internal override IEnumerable<Point> UnsafeGetPoints(Region region, double step)
         {
-            return from point in centralCircle.UnsafeGetPoints(region, step)
-                select new Point(point.X + center.X, point.Y + center.Y);
+            var newUpperLeft = new Point(region.UpperLeft.X - center.X, region.UpperLeft.Y + center.Y);
+            var newLowerRight = new Point(region.LoweRight.X - center.X, region.LoweRight.Y + center.Y);
+            var newRegion = new Region(newUpperLeft, newLowerRight);
+            return from point in centralCircle.UnsafeGetPoints(newRegion, step)
+                select new Point(point.X + center.X, point.Y - center.Y);
         }
     }
 }

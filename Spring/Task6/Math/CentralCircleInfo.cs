@@ -9,7 +9,7 @@ namespace Math
     /// Class representing points of circle
     /// x^2 + y^2 = Radius^2
     /// </summary>
-    sealed class CentralCircleInfo : CurveInfo
+    public sealed class CentralCircleInfo : CurveInfo
     {
         public override string Name => "Circle";
         

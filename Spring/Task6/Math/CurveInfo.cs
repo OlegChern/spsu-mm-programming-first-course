@@ -11,7 +11,7 @@ namespace Math
         
         public IEnumerable<Point> GetPoints(Region region)
         {
-            double step = region.Width / 1000;
+            double step = region.Width / 1024;
 
             if (step < double.Epsilon * 2)
             {

@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
+using Math;
 
 namespace WinFormsUi
 {
@@ -10,11 +11,47 @@ namespace WinFormsUi
             InitializeComponent();
         }
 
-        private void MainForm_Paint(object sender, PaintEventArgs e)
+        void MainForm_Paint(object sender, PaintEventArgs e)
         {
-            Graphics graphicsObj;
+            Controls.Add(new Button
+            {
+                Text = "+",
+                DialogResult = DialogResult.Yes,
+                Width = 80,
+                Height = 24
+            });
+            Controls.Add(new Button
+            {
+                Left = 80,
+                Width = 80,
+                Height = 24,
+                Text = "-",
+                DialogResult = DialogResult.No
+            });
+            Controls.Add(new ComboBox
+            {
+                Left = 160,
+                Width = 80,
+                DisplayMember = "Name",
+                Items = {new CircleInfo(2, 1, 2), new EllipticCurveInfo()}
+            });
 
-            graphicsObj = CreateGraphics();
+            Graphics g = CreateGraphics();
+            g.Lef
+        }
+
+        void myPaint(CurveInfo curve)
+        {
+            
+        }
+        
+        void PaintDot()
+        {
+            
+        }
+        
+        void PaintAxes()
+        {
         }
     }
 }

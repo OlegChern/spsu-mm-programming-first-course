@@ -8,8 +8,8 @@
     xmlns:math="clr-namespace:Math;assembly=Math"
     mc:Ignorable="d"
     Title="MainWindow"
-    Height="375"
-    Width="300"
+    Height="365"
+    Width="310"
     Background="{StaticResource MainBackground}">
 
     <Grid>
@@ -17,6 +17,7 @@
             <ColumnDefinition />
             <ColumnDefinition />
             <ColumnDefinition />
+            
             <ColumnDefinition />
             <ColumnDefinition />
             <ColumnDefinition />
@@ -27,7 +28,6 @@
             <RowDefinition />
             <RowDefinition />
             
-            <RowDefinition />
             <RowDefinition />
             <RowDefinition />
             <RowDefinition />
@@ -63,8 +63,10 @@
             Grid.Column="0"
             Grid.Row="1"
             Grid.ColumnSpan="6"
-            Grid.RowSpan="7"
-            Name="Canvas">
+            Grid.RowSpan="6"
+            Name="Canvas"
+            Background="{StaticResource BaseBackground}"
+            Margin="5,0,5,5">
             
         </Canvas>
         
