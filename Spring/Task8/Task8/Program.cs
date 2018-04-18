@@ -12,7 +12,7 @@ namespace Task8
         // location of .dll file that contains defenition
         // of type implementing Template.IDoer
         // Example:
-        // <project directory location>\TemplateImplementation\bin\Debug
+        // <project directory location>\TemplateImplementation\bin\Debug\TemplateImplementation.dll
         static void Main(string[] args)
         {
             if (args.Length == 0)
