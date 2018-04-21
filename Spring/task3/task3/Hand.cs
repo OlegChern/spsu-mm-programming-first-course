@@ -3,7 +3,7 @@
 namespace Task3
 {
     // I don't know whether it should be struct or not
-    class Hand
+    public class Hand
     {
         public AbstractPlayer Owner { get; }
         public List<Card> Cards { get; }

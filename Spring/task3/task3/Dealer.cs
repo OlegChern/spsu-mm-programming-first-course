@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Task3
 {
-    class Dealer
+    public class Dealer
     {
         List<Card> Hand { get; }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Task3
 {
-    abstract class AbstractPlayer
+    public abstract class AbstractPlayer
     {
         // I'll just trust nothing goes wrong with that public setter...
         public uint Money { get; protected set; }

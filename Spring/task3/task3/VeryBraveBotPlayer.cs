@@ -2,9 +2,9 @@
 
 namespace Task3
 {
-    class BotPlayer2 : AbstractPlayer
+    class VeryBraveBotPlayer : AbstractPlayer
     {
-        public BotPlayer2(uint initialMoney, string name = "Bot 2") : base(initialMoney, name)
+        public VeryBraveBotPlayer(uint initialMoney, string name = "Very brave bot") : base(initialMoney, name)
         {
         }
 

@@ -43,16 +43,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Action.cs" />
-    <Compile Include="BotPlayer1.cs" />
-    <Compile Include="BotPlayer2.cs" />
+    <Compile Include="ConsoleInteractions.cs" />
+    <Compile Include="SameAsDealerBotPlayer.cs" />
+    <Compile Include="VeryBraveBotPlayer.cs" />
     <Compile Include="Card.cs" />
     <Compile Include="AbstractPlayer.cs" />
     <Compile Include="Dealer.cs" />
+    <Compile Include="Game.cs" />
     <Compile Include="Hand.cs" />
     <Compile Include="HumanPlayer.cs" />
     <Compile Include="PlayerState.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ShuffleMachine.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">

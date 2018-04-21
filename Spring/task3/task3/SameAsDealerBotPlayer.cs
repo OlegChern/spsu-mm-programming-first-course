@@ -7,9 +7,9 @@ namespace Task3
      * taks cards as long as below 17.
      * Doesn't perform other actions.
      */
-    class BotPlayer1 : AbstractPlayer
+    class SameAsDealerBotPlayer : AbstractPlayer
     {
-        public BotPlayer1(uint initialMoney, string name = "Bot 1") : base(initialMoney, name)
+        public SameAsDealerBotPlayer(uint initialMoney, string name = "Same-as-dealer bot") : base(initialMoney, name)
         {
         }
 

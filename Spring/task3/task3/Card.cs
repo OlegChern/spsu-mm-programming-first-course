@@ -30,23 +30,23 @@ namespace Task3
 
     public struct Card
     {
-        Suit suit;
-        Value value;
+        internal Suit Suit;
+        internal Value Value;
 
         public override string ToString()
         {
-            return $"{value} of {suit}";
+            return $"{Value} of {Suit}";
         }
 
         public uint Score()
         {
-            if (value == Value.Ace)
+            if (Value == Value.Ace)
             {
                 return 11;
             }
-            if (value <= Value.Ten)
+            if (Value <= Value.Ten)
             {
-                return (uint)value;
+                return (uint)Value;
             }
             return 10;
         }
@@ -57,7 +57,7 @@ namespace Task3
             uint aces = 0;
             foreach (var card in list)
             {
-                if (card.value == Value.Ace)
+                if (card.Value == Value.Ace)
                 {
                     aces++;
                 }
@@ -89,41 +89,6 @@ namespace Task3
             }
             
             return result + aces + m * 10;
-        }
-
-        public static List<Card> ShuffledDecks(uint decks)
-        {
-            var list = CreateDecks(decks);
-            var random = new Random();
-            for (int i = list.Count - 1; i > 0; --i)
-            {
-                int j = random.Next(i + 1);
-                var tmp = list[i];
-                list[i] = list[j];
-                list[j] = tmp;
-            }
-            return list;
-        }
-
-        static List<Card> CreateDecks(uint decks)
-        {
-            var list = new List<Card>();
-            foreach (Suit suit in Enum.GetValues(typeof(Suit)))
-            {
-                foreach (Value value in Enum.GetValues(typeof(Value)))
-                {
-                    var card = new Card
-                    {
-                        suit = suit,
-                        value = value
-                    };
-                    for (int i = 0; i < decks; i++)
-                    {
-                        list.Add(card);
-                    }
-                }
-            }
-            return list;
         }
 
         public static bool IsPair(List<Card> hand)
