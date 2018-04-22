@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Card.cs" />
     <Compile Include="Dealer.cs" />
     <Compile Include="Players\Bots\RiskyBot.cs" />
     <Compile Include="Players\Bots\SmartBot.cs" />

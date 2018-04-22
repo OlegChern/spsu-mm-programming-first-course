@@ -93,7 +93,13 @@
         /// </summary>
         public void Start()
         {
-            bet = money / 2;
+            bet = CalculateBet();
+
+            if (bet == 0)
+            {
+                finished = true;
+                lost = true;
+            }
 
             finished = false;
             lost = false;
@@ -171,6 +177,11 @@
         #region inheritable
         // player's logic
         protected abstract Decision MakeDecision();
+
+        protected virtual int CalculateBet()
+        {
+            return money / 2;
+        }
         #endregion
 
         #region decisions
@@ -203,8 +214,8 @@
 
         private void TakeCard()
         {
-            Card card = Game.Instance.GetCard();
-            cardsSum += Game.GetCardValue(card, cardsSum);
+            Card card = Game.Deck.GetCard();
+            cardsSum += Deck.GetCardValue(card, cardsSum);
         }
         #endregion
     }

@@ -11,7 +11,7 @@
                 return Decision.Stand;
             }
 
-            int dealerCardValue = Game.Instance.DealerCardValue;
+            int dealerCardValue = Game.Dealer.FaceUpCardValue;
 
             if (CardsSum == 16 && dealerCardValue >= 9 && dealerCardValue <= 11)
             {
@@ -32,6 +32,11 @@
             }
 
             return Decision.Hit;
+        }
+
+        protected override int CalculateBet()
+        {
+            return (int)(Money * 0.4f);
         }
     }
 }

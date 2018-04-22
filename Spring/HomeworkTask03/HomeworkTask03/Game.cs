@@ -8,9 +8,8 @@
 
         #region fields
         private Deck deck;
-        private Player[] players;
-
         private Dealer dealer;
+        private Player[] players;
 
         private static Game instance;
         #endregion
@@ -24,14 +23,19 @@
             }
         }
 
-        public int DealerCardValue
+        public static Deck Deck
         {
             get
             {
-                int dealerCardValue = GetCardValue(dealer.Card);
-                dealerCardValue = dealerCardValue != 1 ? dealerCardValue : 11;
+                return instance.deck;
+            }
+        }
 
-                return dealerCardValue;
+        public static Dealer Dealer
+        {
+            get
+            {
+                return instance.dealer;
             }
         }
         #endregion
@@ -107,58 +111,6 @@
                 {
                     player.Win();
                 }
-            }
-        }
-        #endregion
-
-        #region cards methods
-        /// <summary>
-        /// Get one card from the deck
-        /// </summary>
-        /// <returns></returns>
-        public Card GetCard()
-        {
-            return deck.Pop();
-        }
-
-        /// <summary>
-        /// Get value of the card
-        /// </summary>
-        /// <param name="card">card to get value</param>
-        /// <returns></returns>
-        public static int GetCardValue(Card card)
-        {
-            switch (card)
-            {
-                case Card.King:
-                case Card.Queen:
-                case Card.Jack:
-                case Card.Ten:
-                    return 10;
-                default:
-                    return (int)card;
-            }
-        }
-
-        /// <summary>
-        /// Get value of the card
-        /// </summary>
-        /// <param name="card">card to get value</param>
-        /// <param name="cardsSum">sum of cards to calculate ace value</param>
-        /// <returns></returns>
-        public static int GetCardValue(Card card, int cardsSum)
-        {
-            switch (card)
-            {
-                case Card.King:
-                case Card.Queen:
-                case Card.Jack:
-                case Card.Ten:
-                    return 10;
-                case Card.Ace:
-                    return cardsSum + 11 > 21 ? 1 : 11;
-                default:
-                    return (int)card;
             }
         }
         #endregion

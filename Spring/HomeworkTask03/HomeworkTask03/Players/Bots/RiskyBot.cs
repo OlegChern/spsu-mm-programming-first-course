@@ -13,5 +13,10 @@
 
             return Decision.Hit;
         }
+
+        protected override int CalculateBet()
+        {
+            return Money;
+        }
     }
 }

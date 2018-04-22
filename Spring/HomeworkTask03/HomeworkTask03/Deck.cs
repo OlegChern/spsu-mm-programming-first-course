@@ -3,28 +3,14 @@ using System.Collections.Generic;
 
 namespace BlackJack
 {
-    public enum Card
-    {
-        Ace = 1,
-        Two,
-        Three,
-        Four,
-        Five,
-        Six,
-        Seven,
-        Eight,
-        Nine,
-        Ten,
-        Jack,
-        Queen,
-        King
-    }
-
     class Deck
     {
         const int deckCount = 8;
         private Stack<Card> deck;
 
+        /// <summary>
+        /// Creates and shuffles deck
+        /// </summary>
         public Deck()
         {
             deck = new Stack<Card>();
@@ -43,9 +29,50 @@ namespace BlackJack
             }
         }
 
-        public Card Pop()
+        /// <summary>
+        /// Get one card from the deck
+        /// </summary>
+        /// <returns></returns>
+        public Card GetCard()
         {
             return deck.Pop();
+        }
+
+        /// <summary>
+        /// Get value of the card
+        /// </summary>
+        /// <param name="card">card to get value</param>
+        /// <returns></returns>
+        public static int GetCardValue(Card card)
+        {
+            switch (card)
+            {
+                case Card.King:
+                case Card.Queen:
+                case Card.Jack:
+                case Card.Ten:
+                    return 10;
+                default:
+                    return (int)card;
+            }
+        }
+
+        /// <summary>
+        /// Get value of the card
+        /// </summary>
+        /// <param name="card">card to get value</param>
+        /// <param name="cardsSum">sum of cards to calculate ace value</param>
+        /// <returns></returns>
+        public static int GetCardValue(Card card, int cardsSum)
+        {
+            if (card == Card.Ace)
+            {
+                return cardsSum + 11 > 21 ? 1 : 11;
+            }
+            else
+            {
+                return GetCardValue(card);
+            }
         }
 
         // Knuth shuffle

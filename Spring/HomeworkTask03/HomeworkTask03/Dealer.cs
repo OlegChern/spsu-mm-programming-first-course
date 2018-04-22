@@ -35,18 +35,29 @@ namespace BlackJack
                 return cardsSum;
             }
         }
-        #endregion
 
-        /// <summary>
-        /// Face-up card
-        /// </summary>
-        public Card Card
+        public int FaceUpCardValue
+        {
+            get
+            {
+                // cards[0] is face-up card
+                int cardValue = Deck.GetCardValue(cards[0]);
+
+                // if ace then 11
+                cardValue = cardValue != 1 ? cardValue : 11;
+
+                return cardValue;
+            }
+        }
+
+        /*public Card FaceUpCard
         {
             get
             {
                 return cards[0];
             }
-        }
+        }*/
+        #endregion
 
         public Dealer()
         {
@@ -81,10 +92,10 @@ namespace BlackJack
 
         private void TakeCard()
         {
-            Card card = Game.Instance.GetCard();
+            Card card = Game.Deck.GetCard();
             cards.Add(card);
 
-            cardsSum += Game.GetCardValue(card, cardsSum);
+            cardsSum += Deck.GetCardValue(card, cardsSum);
         }
     }
 }
