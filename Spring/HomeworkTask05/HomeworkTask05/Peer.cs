@@ -22,13 +22,14 @@ namespace Chat
 
         #region constants
         private const int MessageLength = 256;
+        private const int MaxRetries = 8;
         #endregion
 
         #region private fields
         private string name;
         private bool isRunning;
 
-        Socket receiver;
+        private Socket receiver;
         private Thread receivingThread;
 
         private IPEndPoint localEp = null;
@@ -64,46 +65,7 @@ namespace Chat
         {
             receiver = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-            // get local endpoint
-            {
-                IPEndPoint temp = null;
-
-                foreach (IPAddress ip in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
-                {
-                    if (ip.AddressFamily == AddressFamily.InterNetwork)
-                    {
-                        temp = new IPEndPoint(ip, 0);
-                        break;
-                    }
-                }
-
-                if (temp == null)
-                {
-                    byte[] byteIp = { 192, 168, 0, 1 };
-                    temp = new IPEndPoint(new IPAddress(byteIp), 0);
-                }
-
-                while (true)
-                {
-                    try
-                    {
-                        temp.Port = UserInterface.GetPort();
-
-                        localEp = temp;
-                        receiver.Bind(localEp);
-
-                        break;
-                    }
-                    catch
-                    {
-                        UserInterface.ShowSpecification("This port is already in use!");
-                        continue;
-                    }
-                }
-
-                UserInterface.ShowSpecification("Current IPv4: " + localEp.Address.MapToIPv4().ToString());
-                UserInterface.ShowSpecification("Current IPv6: " + localEp.Address.MapToIPv6().ToString());
-            }
+            BindReceiver();
 
             // additional thread for receiving messages
             receivingThread = new Thread(new ThreadStart(ReceiveLoop));
@@ -134,61 +96,7 @@ namespace Chat
                         }
                         while (handler.Available > 0);
 
-                        #region process data type
-                        DataType type = DataType.Null;
-
-                        if (message != string.Empty)
-                        {
-                            type = (DataType)message[0];
-                            message = message.Remove(0, 1);
-                        }
-
-                        switch (type)
-                        {
-                            case DataType.Message:
-                                {
-                                    UserInterface.ShowMessage(message);
-                                    break;
-                                }
-                            case DataType.IPRequest:
-                                {
-                                    // connect to requester's local socket, not to sender socket!
-                                    IPEndPoint requester;
-                                    GetEndPoint(message, out requester);
-                                    Connect(requester, false);
-
-                                    // send all current connected endpoints to all peers
-                                    foreach (IPEndPoint ep in connectedEp)
-                                    {
-                                        Send(ep.ToString(), DataType.ConnectRequest);
-                                    }
-
-                                    break;
-                                }
-                            case DataType.ConnectRequest:
-                                {
-                                    // connect to received endpoint
-                                    IPEndPoint ep;
-                                    if (GetEndPoint(message, out ep))
-                                    {
-                                        Connect(ep, false);
-                                    }
-
-                                    break;
-                                }
-                            case DataType.Disconnect:
-                                {
-                                    // get received endpoint and then disconnect it
-                                    IPEndPoint ep;
-                                    if (GetEndPoint(message, out ep))
-                                    {
-                                        Disconnect(ep);
-                                    }
-
-                                    break;
-                                }
-                        }
-                        #endregion
+                        ProcessReceivedData(message);
 
                         handler.Shutdown(SocketShutdown.Both);
                         handler.Close();
@@ -278,12 +186,11 @@ namespace Chat
         {
             try
             {
-                // create temp list because the original one is changed in loop
-                List<IPEndPoint> tempList = new List<IPEndPoint>(connectedEp);
+                List<IPEndPoint> failedConnections = new List<IPEndPoint>();
                 int length = data.Length;
 
                 // send data for each socket
-                foreach (IPEndPoint ep in tempList)
+                foreach (IPEndPoint ep in connectedEp)
                 {
                     using (Socket sender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
                     {
@@ -291,20 +198,21 @@ namespace Chat
                         {
                             // connect to endpoint
                             sender.Connect(ep);
+
+                            // send data
+                            int sendedLength = sender.Send(data);
+
+                            if (length != sendedLength)
+                            {
+                                // if not all data sended go to catch block
+                                throw new Exception();
+                            }
                         }
                         catch
                         {
-                            UserInterface.ShowSpecification("Can't connect to " + ep.ToString() + ". Disconnecting it...");
-                            SendDisconnectRequest(ep);
-
+                            // if there is some exception
+                            failedConnections.Add(ep);
                             continue;
-                        }
-
-                        int sendedLength = sender.Send(data);
-
-                        if (length != sendedLength)
-                        {
-                            sender.Send(data);
                         }
 
                         sender.Shutdown(SocketShutdown.Both);
@@ -312,6 +220,10 @@ namespace Chat
                     }
                 }
 
+                if (failedConnections.Count != 0)
+                {
+                    ProcessFailedConnections(failedConnections, data);
+                }
             }
             catch (SocketException exception)
             {
@@ -396,74 +308,254 @@ namespace Chat
         #endregion
 
         #region additional methods
+        private void BindReceiver()
+        {
+            IPEndPoint tempEp = GetLocalEndPoint();
+
+            while (true)
+            {
+                try
+                {
+                    tempEp.Port = UserInterface.GetPort();
+
+                    localEp = tempEp;
+                    receiver.Bind(localEp);
+
+                    break;
+                }
+                catch
+                {
+                    UserInterface.ShowSpecification("This port is already in use!");
+                    continue;
+                }
+            }
+
+            UserInterface.ShowSpecification("Current IPv4: " + localEp.Address.MapToIPv4().ToString());
+            UserInterface.ShowSpecification("Current IPv6: " + localEp.Address.MapToIPv6().ToString());
+        }
+
+        private IPEndPoint GetLocalEndPoint()
+        {
+            IPEndPoint ep = null;
+
+            foreach (IPAddress ip in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    ep = new IPEndPoint(ip, 0);
+                    break;
+                }
+            }
+
+            if (ep == null)
+            {
+                byte[] byteIp = { 192, 168, 0, 1 };
+                ep = new IPEndPoint(new IPAddress(byteIp), 0);
+            }
+
+            return ep;
+        }
+
+        private void ProcessFailedConnections(List<IPEndPoint> list, byte[] data)
+        {
+            int length = data.Length;
+
+            foreach (IPEndPoint ep in list)
+            {
+                int retriesCount = 0;
+
+                do
+                {
+                    using (Socket sender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+                    {
+                        try
+                        {
+                            // connect to endpoint
+                            sender.Connect(ep);
+
+                            // send data
+                            int sendedLength = sender.Send(data);
+
+                            if (length != sendedLength)
+                            {
+                                // if not all data sended go to catch block
+                                throw new Exception();
+                            }
+                        }
+                        catch
+                        {
+                            retriesCount++;
+                            continue;
+                        }
+
+                        sender.Shutdown(SocketShutdown.Both);
+                        sender.Close();
+                        break;
+                    }
+                }
+                while (retriesCount < MaxRetries);
+
+                if (retriesCount >= MaxRetries)
+                {
+                    UserInterface.ShowSpecification("Can't connect to " + ep.ToString() + ". Disconnecting it...");
+                    SendDisconnectRequest(ep);
+                }
+            }
+        }
+
+        private void ProcessReceivedData(string message)
+        {
+            DataType type = DataType.Null;
+
+            if (message != string.Empty)
+            {
+                // first byte is data type
+                type = (DataType)message[0];
+
+                // remove it
+                message = message.Remove(0, 1);
+            }
+
+            switch (type)
+            {
+                case DataType.Message:
+                    {
+                        // just show received message
+                        UserInterface.ShowMessage(message);
+                        break;
+                    }
+                case DataType.IPRequest:
+                    {
+                        // connect to requester's local socket, not to sender socket!
+                        IPEndPoint requester;
+                        if (GetEndPoint(message, out requester))
+                        {
+                            Connect(requester, false);
+
+                            // send all current connected endpoints to all peers
+                            foreach (IPEndPoint ep in connectedEp)
+                            {
+                                Send(ep.ToString(), DataType.ConnectRequest);
+                            }
+                        }
+
+                        break;
+                    }
+                case DataType.ConnectRequest:
+                    {
+                        // connect to received endpoint
+                        IPEndPoint ep;
+                        if (GetEndPoint(message, out ep))
+                        {
+                            Connect(ep, false);
+                        }
+
+                        break;
+                    }
+                case DataType.Disconnect:
+                    {
+                        // get received endpoint and then disconnect it
+                        IPEndPoint ep;
+                        if (GetEndPoint(message, out ep))
+                        {
+                            Disconnect(ep);
+                        }
+
+                        break;
+                    }
+            }
+        }
+
         // process message to find commands
         // return true if there is any command
         private bool ProcessCommand(string message)
         {
-            if (message.Length > 1)
+            if (message.Length < 2)
             {
-                if (message[0] == '/')
-                {
-                    switch (message[1])
-                    {
-                        case 'c':
-                            {
-                                IPEndPoint ep;
-                                if (UserInterface.GetEndPoint(message, out ep))
-                                {
-                                    Connect(ep, true);
-                                }
-
-                                break;
-                            }
-                        case 's':
-                            {
-                                ShowAllConnections();
-                                break;
-                            }
-                        case 'd':
-                            {
-                                SendDisconnectRequest(localEp);
-                                connectedEp.Clear();
-
-                                UserInterface.ShowSpecification("Disconnected");
-                                break;
-                            }
-                        case 'q':
-                            {
-                                Exit();
-                                break;
-                            }
-                    }
-
-                    return true;
-                }
+                return false;
             }
 
-            return false;
+            if (message[0] != '/')
+            {
+                return false;
+            }
+
+            if (message.Length > 2 && message[2] != ' ')
+            {
+                return false;
+            }
+
+            switch (message[1])
+            {
+                case 'c':
+                    {
+                        // connect to endpoint
+                        IPEndPoint ep;
+                        if (UserInterface.GetEndPoint(message, out ep))
+                        {
+                            Connect(ep, true);
+                        }
+
+                        break;
+                    }
+                case 's':
+                    {
+                        ShowAllConnections();
+                        break;
+                    }
+                case 'd':
+                    {
+                        // send disconnect request to all peers
+                        SendDisconnectRequest(localEp);
+                        connectedEp.Clear();
+
+                        UserInterface.ShowSpecification("Disconnected");
+                        break;
+                    }
+                case 'q':
+                    {
+                        Exit();
+                        break;
+                    }
+            }
+
+            return true;
         }
 
         private bool GetEndPoint(string message, out IPEndPoint ep)
         {
             ep = null;
 
-            string[] ipSplitted = message.Split('.', ':');
+            string[] splitted = message.Split(':');
 
-            if (ipSplitted.Length < 5)
+            IPAddress ip;
+            if (splitted.Length < 2)
             {
                 return false;
             }
-
-            // read ip
-            byte[] ipBytes = new byte[4];
-
-            for (int i = 0; i < 4; i++)
+            else if (splitted.Length == 2)
             {
-                ipBytes[i] = byte.Parse(ipSplitted[i]);
+                // ipv4
+                if (!IPAddress.TryParse(splitted[0], out ip))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                // ipv6
+                if (!IPAddress.TryParse(string.Join(":", splitted, 0, splitted.Length - 2), out ip))
+                {
+                    return false;
+                }
             }
 
-            IPAddress ip = new IPAddress(ipBytes);
-            int port = int.Parse(ipSplitted[4]);
+            // last part is port
+            int port;
+            if (!int.TryParse(splitted[splitted.Length - 1], out port))
+            {
+                return false;
+            }
 
             ep = new IPEndPoint(ip, port);
             return true;

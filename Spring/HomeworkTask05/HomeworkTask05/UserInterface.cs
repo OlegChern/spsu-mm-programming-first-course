@@ -9,7 +9,7 @@ namespace Chat
         {
             Console.WriteLine("Peer-to-peer chat\n");
             Console.WriteLine("Main commands:");
-            Console.WriteLine("  /c <ip> - to connect to peer with IP <ip>");
+            Console.WriteLine("  /c <ip>:<port> - to connect to peer with IP <ip> and port <port>");
             Console.WriteLine("  /s      - to show all connceted IP's");
             Console.WriteLine("  /d      - to disconnect");
             Console.WriteLine("  /q      - to exit\n");
@@ -40,21 +40,22 @@ namespace Chat
             return Console.ReadLine();
         }
 
-        public static ConsoleKeyInfo GetKey()
+        public static char GetKey()
         {
-            return Console.ReadKey();
+            return Console.ReadKey().KeyChar;
         }
 
         public static bool GetEndPoint(string message, out IPEndPoint ep)
         {
             ep = null;
 
+            // first part is command "/c"
             string[] splitted = message.Split(' ', ':');
 
             IPAddress ip;
             if (splitted.Length < 3)
             {
-                ShowSpecification("Not enough arguments!");
+                ShowSpecification("Not enough arguments! Should be: <ip>:<port>");
                 return false;
             }
             else if (splitted.Length == 3)
@@ -69,7 +70,8 @@ namespace Chat
             else
             {
                 // ipv6
-                if (!IPAddress.TryParse(string.Join(":", splitted, 1, splitted.Length - 2), out ip))
+                string ipString = string.Join(":", splitted, 1, splitted.Length - 2);
+                if (!IPAddress.TryParse(ipString, out ip))
                 {
                     ShowSpecification("Wrong IP address!");
                     return false;
@@ -169,9 +171,9 @@ namespace Chat
         public static bool RequestExit()
         {
             ShowSpecification("Press Y to exit: ");
-            ConsoleKeyInfo key = GetKey();
+            char key = GetKey();
 
-            return key.Key == ConsoleKey.Y;
+            return key == 'Y' || key == 'y';
         }
     }
 }

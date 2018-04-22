@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Chat;
 
-namespace Chat
+namespace HomeworkTask05
 {
 	class Program
 	{
 		static void Main()
 		{
-            		UserInterface.ShowTutorial();
+            UserInterface.ShowTutorial();
 
 			Peer localPeer = new Peer();
 			localPeer.Start();
