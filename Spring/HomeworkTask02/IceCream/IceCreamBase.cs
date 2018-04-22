@@ -5,7 +5,7 @@
         private string name;
         private float weight;
 
-        protected string Name
+        public string Name
         {
             get
             {
@@ -13,7 +13,7 @@
             }
         }
 
-        protected float Weight
+        public float Weight
         {
             get
             {

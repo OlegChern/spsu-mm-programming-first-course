@@ -28,7 +28,7 @@ namespace IceCreamImplementation
         {
             string flavorStr = flavor.ToString();
 
-            string result = "Recipe of " + Name + ": ";
+            string result = string.Empty;
             result += iceRecipe[0] + flavorStr + iceRecipe[1]
                 + Weight + iceRecipe[2] + (Weight * 1.1f).ToString("F") + iceRecipe[3];
 
