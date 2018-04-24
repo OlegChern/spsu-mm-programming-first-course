@@ -84,5 +84,35 @@ namespace Task3
             }
             while (true);
         }
+        
+        public static void WriteList<T>(IList<T> list, string message = null)
+        {
+            if (message != null)
+            {
+                Console.Write(message);
+            }
+            for (int i = 0; i < list.Count; i++)
+            {
+                Console.Write((list[i]));
+                if (i == list.Count - 2)
+                {
+                    Console.Write(" and ");
+                }
+                else if (i != list.Count - 1)
+                {
+                    Console.Write(", ");
+                }
+            }
+        }
+        
+        public static void PressAnyKey()
+        {
+            Console.Write("Press any key to continue...");
+            Console.ReadKey();
+            int currentLineCursor = Console.CursorTop;
+            Console.SetCursorPosition(0, Console.CursorTop);
+            Console.Write(new string(' ', Console.WindowWidth));
+            Console.SetCursorPosition(0, currentLineCursor);
+        }
     }
 }
