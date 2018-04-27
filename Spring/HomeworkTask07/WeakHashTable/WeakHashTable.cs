@@ -1,8 +1,11 @@
-﻿namespace WeakHashTable
+﻿using System.Threading.Tasks;
+
+namespace WeakHashTable
 {
-    public class HashTable<T> where T : class
+    public class WeakHashTable<T> where T : class
     {
-		#region constants
+        #region constants
+        private const int DefaultStorageTime = 60000;
 		private const float IncreaseMultiplier = 1.5f;
 
         private const int DefaultChainSize = 16;
@@ -18,15 +21,27 @@
 		private HashTableChain<T>[] chains;
 		private int tableSize;
         private int maxChainSize;
+        private int storageTime;
+        #endregion
+
+        #region properties
+        public int StorageTime
+        {
+            get
+            {
+                return storageTime;
+            }
+        }
         #endregion
 
         #region constructors
         /// <summary>
-        /// Creates HashTable
+        /// Creates WeakHashTable
         /// </summary>
         /// <param name="tableSize">amount of chains in table</param>
         /// <param name="maxChainSize">max amount of elements in chain</param>
-        public HashTable(int tableSize, int maxChainSize)
+        /// <param name="storageTime">elements' storage time in milliseconds</param>
+        public WeakHashTable(int tableSize, int maxChainSize, int storageTime)
 		{
             Normalize(ref tableSize, MinAdmittedTableSize, MaxAdmittedTableSize);
             Normalize(ref maxChainSize, MinAdmittedChainSize, MaxAdmittedChainSize);
@@ -40,29 +55,42 @@
 
             this.tableSize = tableSize;
             this.maxChainSize = maxChainSize;
+            this.storageTime = storageTime < 0 ? 0 : storageTime;
         }
 
+        #region additional contructors
         /// <summary>
-        /// Creates HashTable with default max chain size
+        /// Creates WeakHashTable with default storage time
         /// </summary>
         /// <param name="tableSize">amount of chains in table</param>
-        public HashTable(int tableSize) : this(tableSize, DefaultChainSize) { }
+        /// <param name="maxChainSize">max amount of elements in chain</param>
+        public WeakHashTable(int tableSize, int maxChainSize) : this(tableSize, maxChainSize, DefaultStorageTime) { }
 
         /// <summary>
-        /// Creates HashTable with default table size and max chain size
+        /// Creates WeakHashTable with default max chain size and storage time
         /// </summary>
-        public HashTable() : this(DefaultTableSize, DefaultChainSize) { }
+        /// <param name="tableSize">amount of chains in table</param>
+        public WeakHashTable(int tableSize) : this(tableSize, DefaultChainSize, DefaultStorageTime) { }
+
+        /// <summary>
+        /// Creates WeakHashTable with default table size, max chain size and storage time
+        /// </summary>
+        public WeakHashTable() : this(DefaultTableSize, DefaultChainSize, DefaultStorageTime) { }
+        #endregion
         #endregion
 
         #region public methods
         /// <summary>
-        /// Adds element to HashTable
+        /// Adds element to WeakHashTable
         /// </summary>
         /// <param name="key">element's key</param>
         /// <param name="value">element's value</param>
         public void Add(string key, T value)
 		{
-			HashTableElement<T> newElement = new HashTableElement<T>(key, value);
+            // first, asynchronously wait store time
+            Wait(value);
+
+            HashTableElement<T> newElement = new HashTableElement<T>(key, value);
 			HashTableChain<T> chain = chains[Hash(key)];
 
 			chain.Add(newElement);
@@ -92,7 +120,7 @@
 			HashTableElement<T> element = chains[Hash(key)].Find(key);
 			if (element != null)
 			{
-				return element.Value.TryGetTarget(out value);
+				return element.TryGetValue(out value);
 			}
 
 			value = default(T);
@@ -126,7 +154,7 @@
                         result += string.Format("{0, 10} {1, 10}", Hash(element.Key), element.Key);
 
                         T value;
-                        if (element.Value.TryGetTarget(out value))
+                        if (element.TryGetValue(out value))
                         {
                             result += string.Format("{0, 12}", value);
                         }
@@ -141,6 +169,9 @@
 		#endregion
 
 		#region supporting methods
+        /// <summary>
+        /// Calculates hash based on table size
+        /// </summary>
 		private int Hash(string key)
 		{
 			int hash = 0;
@@ -172,12 +203,21 @@
 				// chain[j] is an element of chain with index j
 				for (int j = 0; j < sourceChain.ChainSize; j++)
 				{
-					// recalculate hash with new table size
-					int hash = Hash(sourceChain[j].Key);
+                    T value;
 
-					// add element to new chain with recalculated hash key
-					temp[hash].Add(sourceChain[j]);
-				}
+                    // if we can get value-element then add it
+                    if (sourceChain[j].TryGetValue(out value))
+                    {
+                        // recalculate hash with new table size
+                        int hash = Hash(sourceChain[j].Key);
+
+                        // create new element without pointer to the next one
+                        HashTableElement<T> elem = new HashTableElement<T>(sourceChain[j].Key, value);
+
+                        // add element to new chain with recalculated hash key
+                        temp[hash].Add(elem);
+                    }
+                }
 			}
 
 			chains = temp;
@@ -187,6 +227,13 @@
         {
             x = x < min ? min :
                 x > max ? max : x;
+        }
+
+        private async void Wait(T value)
+        {
+            // there is strong reference
+            // so just wait storage time
+            await Task.Delay(storageTime);
         }
         #endregion
     }

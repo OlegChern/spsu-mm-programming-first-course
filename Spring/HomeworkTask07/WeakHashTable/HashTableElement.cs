@@ -6,7 +6,7 @@ namespace WeakHashTable
 	{
         #region fields
         private string key;
-        private WeakReference<T> value;
+        private WeakReference<T> valueRef;
         private HashTableElement<T> next;
         #endregion
 
@@ -16,14 +16,6 @@ namespace WeakHashTable
 			get
             {
                 return key;
-            }
-		}
-
-		internal WeakReference<T> Value
-		{
-			get
-            {
-                return value;
             }
 		}
 
@@ -43,8 +35,19 @@ namespace WeakHashTable
         internal HashTableElement(string key, T value)
 		{
 			this.key = key;
-            this.value = new WeakReference<T>(value);
+            this.valueRef = new WeakReference<T>(value);
             next = null;
 		}
-	}
+
+        internal bool TryGetValue(out T value)
+        {
+            return valueRef.TryGetTarget(out value);
+        }
+
+        /*private void Store(int storageTime)
+        {
+            HashTableElement<T> reference = this;
+            Thread.Sleep(storageTime);
+        }*/
+    }
 }

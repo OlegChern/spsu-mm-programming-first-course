@@ -4,12 +4,13 @@ namespace HomeworkTask07
 {
     class TestClass
     {
+        static Random random = new Random();
+
         float x;
         float y;
 
         public TestClass()
         {
-            Random random = new Random();
             x = (float)random.NextDouble();
             y = (float)random.NextDouble();
         }

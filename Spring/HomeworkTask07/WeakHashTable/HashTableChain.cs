@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace WeakHashTable
+﻿namespace WeakHashTable
 {
     internal class HashTableChain<T> where T : class
     {
@@ -102,8 +100,10 @@ namespace WeakHashTable
                 return;
             }
 
+            // if element to remove is root
             if (rootElement.Key == key)
             {
+                // fix links
                 if (rootElement.Next != null)
                 {
                     rootElement = rootElement.Next;
@@ -113,23 +113,24 @@ namespace WeakHashTable
                     rootElement = null;
                 }
             }
-
-            HashTableElement<T> current = rootElement;
-
-            while (current.Next != null)
+            else
             {
-                if (current.Next.Key == key)
+                HashTableElement<T> current = rootElement;
+
+                while (current.Next != null)
                 {
-                    current.Next = current.Next.Next;
-                    chainSize--;
+                    if (current.Next.Key == key)
+                    {
+                        current.Next = current.Next.Next;
+                        break;
+                    }
 
-                    return;
+                    current = current.Next;
                 }
-
-                current = current.Next;
             }
 
-            #endregion
+            chainSize--;
         }
+        #endregion
     }
 }
