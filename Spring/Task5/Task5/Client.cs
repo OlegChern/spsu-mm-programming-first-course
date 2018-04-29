@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Task5.Events;
-
-// TODO: chat crashes after an attempt to connect to itself, fix
 
 namespace Task5
 {
@@ -216,6 +215,15 @@ namespace Task5
             var ipAddress = ipHostInfo.AddressList[0];
             var remoteEp = new IPEndPoint(ipAddress, port);
 
+            // Check local end point
+            var localHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+            
+            if (IsListening && ListeningPort == port &&
+                Equals(ipHostInfo.AddressList[0], localHostInfo.AddressList[0]))
+            {
+                throw new InvalidOperationException("Cannot connect to itself");
+            }
+            
             // Create a TCP/IP socket.  
             var client = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
