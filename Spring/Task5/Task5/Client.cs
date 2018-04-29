@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using Task5.Events;
 
+// TODO: chat crashes after an attempt to connect to itself, fix
+
 namespace Task5
 {
     sealed class Client : AbstractClient
@@ -20,6 +22,7 @@ namespace Task5
 
         public override event EventHandler<MessageReceivedEventArgs> MessageReceived;
         public override event EventHandler<ConnectionsCountChangedEventArgs> ConnectionsCountChanged;
+        public override event EventHandler ListeningStateChanged;
 
         #region private members
 
@@ -38,7 +41,7 @@ namespace Task5
             {
                 if (!socket.Connected)
                 {
-                    incomingConnections.Remove(socket);
+                    StopHandling(socket);
                     return;
                 }
 
@@ -47,10 +50,11 @@ namespace Task5
                 {
                     bytesRead = await socket.ReceiveAsync(segment, SocketFlags.None);
                 }
-                catch
+                catch (Exception e)
                 {
-                    MessageBox.Show("One of devices must have been disconnected", "Error reading data");
-                    incomingConnections.Remove(socket);
+                    MessageBox.Show($"One of devices must have been disconnected:{Environment.NewLine}{e}",
+                        "Error reading data");
+                    StopHandling(socket);
                     return;
                 }
 
@@ -58,19 +62,39 @@ namespace Task5
 
                 if (string.IsNullOrWhiteSpace(message))
                 {
-                    continue;
+                    StopHandling(socket);
+                    MessageBox.Show("One of devices must have been disconnected", "Error: empty string received");
+                    return;
                 }
 
                 if (message == IpAddressMessage)
                 {
                     Disconnect();
+                    MessageBox.Show("Disconnected due to loops in network", "Connection terminated");
                     ConnectionsCountChanged?.Invoke(this, new ConnectionsCountChangedEventArgs(ConnectionsCount));
-                    continue;
+                    return;
                 }
 
                 MessageReceived?.Invoke(this, new MessageReceivedEventArgs(message));
                 await Send(message, socket);
             }
+        }
+
+        void StopHandling(Socket socket)
+        {
+            if (socket == outcomingConnection)
+            {
+                Disconnect();
+                return;
+            }
+
+            if (incomingConnections.Remove(socket))
+            {
+                ConnectionsCountChanged?.Invoke(this, new ConnectionsCountChangedEventArgs(ConnectionsCount));
+                return;
+            }
+            
+            throw new InvalidOperationException("StopHandling() was given a socket that doesn't belong to client");
         }
 
         #endregion private members
@@ -86,7 +110,7 @@ namespace Task5
 
         #region public methods
 
-        public override async Task StartListening(int port)
+        public override void StartListening(int port)
         {
             if (IsListening)
             {
@@ -102,15 +126,7 @@ namespace Task5
             var listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
             // Bind the socket to the local endpoint
-            try
-            {
-                listener.Bind(localEndPoint);
-            }
-            catch
-            {
-                MessageBox.Show("Could not occupy port");
-                return;
-            }
+            listener.Bind(localEndPoint);
 
             listener.Listen(100);
 
@@ -118,6 +134,13 @@ namespace Task5
             // Let's just hope code above executes quickly enough to prevent problems
             listeningSocet = listener;
 
+            ListeningStateChanged?.Invoke(this, EventArgs.Empty);
+
+            Handle();
+        }
+
+        async void Handle()
+        {
             // Listen for connections
             while (true)
             {
@@ -127,13 +150,13 @@ namespace Task5
                 }
 
                 Socket handler;
-                // As far as I understand, this operation is canceled when socket gets disposed
                 try
                 {
+                    // this operation is canceled when socket gets disposed
                     handler = await listeningSocet.AcceptAsync();
                     StartReceivingMessages(handler);
                 }
-                catch (ObjectDisposedException)
+                catch (SocketException)
                 {
                     return;
                 }
@@ -160,11 +183,13 @@ namespace Task5
             }
 
             listeningSocet = null;
+            ListeningStateChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public override void TerminateIncomingConnections()
         {
             // TODO: do I really need to lock?
+            // Probably not, but I'm afraid to modify this old code
             lock (incomingConnections)
             {
                 foreach (var socket in incomingConnections)
@@ -175,7 +200,7 @@ namespace Task5
 
                 incomingConnections.Clear();
             }
-            
+
             ConnectionsCountChanged?.Invoke(this, new ConnectionsCountChangedEventArgs(ConnectionsCount));
         }
 
@@ -203,7 +228,7 @@ namespace Task5
             await Send(IpAddressMessage);
 
             ConnectionsCountChanged?.Invoke(this, new ConnectionsCountChangedEventArgs(ConnectionsCount));
-            
+
             StartReceivingMessages(client);
         }
 
@@ -217,7 +242,7 @@ namespace Task5
             outcomingConnection.Shutdown(SocketShutdown.Both);
             outcomingConnection.Close();
             outcomingConnection = null;
-            
+
             ConnectionsCountChanged?.Invoke(this, new ConnectionsCountChangedEventArgs(ConnectionsCount));
         }
 

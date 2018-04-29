@@ -35,15 +35,15 @@ namespace Task5
             Context.Closing -= OnContextClosing;
         }
 
-        async void OnStartListeningRequested(object sender, StartListeningRequestedEventArgs args)
+        void OnStartListeningRequested(object sender, StartListeningRequestedEventArgs args)
         {
             try
             {
-                await Client.StartListening(args.ListeningPort);
+                Client.StartListening(args.ListeningPort);
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, "Error starting listening");
+                MessageBox.Show(e.Message, "Error: could not occupy port");
                 return;
             }
 

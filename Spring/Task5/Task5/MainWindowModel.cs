@@ -58,7 +58,7 @@ namespace Task5
 
         async void OnSendRequested(object sender, SendRequestedEventArgs args)
         {
-            string message = $"[{Login}] {args.Message}{Environment.NewLine}";
+            string message = $"[{Login}] {args.Message}";
             Window.ClearInput();
 
             try

@@ -7,5 +7,6 @@ namespace Task5
     {
         event EventHandler<MessageReceivedEventArgs> MessageReceived;
         event EventHandler<ConnectionsCountChangedEventArgs> ConnectionsCountChanged;
+        event EventHandler ListeningStateChanged;
     }
 }

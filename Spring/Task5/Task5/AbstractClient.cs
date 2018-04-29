@@ -8,8 +8,10 @@ namespace Task5
     public abstract class AbstractClient : IClientInformation, IClientEvents
     {
         public abstract event EventHandler<MessageReceivedEventArgs> MessageReceived;
-        public abstract event EventHandler<ConnectionsCountChangedEventArgs> ConnectionsCountChanged; 
-        
+        public abstract event EventHandler<ConnectionsCountChangedEventArgs> ConnectionsCountChanged;
+        public abstract event EventHandler ListeningStateChanged;
+
+
         public abstract int IncomingConnectionsCount { get; }
         public abstract string OutcomingConnectionIp { get; }
         public abstract int ListeningPort { get; }
@@ -22,7 +24,7 @@ namespace Task5
         /// <summary>
         /// Begins accepting incoming connections
         /// </summary>
-        public abstract Task StartListening(int port);
+        public abstract void StartListening(int port);
 
         /// <summary>
         /// Stops accepting incoming connections

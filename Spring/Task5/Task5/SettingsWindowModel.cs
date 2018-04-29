@@ -27,7 +27,10 @@ namespace Task5
             Window.DisconnectRequested += OnDisconnectRequested;
 
             Client.ConnectionsCountChanged += OnClientConnectionsCountChanged;
+            Client.ListeningStateChanged += OnClientListeningStateChanged;
         }
+
+        void OnClientListeningStateChanged(object sender, EventArgs e) => Window.InvalidateInformation(Client);
 
         void OnClientConnectionsCountChanged(object sender, ConnectionsCountChangedEventArgs args) =>
             Window.InvalidateInformation(Client);
@@ -47,7 +50,7 @@ namespace Task5
         {
             Window.StartListeningButton.IsEnabled = false;
             var startListening = new StartListeningWindowModel(this);
-            startListening.Closing += (obj, eventArgs) => Window.InvalidateInformation(Client);
+            startListening.Closing += (o, eventArgs) => Window.InvalidateInformation(Client);
             startListening.Show();
         }
 
@@ -60,7 +63,7 @@ namespace Task5
         {
             Window.ConnectButton.IsEnabled = false;
             var connect = new ConnectWindowModel(this);
-            connect.Closing += (obj, eventArgs) => Window.InvalidateInformation(Client);
+            connect.Closing += (o, eventArgs) => Window.InvalidateInformation(Client);
             connect.Show();
         }
 
