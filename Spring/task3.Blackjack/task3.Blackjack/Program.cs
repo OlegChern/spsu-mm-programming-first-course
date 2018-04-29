@@ -28,8 +28,8 @@ namespace Task3.Blackjack
         static void Main(string[] args)
         {
             Console.WriteLine("Checking Bots:");
-            Console.WriteLine("BotRandom: {0}", CheckBot(new Bot1(0)));
-            Console.WriteLine("BotDependentOnDealer: {0}", CheckBot(new Bot2(0)));
+            Console.WriteLine("BotRandom: {0}", CheckBot(new BotRandom(0)));
+            Console.WriteLine("BotDependentOnDealer: {0}", CheckBot(new BotDependentOnDealer(0)));
             Console.WriteLine();
 
             int input = -1;
@@ -50,11 +50,11 @@ namespace Task3.Blackjack
             }
             else if(input == 2)
             {
-                blackjack = new Blackjack(realPlayer, new Bot1(1000));
+                blackjack = new Blackjack(realPlayer, new BotRandom(1000));
             }
             else
             {
-                blackjack = new Blackjack(realPlayer, new Bot2(1000));
+                blackjack = new Blackjack(realPlayer, new BotDependentOnDealer(1000));
             }
 
             Console.WriteLine();

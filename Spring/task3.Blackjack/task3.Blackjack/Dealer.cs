@@ -8,31 +8,9 @@ namespace Task3.Blackjack
     {
         private List<Card> cards;
 
-        private int sumCards;
-        public int SumCards
-        {
-            get
-            {
-                return sumCards;
-            }
-            private set
-            {
-                sumCards = value;
-            }
-        }
+        public int SumCards { get; private set; }
 
-        private Card firstCard;
-        public Card FirstCard
-        {
-            get
-            {
-                return firstCard;
-            }
-            private set
-            {
-                firstCard = value;
-            }
-        }
+        public Card FirstCard { get; private set; }
 
         public Dealer()
         {

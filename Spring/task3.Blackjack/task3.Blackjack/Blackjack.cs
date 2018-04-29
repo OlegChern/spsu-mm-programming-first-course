@@ -18,16 +18,16 @@ namespace Task3.Blackjack
 
         private int bet;
 
-        public Blackjack(APlayer player1, APlayer player2)
+        public Blackjack(APlayer firstPlayer, APlayer secondPlayer)
         {
             dealer = new Dealer();
             decks = new Decks(standardNumberOfDecks);
             bet = standardBet;
             players = new List<APlayer>();
-            players.Add(player1);
-            if (player2 != null)
+            players.Add(firstPlayer);
+            if (secondPlayer != null)
             {
-                players.Add(player2);
+                players.Add(secondPlayer);
             }
         }
 

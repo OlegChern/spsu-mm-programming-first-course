@@ -1,8 +1,8 @@
 ﻿namespace Task3.Blackjack
 {
-    public class Bot2 : APlayer
+    public class BotDependentOnDealer : APlayer
     {
-        public Bot2(double money)
+        public BotDependentOnDealer(double money)
             : base("BotDependentOnDealer", money)
         {
         }

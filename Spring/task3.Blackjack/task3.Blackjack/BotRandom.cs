@@ -3,9 +3,9 @@
 
 namespace Task3.Blackjack
 {
-    public class Bot1 : APlayer
+    public class BotRandom : APlayer
     {
-        public Bot1(double money)
+        public BotRandom(double money)
             : base("BotRandom", money)
         {
         }

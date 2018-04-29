@@ -10,19 +10,7 @@ namespace Task3.Blackjack
 
         private List<Card> cards;
 
-        private double money;
-
-        public double Money
-        {
-            get
-            {
-                return money;
-            }
-            private set
-            {
-                money = value;
-            }
-        }
+        public double Money { get; private set; }
 
         private int sumCards;
 
@@ -46,7 +34,7 @@ namespace Task3.Blackjack
         public APlayer(string name, double money)
         {
             this.name = name;
-            this.money = money;
+            Money = money;
             cards = new List<Card>();
             SumCards = 0;
         }
