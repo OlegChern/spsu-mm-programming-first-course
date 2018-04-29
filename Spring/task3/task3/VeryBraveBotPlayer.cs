@@ -11,7 +11,7 @@ namespace Task3
         public override Action ChooseAction(Dealer dealer, Hand hand)
         {
             Action result;
-            uint score = Card.GetScore(hand.Cards);
+            uint score = CardUtils.GetScore(hand.Cards);
             var actions = GetPossibleActions(hand);
             if (score == 15)
             {

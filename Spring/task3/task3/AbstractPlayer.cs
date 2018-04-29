@@ -23,7 +23,7 @@ namespace Task3
                 case Action.Double:
                     return hand.InitialBet <= Money;
                 case Action.Split:
-                    return Card.IsPair(hand.Cards) && hand.InitialBet <= Money;
+                    return CardUtils.IsPair(hand.Cards) && hand.InitialBet <= Money;
                 case Action.Surrender:
                     return hand.Cards.Count == 2;
                 default:

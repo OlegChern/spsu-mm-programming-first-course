@@ -41,7 +41,7 @@ namespace Task3
             TakeEnoughCards(deck);
         }
 
-        public uint Score() => Card.GetScore(Hand);
+        public uint Score() => CardUtils.GetScore(Hand);
 
         public void WriteCards(string message = null)
         {

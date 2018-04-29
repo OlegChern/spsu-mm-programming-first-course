@@ -83,7 +83,7 @@ namespace Task3
                 Console.WriteLine("Dealer lost!");
                 foreach (var hand in hands)
                 {
-                    if (Card.GetScore(hand.Cards) == 21 && hand.Cards.Count == 2)
+                    if (CardUtils.GetScore(hand.Cards) == 21 && hand.Cards.Count == 2)
                     {
                         Console.WriteLine(
                             $"{hand.Owner.Name} {(hand.Owner.Name == "You" ? "have" : "has")} blackjack!");
@@ -105,7 +105,7 @@ namespace Task3
             {
                 foreach (var hand in hands)
                 {
-                    uint score = Card.GetScore(hand.Cards);
+                    uint score = CardUtils.GetScore(hand.Cards);
 
                     if (score == dealer.Score())
                     {
@@ -143,7 +143,7 @@ namespace Task3
         /// </returns>
         static PlayerState CheckScore(Hand hand, Dealer dealer)
         {
-            if (Card.GetScore(hand.Cards) == 21 && hand.Cards.Count == 2)
+            if (CardUtils.GetScore(hand.Cards) == 21 && hand.Cards.Count == 2)
             {
                 Console.WriteLine("{0} {1} blackjack!", hand.Owner.Name, hand.Owner.Name == "You" ? "have" : "has");
                 if (dealer.FirstCard.Score() != 10 || dealer.FirstCard.Score() == 11)
@@ -159,7 +159,7 @@ namespace Task3
                 return PlayerState.Won;
             }
 
-            if (Card.GetScore(hand.Cards) <= 21)
+            if (CardUtils.GetScore(hand.Cards) <= 21)
             {
                 return PlayerState.Playing;
             }
@@ -179,7 +179,7 @@ namespace Task3
         static bool PerformActions(IList<Hand> hands, IList<Card> deck, int index, Dealer dealer)
         {
             AbstractPlayer.WriteCards(hands[index].Cards, "Current hand: ");
-            Console.WriteLine($" (score: {Card.GetScore(hands[index].Cards)})");
+            Console.WriteLine($" (score: {CardUtils.GetScore(hands[index].Cards)})");
             switch (CheckScore(hands[index], dealer))
             {
                 case PlayerState.Playing:
@@ -263,7 +263,7 @@ namespace Task3
                     bets[i]
                 ));
                 Console.WriteLine(
-                    $"{players[i].Name} got {deck[0]} and {deck[1]} (score: {Card.GetScore(hands[i].Cards)})");
+                    $"{players[i].Name} got {deck[0]} and {deck[1]} (score: {CardUtils.GetScore(hands[i].Cards)})");
                 deck.RemoveAt(0);
                 deck.RemoveAt(0);
             }

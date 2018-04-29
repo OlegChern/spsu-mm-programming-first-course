@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Action.cs" />
+    <Compile Include="CardUtils.cs" />
     <Compile Include="ConsoleInteractions.cs" />
     <Compile Include="SameAsDealerBotPlayer.cs" />
     <Compile Include="VeryBraveBotPlayer.cs" />
