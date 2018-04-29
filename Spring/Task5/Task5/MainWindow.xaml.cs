@@ -1,100 +1,60 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Windows;
+using Task5.Events;
 
 namespace Task5
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// Closely connected with IClient
-    /// Singleton
-    /// </summary>
     public sealed partial class MainWindow : Window
     {
-        static MainWindow instance;
+        public event EventHandler<SendRequestedEventArgs> SendRequested;
+        public event EventHandler<TextUpdatedEventArgs> MessageTextChanged;
+        public event EventHandler SettingsWindowRequested;
 
-        public static MainWindow Instance => instance ?? (instance = new MainWindow());
+        public bool IsSendButtonEnabled
+        {
+            // get => SendButton.IsEnabled;
+            set => SendButton.IsEnabled = value;
+        }
 
-        internal IClient Client { get; }
+        public bool IsSettingsButtonEnabled
+        {
+            // get => SettingsButton.IsEnabled;
+            set => SettingsButton.IsEnabled = value;
+        }
 
-        MainWindow()
+        public void SetConnectionsCount(int connections)
+        {
+            if (connections < 0)
+            {
+                throw new ArgumentException(nameof(connections));
+            }
+
+            ConnectiosScreen.Text = $"Connections: {connections}";
+        }
+
+        public void AddMessage(string message)
+        {
+            ChatScreen.Text += $"{Environment.NewLine}{message}";
+        }
+
+        public void ClearInput()
+        {
+            InputBox.Text = "";
+        }
+
+        public MainWindow()
         {
             InitializeComponent();
 
-            Client = new Client();
-
             ExitApplicationButton.Click += (sender, args) => Close();
 
-            Closing += OnClose;
+            SettingsButton.Click += (sender, args) => SettingsWindowRequested?.Invoke(this, EventArgs.Empty);
+
+            SendButton.Click += (sender, args) =>
+                SendRequested?.Invoke(this, new SendRequestedEventArgs(InputBox.Text));
 
             InputBox.TextChanged += (sender, args) =>
-                SendButton.IsEnabled = Client.HasConnections && !string.IsNullOrEmpty(InputBox.Text);
-
-            SettingsButton.Click += (sender, args) => SettingsWindow.Instance.Show();
-
-            SendButton.Click += OnSendButtonOnClick;
-
-            Client.MessageReceived += s => Dispatcher.Invoke(() => ChatScreen.Text += $"{Environment.NewLine}{s}");
-
-            Client.AutoDisconnected += () =>
-                Dispatcher.Invoke(() => MessageBox.Show("Disconnected due to loops in network", "Disconnectted"));
+                MessageTextChanged?.Invoke(sender, new TextUpdatedEventArgs(InputBox.Text));
         }
-
-        #region callbacks
-
-        void OnSendButtonOnClick(object sender, RoutedEventArgs args)
-        {
-            string message = $"[{Title}] {InputBox.Text}";
-            InputBox.Text = "";
-            try
-            {
-                Client.Send(message);
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.ToString(), "Error");
-                return;
-            }
-
-            ChatScreen.Text += Environment.NewLine;
-            ChatScreen.Text += message;
-        }
-
-        void OnClose(object sender, CancelEventArgs args)
-        {
-            if (Client.IsListening)
-            {
-                Client.StopListening();
-            }
-
-            if (Client.IncomingConnectionsCount != 0)
-            {
-                Client.TerminateIncomingConnections();
-            }
-
-            if (Client.HasOutcomingConnection)
-            {
-                Client.Disconnect();
-            }
-
-            if (SettingsWindow.HasInstance)
-            {
-                SettingsWindow.Instance.Close();
-            }
-
-            if (ConnectWindow.HasInstance)
-            {
-                ConnectWindow.Instance.Close();
-            }
-
-            if (StartListeningWindow.HasInstance)
-            {
-                StartListeningWindow.Instance.Close();
-            }
-
-            instance = null;
-        }
-
-        #endregion callbacks
     }
 }

@@ -1,33 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using Task5.Events;
 
 namespace Task5
 {
-    sealed class Client : IClient
+    sealed class Client : AbstractClient
     {
-        public static int DefaultListeningPort => 11000;
-
         const int BufferSize = 1024;
 
         public Client()
         {
-            IncomingConnections = new List<Socket>();
+            incomingConnections = new List<Socket>();
         }
 
-        public event Action<string> MessageReceived;
-        public event Action AutoDisconnected;
+        public override event EventHandler<MessageReceivedEventArgs> MessageReceived;
+        public override event EventHandler<ConnectionsCountChangedEventArgs> ConnectionsCountChanged;
 
         #region private members
 
         Socket listeningSocet;
         Socket outcomingConnection;
-        IList<Socket> IncomingConnections { get; }
+        readonly IList<Socket> incomingConnections;
 
         string IpAddressMessage => outcomingConnection?.LocalEndPoint?.ToString();
 
@@ -40,7 +38,7 @@ namespace Task5
             {
                 if (!socket.Connected)
                 {
-                    IncomingConnections.Remove(socket);
+                    incomingConnections.Remove(socket);
                     return;
                 }
 
@@ -52,7 +50,7 @@ namespace Task5
                 catch
                 {
                     MessageBox.Show("One of devices must have been disconnected", "Error reading data");
-                    IncomingConnections.Remove(socket);
+                    incomingConnections.Remove(socket);
                     return;
                 }
 
@@ -66,36 +64,29 @@ namespace Task5
                 if (message == IpAddressMessage)
                 {
                     Disconnect();
-                    AutoDisconnected?.Invoke();
+                    ConnectionsCountChanged?.Invoke(this, new ConnectionsCountChangedEventArgs(ConnectionsCount));
                     continue;
                 }
 
-                MessageReceived?.Invoke(message);
+                MessageReceived?.Invoke(this, new MessageReceivedEventArgs(message));
                 await Send(message, socket);
             }
         }
 
         #endregion private members
 
-        #region interface properties
+        public override int IncomingConnectionsCount => incomingConnections.Count;
 
-        public int IncomingConnectionsCount => IncomingConnections.Count;
+        public override int ListeningPort => (listeningSocet?.LocalEndPoint as IPEndPoint)?.Port ?? -1;
 
-        public bool HasOutcomingConnection => outcomingConnection != null;
+        public override string OutcomingConnectionIp =>
+            (outcomingConnection?.LocalEndPoint as IPEndPoint)?.Address?.ToString();
 
-        public bool IsListening => listeningSocet != null;
+        public override bool HasConnections => HasOutcomingConnection || IncomingConnectionsCount > 0;
 
-        public int ListeningPort { get; private set; } = -1;
+        #region public methods
 
-        public string OutcomingConnectionIp { get; private set; } = "None";
-
-        public bool HasConnections => HasOutcomingConnection || IncomingConnectionsCount > 0;
-
-        #endregion interface properties
-
-        #region interface methods
-
-        public async Task StartListening(int port)
+        public override async Task StartListening(int port)
         {
             if (IsListening)
             {
@@ -120,13 +111,12 @@ namespace Task5
                 MessageBox.Show("Could not occupy port");
                 return;
             }
-            
+
             listener.Listen(100);
 
             // I'm not sure about thread-safety of this assignment.
             // Let's just hope code above executes quickly enough to prevent problems
             listeningSocet = listener;
-            ListeningPort = port;
 
             // Listen for connections
             while (true)
@@ -148,18 +138,12 @@ namespace Task5
                     return;
                 }
 
-                IncomingConnections.Add(handler);
-                MainWindow.Instance.ConnectiosScreen.Text =
-                    $"Connections: {IncomingConnectionsCount + (HasOutcomingConnection ? 1 : 0)}";
-                if (SettingsWindow.HasInstance)
-                {
-                    SettingsWindow.Instance.IncomingConnectionsScreen.Text =
-                        $"Incoming connections: {IncomingConnectionsCount}";
-                }
+                incomingConnections.Add(handler);
+                ConnectionsCountChanged?.Invoke(this, new ConnectionsCountChangedEventArgs(ConnectionsCount));
             }
         }
 
-        public void StopListening()
+        public override void StopListening()
         {
             if (!IsListening)
             {
@@ -176,24 +160,26 @@ namespace Task5
             }
 
             listeningSocet = null;
-            ListeningPort = -1;
         }
 
-        public void TerminateIncomingConnections()
+        public override void TerminateIncomingConnections()
         {
-            lock (IncomingConnections)
+            // TODO: do I really need to lock?
+            lock (incomingConnections)
             {
-                foreach (var socket in IncomingConnections)
+                foreach (var socket in incomingConnections)
                 {
                     socket.Shutdown(SocketShutdown.Both);
                     socket.Close();
                 }
 
-                IncomingConnections.Clear();
+                incomingConnections.Clear();
             }
+            
+            ConnectionsCountChanged?.Invoke(this, new ConnectionsCountChangedEventArgs(ConnectionsCount));
         }
 
-        public async Task Connect(string ip, int port)
+        public override async Task Connect(string ip, int port)
         {
             if (HasOutcomingConnection)
             {
@@ -211,16 +197,17 @@ namespace Task5
             // Connect to the remote endpoint. 
             await client.ConnectAsync(remoteEp);
 
-            OutcomingConnectionIp = ip;
             outcomingConnection = client;
 
             // This action should terminate current connection if loops are present
             await Send(IpAddressMessage);
 
+            ConnectionsCountChanged?.Invoke(this, new ConnectionsCountChangedEventArgs(ConnectionsCount));
+            
             StartReceivingMessages(client);
         }
 
-        public void Disconnect()
+        public override void Disconnect()
         {
             if (!HasOutcomingConnection)
             {
@@ -230,20 +217,21 @@ namespace Task5
             outcomingConnection.Shutdown(SocketShutdown.Both);
             outcomingConnection.Close();
             outcomingConnection = null;
-            OutcomingConnectionIp = "None";
+            
+            ConnectionsCountChanged?.Invoke(this, new ConnectionsCountChangedEventArgs(ConnectionsCount));
         }
 
-        public Task Send(string message)
+        public override Task Send(string message)
         {
             return Send(message, null);
         }
 
-        public Task Send(MessageData data)
+        public override Task Send(MessageData data)
         {
             return Send(data.Message, data.Socket);
         }
 
-        public async Task Send(string message, Socket ignore)
+        public override async Task Send(string message, Socket ignore)
         {
             if (string.IsNullOrWhiteSpace(message))
             {
@@ -262,7 +250,7 @@ namespace Task5
                 await outcomingConnection.SendAsync(data, SocketFlags.None);
             }
 
-            foreach (var socket in IncomingConnections)
+            foreach (var socket in incomingConnections)
             {
                 if (socket != ignore)
                 {
@@ -271,6 +259,6 @@ namespace Task5
             }
         }
 
-        #endregion interface methods
+        #endregion public methods
     }
 }

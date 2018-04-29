@@ -2,7 +2,7 @@
 
 namespace Task5
 {
-    sealed class MessageData
+    public sealed class MessageData
     {
         public string Message { get; }
         

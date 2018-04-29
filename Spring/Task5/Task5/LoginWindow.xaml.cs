@@ -1,44 +1,47 @@
-﻿using System;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace Task5
 {
-    /// <summary>
-    /// Interaction logic for LoginWindow.xaml
-    /// </summary>
-    public sealed partial class LoginWindow
+    // This class is too simple
+    // to introduce complexity
+    // related with ViewModel 
+    public sealed partial class LoginWindow : Window
     {
         public LoginWindow()
         {
             InitializeComponent();
 
-            NameInputTextBox.TextChanged += (sender, args) =>
-            {
-                if (!string.IsNullOrEmpty(NameInputTextBox.Text))
-                {
-                    NameInputTextBox.Background = (SolidColorBrush)FindResource("BaseBackground");
-                    LoginButton.IsEnabled = Regex.IsMatch(NameInputTextBox.Text, @"\A\S{3,}\z");
-                }
-                else
-                {
-                    NameInputTextBox.Background = null;
-                    LoginButton.IsEnabled = false;
-                }
-            };
+            NameInputTextBox.TextChanged += InputNameChanged;
 
             ExitButton.Click += (sender, args) => Close();
 
             LoginButton.Click += (sender, args) =>
             {
-                var mainWindow = MainWindow.Instance;
-                mainWindow.Title = NameInputTextBox.Text;
-                mainWindow.Show();
+                new MainWindowModel(NameInputTextBox.Text).Show();
+                
+                // After this MainWindowModel turns into closure,
+                // inaccessible for anyone, but still alive,
+                // since MainWindow has references to it's methods
+                
                 Close();
             };
+        }
+
+        void InputNameChanged(object sender, TextChangedEventArgs textChangedEventArgs)
+        {
+            if (!string.IsNullOrEmpty(NameInputTextBox.Text))
+            {
+                NameInputTextBox.Background = (SolidColorBrush) FindResource("BaseBackground");
+                LoginButton.IsEnabled = Regex.IsMatch(NameInputTextBox.Text, @"\A\S{3,}\z");
+            }
+            else
+            {
+                NameInputTextBox.Background = null;
+                LoginButton.IsEnabled = false;
+            }
         }
     }
 }
