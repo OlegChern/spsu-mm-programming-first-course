@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1508189464 source:c:\ide\common7\ide\task2\pifagoreantriple.c
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+
