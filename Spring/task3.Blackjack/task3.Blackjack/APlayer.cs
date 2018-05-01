@@ -12,19 +12,7 @@ namespace Task3.Blackjack
 
         public double Money { get; private set; }
 
-        private int sumCards;
-
-        public int SumCards
-        {
-            get
-            {
-                return sumCards;
-            }
-            private set
-            {
-                sumCards = value;
-            }
-        }
+        public int SumCards { get; private set; }
 
         public void ChangeAmountOfMoney(double value)
         {
