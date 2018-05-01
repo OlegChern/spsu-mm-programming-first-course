@@ -3,5 +3,5 @@
 Available filters : Gauss
                     SobelX
                     SobelY
-					GrayScale
-					Average
+                    GrayScale
+                    Average
