@@ -3,6 +3,7 @@
 using namespace std;
 #include "cards.cpp"
 #include "Players.cpp"
+#include "Bots.cpp"
 
 template <class T>
 class BlackJack
@@ -20,7 +21,6 @@ public:
         deck = new CardDeck(NUMBER_OF_DECKS);
     }
     ~BlackJack(){}
-    
     void Round(T* Bot)
     {
         int sol_1 = 1;
@@ -32,11 +32,11 @@ public:
         }
         if (Bot->getCount() == 21 && Casino.getCount() != 21)
         {
-            Bot->changeCash(bets[0] / 2 * 5);
+            Bot->addToCash(PayBlackJack(bets[0]));
         }
         else if ((Bot->getCount() == 21) && (Casino.getCount() == 21))
         {
-            Bot->changeCash(bets[0] * 2);
+            Bot->addToCash(Pay21And21(bets[0]));
         }
         else
         {
@@ -56,19 +56,18 @@ public:
                 }
                 if (Casino.getCount() > 21)
                 {
-                    Bot->changeCash(bets[0] * 2);
+                    Bot->addToCash(PayCasinoTooMuch(bets[0]));
                 }
                 else
                 {
                     if (Bot->getCount() > Casino.getCount())
                     {
-                        Bot->changeCash(bets[0] * 2);
+                        Bot->addToCash(PayCountWin(bets[0]));
                     }
                 }
             }
         }
     }
-    
     void Game(T* Bot, int numOfRounds)
     {
         for (int i = 0; i < numOfRounds; i++)
@@ -78,5 +77,23 @@ public:
             Casino.refill();
         }
     }
-    
+
+    static int PayBlackJack (int bet)
+    {
+        return bet / 2 * 5;
+    }
+
+    static int Pay21And21 (int bet)
+    {
+        return bet * 2;
+    }
+
+    static int PayCasinoTooMuch (int bet)
+    {
+        return bet * 2;
+    }
+    static int PayCountWin (int bet)
+    {
+        return bet * 2;
+    }
 };

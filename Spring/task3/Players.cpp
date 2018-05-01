@@ -1,5 +1,4 @@
 #pragma once
-
 class Member : public Cards
 {
 protected:
@@ -11,35 +10,31 @@ public:
         refill();
     }
     ~Member(){}
-    
     int getCount()
     {
         return count;
     }
-    
     void refill()
     {
-        for (int i = 0; i < 13; i++)
+        for (int i = 0; i < NUM_OF_VALUES; i++)
         {
-            for (int j; j < 4; j++)
+            for (int j; j < NUM_OF_SUITS; j++)
             {
                 condition[i][j] = 0;
             }
         }
         count = 0;
-        countOfTakenCards = 0;
     }
-    
     void TakeCard(CardDeck* deck)
     {
-        pair <int, int> card = deck->GiveCard();
+        pair <int, int> card = deck->GetCard();
         condition[card.first][card.second] = 1;
-        if (card.first < 8)
+        if (card.first < NUM_OF_VALUES - 5)
         {
             count += (card.first + 2);
             countOfTakenCards++;
         }
-        else if (card.first != 13)
+        else if (card.first != NUM_OF_VALUES)
         {
             count += 10;
             countOfTakenCards++;
@@ -72,102 +67,12 @@ public:
         cash = money;
     }
     ~Player(){}
-    
-    void changeCash(int money)
+    void addToCash(int money)
     {
         cash += money;
     }
-    
-    int showCash()
+    int getCash()
     {
         return cash;
     }
-    
-};
-
-
-
-class SillyBot : public Player
-{
-public:
-    SillyBot(int money = START_CASH) : Player(money){}
-    ~SillyBot(){}
-    
-    int MakeDecision()
-    {
-        if (count <= 11 || (countOfTakenCards == 2 && (condition[13][0] > 0 || condition[13][1] > 0 || condition[13][2] > 0 || condition[13][3] > 0)))
-        {
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-    
-    int PlaceBet()
-    {
-        cash -= MEDIUM_BET;
-        return MEDIUM_BET;
-    }
-    
-};
-
-class CleverBot : public Player
-{
-    int CheatCount;
-public:
-    CleverBot(int money) : Player(money)
-    {
-        CheatCount = 0;
-    }
-    ~CleverBot(){}
-    
-    int MakeDecision()
-    {
-        for (int i = 0; i < 13; i++)
-        {
-            for (int j = 0; j < 4; j++)
-            {
-                if (condition[i][j] != 0)
-                {
-                    if (i <= 4)
-                    {
-                        CheatCount--;
-                    }
-                    else if (i > 7)
-                    {
-                        CheatCount++;
-                    }
-                }
-            }
-        }
-        if (CheatCount > 10 && (count <= 13 || (countOfTakenCards == 2 && (condition[13][0] > 0 || condition[13][1] > 0 || condition[13][2] > 0 || condition[13][3] > 0))))
-        {
-            return 1;
-        }
-        else if (count <= 11 || (countOfTakenCards == 2 && (condition[13][0] > 0 || condition[13][1] > 0 || condition[13][2] > 0 || condition[13][3] > 0)))
-        {
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-    
-    int PlaceBet()
-    {
-        if (CheatCount >= 0)
-        {
-            cash -= MEDIUM_BET;
-            return MEDIUM_BET;
-        }
-        else
-        {
-            cash -= LOW_BET;
-            return LOW_BET;
-        }
-    }
-    
 };
