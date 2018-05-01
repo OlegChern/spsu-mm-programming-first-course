@@ -25,14 +25,14 @@ namespace WinFormsTechnology
         {
             get
             {
-                return PictureBox.Size.Width / 2;
+                return (PictureBox.Width) / 2;
             }
         }
         private float HalfBoxHeight
         {
             get
             {
-                return PictureBox.Size.Height / 2;
+                return (PictureBox.Height) / 2;
             }
         }
 
