@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Math;
 
 namespace WpfUi
@@ -9,21 +8,17 @@ namespace WpfUi
     /// </summary>
     public partial class MainWindow
     {
-        int pixelsInUnit;
-
-        Painter painter;
-
         public MainWindow()
         {
             InitializeComponent();
 
-            pixelsInUnit = 64;
+            int pixelsInUnit = 64;
 
-            painter = new WpfPainter(Canvas);
+            var painter = new WpfPainter(Canvas);
 
             FunctionSelectionBox.ItemsSource = new List<CurveInfo>
             {
-                new CircleInfo(2, 1, 2),
+                new CentralCircleInfo(2),
                 new EllipticCurveInfo()
             };
 

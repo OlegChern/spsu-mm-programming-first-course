@@ -10,8 +10,7 @@ namespace WinFormsUi
         public const int WindowWidth = 400;
         public const int WindowHeight = 400;
 
-
-        Painter painter;
+        WinFormsPainter painter;
 
         int pixelsInUnit;
 
@@ -28,6 +27,8 @@ namespace WinFormsUi
             painter = new WinFormsPainter(CreateGraphics());
 
             initializes = true;
+
+            Closing += (sender, args) => painter.Dispose();
         }
 
         void MainForm_Paint(object sender, PaintEventArgs e)
@@ -59,7 +60,12 @@ namespace WinFormsUi
                 Left = 160,
                 Width = 80,
                 DisplayMember = "Name",
-                Items = { new CircleInfo(2, 1, 2), new EllipticCurveInfo() }
+                Items =
+                {
+                    new CentralCircleInfo(2),
+                    new EllipticCurveInfo()
+                },
+                DropDownStyle =  ComboBoxStyle.DropDownList
             };
 
             plusButton.Click += (o, args) => PlusButton_Click(plusButton, minusButton, (CurveInfo) comboBox.SelectedItem);

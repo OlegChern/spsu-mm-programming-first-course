@@ -1,10 +1,7 @@
 ﻿using Math;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Point = Math.Point;
 
 namespace WinFormsUi
 {
@@ -21,7 +18,7 @@ namespace WinFormsUi
         public WinFormsPainter(Graphics graphics)
         {
             this.graphics = graphics;
-            pen = new Pen(Color.Black, 2);
+            pen = new Pen(Brushes.Black, LineThickness);
         }
 
         protected override void Clear()
@@ -31,15 +28,20 @@ namespace WinFormsUi
 
         protected override void PaintAxes()
         {
-            var pen = new Pen(Color.Blue, 2);
-            graphics.DrawLine(pen, ScreenWidth / 2, 0, ScreenWidth / 2, ScreenHeight);
-            graphics.DrawLine(pen, 0, ScreenHeight / 2, ScreenWidth, ScreenHeight / 2);
-            pen.Dispose();
+            var localPen = new Pen(Color.Blue, 2);
+            
+            // X-axis
+            graphics.DrawLine(localPen, 0, ScreenHeight / 2, ScreenWidth, ScreenHeight / 2);
+            
+            // Y-axis
+            graphics.DrawLine(localPen, ScreenWidth / 2, 0, ScreenWidth / 2, ScreenHeight);
+            
+            localPen.Dispose();
         }
 
-        protected override void PaintDot(Math.Point dot)
+        protected override void PaintLine(Point start, Point end)
         {
-            graphics.DrawEllipse(pen, (int) dot.Y, (int) dot.X, 2, 2);
+            graphics.DrawLine(pen, start.X, start.Y, start.X, end.Y);
         }
 
         public void Dispose()

@@ -1,8 +1,8 @@
 ﻿using Math;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Point = Math.Point;
 
 namespace WpfUi
 {
@@ -50,19 +50,26 @@ namespace WpfUi
             });
         }
 
-        protected override void PaintDot(Math.Point dot)
+        protected override void PaintLine(Point start, Point end)
         {
-            var currentDot = new Ellipse
+            panel.Children.Add(new Line
             {
                 Stroke = brush,
-                StrokeThickness = 3
-            };
-            Panel.SetZIndex(currentDot, 3);
-            currentDot.Height = PointSize;
-            currentDot.Width = PointSize;
-            currentDot.Fill = new SolidColorBrush(Colors.Green);
-            currentDot.Margin = new Thickness(dot.Y, dot.X, 0, 0);
-            panel.Children.Add(currentDot);
+                X1 = start.X,
+                X2 = end.X,
+                Y1 = start.Y,
+                Y2 = end.Y,
+                StrokeThickness = LineThickness
+            });
+        }
+
+        protected override void PaintDot(Point dot)
+        {
+            panel.Children.Add(new Ellipse
+            {
+                Stroke = brush,
+                // TODO
+            });
         }
     }
 }

@@ -1,10 +1,12 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Math
 {
     public abstract class Painter
     {
-        protected const int PointSize = 3;
+        protected const int LineThickness = 3;
+        protected const double MinStep = double.Epsilon * 16;
 
         protected abstract double ScreenWidth { get; }
         protected abstract double ScreenHeight { get; }
@@ -20,30 +22,63 @@ namespace Math
                 return;
             }
 
-            var zeroPoint = new Point(ScreenHeight / 2, ScreenWidth / 2);
-
-            var upperLeft = new Point(-ScreenWidth / 2, -ScreenHeight / 2) / pixelsInUnit;
+            var zeroPoint = new Point(ScreenWidth / 2, ScreenHeight / 2);
 
             var lowerRight = new Point(ScreenWidth / 2, ScreenHeight / 2) / pixelsInUnit;
 
+            var upperLeft = -lowerRight;
+
             var region = new Region(upperLeft, lowerRight);
 
-            var realPoints =
-                from point in curve.GetPoints(region)
-                let realPoint = new Point(point.Y, point.X) * pixelsInUnit + zeroPoint
-                // TODO: move this filtering closer to point rendering
-                where realPoint.X >= 0
-                      && realPoint.X <= ScreenHeight
-                      && realPoint.Y >= 0
-                      && realPoint.Y <= ScreenWidth
-                select realPoint;
+            var transformedComponents =
+                from component in curve.GetConnectivityComponents(region)
+                let transformedComponent =
+                    from point in component.Dots
+                    select point * pixelsInUnit + zeroPoint
+                select new ConnectivityComponent(transformedComponent);
 
-            realPoints.ForEach(point => PaintDot(point));
+            foreach (var component in transformedComponents)
+            {
+                Point? previousPoint = null;
+
+                foreach (var point in component.Dots)
+                {
+                    if (IsBorderPoint(point))
+                    {
+                        previousPoint = null;
+                        PaintDot(point);
+                        continue;
+                    }
+
+                    if (previousPoint != null)
+                    {
+                        PaintLine(previousPoint.Value, point);
+                    }
+
+                    previousPoint = point;
+                }
+            }
+        }
+
+        protected virtual bool IsBorderPoint(Point point)
+        {
+            double step = ScreenHeight / 1024;
+            if (step < MinStep)
+            {
+                step = MinStep;
+            }
+
+            return point.Y < ScreenHeight - step &&
+                   point.Y > step &&
+                   point.X < ScreenWidth - step &&
+                   point.X > step;
         }
 
         protected abstract void Clear();
 
         protected abstract void PaintAxes();
+
+        protected abstract void PaintLine(Point start, Point end);
 
         protected abstract void PaintDot(Point dot);
     }

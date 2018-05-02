@@ -8,19 +8,22 @@ namespace Math
     public abstract class CurveInfo
     {
         public abstract string Name { get; }
-        
-        public IEnumerable<Point> GetPoints(Region region)
-        {
-            double step = region.Width / 1024;
 
-            if (step < double.Epsilon * 2)
+        public IEnumerable<ConnectivityComponent> GetConnectivityComponents(Region region)
+        {
+            double step = region.Width / 512;
+
+            const double minStep = double.Epsilon * 16;
+
+            if (step < minStep)
             {
-                step = double.Epsilon * 2;
+                step = minStep;
             }
 
-            return UnsafeGetPoints(region, step);
+            return UnsafeGetConnectivityComponents(region, step);
         }
 
-        internal abstract IEnumerable<Point> UnsafeGetPoints(Region region, double step);
+        internal abstract IEnumerable<ConnectivityComponent>
+            UnsafeGetConnectivityComponents(Region region, double step);
     }
 }

@@ -4,22 +4,16 @@ namespace Math
 {
     public struct Region
     {
-#if DEBUG
         public readonly Point UpperLeft;
         public readonly Point LoweRight;
-#else
-        Point upperLeft;
-        Point lowerRight;
-#endif
 
-        public double Width => LoweRight.X - UpperLeft.Y;
+        public double Width => LoweRight.Y - UpperLeft.X;
 
-        public double Height => LoweRight.Y - UpperLeft.Y;
+        public double Height => LoweRight.X - UpperLeft.X;
 
         public Region(Point upperLeft, Point loweRight)
         {
-            // TODO: verify that this assertation is correct
-            if (upperLeft.X >= loweRight.X || upperLeft.Y >= loweRight.Y)
+            if (upperLeft.Y >= loweRight.Y || upperLeft.X >= loweRight.X)
             {
                 throw new ArgumentException(
                     "upper-left corner should actually be upper-left relatively to lower-right one");

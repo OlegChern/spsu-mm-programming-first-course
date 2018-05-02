@@ -14,9 +14,14 @@ namespace Math
             }
         } 
 
-        public static void DrawLine(this Graphics graphics, Pen pen, double x1, double x2, double y1, double y2)
+        public static void DrawLine(this Graphics graphics, Pen pen, double x1, double y1, double x2, double y2)
         {
-            graphics.DrawLine(pen, (float)x1, (float)x2, (float)y1, (float)y2);
+            graphics.DrawLine(pen, (float)x1, (float)y1, (float)x2, (float)y2);
+        }
+
+        public static IEnumerable<Point> NoPoints()
+        {
+            yield break;
         }
     }
 }
