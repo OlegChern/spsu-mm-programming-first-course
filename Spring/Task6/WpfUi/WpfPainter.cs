@@ -1,4 +1,5 @@
-﻿using Math;
+﻿using System.Windows;
+using Math;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -65,11 +66,17 @@ namespace WpfUi
 
         protected override void PaintDot(Point dot)
         {
-            panel.Children.Add(new Ellipse
+            var currentDot = new Ellipse
             {
                 Stroke = brush,
-                // TODO
-            });
+                StrokeThickness = LineThickness
+            };
+            Panel.SetZIndex(currentDot, 3);
+            currentDot.Height = LineThickness;
+            currentDot.Width = LineThickness;
+            currentDot.Fill = new SolidColorBrush(Colors.Green);
+            currentDot.Margin = new Thickness(dot.X, dot.Y, 0, 0);
+            panel.Children.Add(currentDot);
         }
     }
 }

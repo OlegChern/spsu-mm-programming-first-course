@@ -62,16 +62,16 @@ namespace Math
 
         protected virtual bool IsBorderPoint(Point point)
         {
-            double step = ScreenHeight / 1024;
+            double step = ScreenHeight / 256;
             if (step < MinStep)
             {
                 step = MinStep;
             }
 
-            return point.Y < ScreenHeight - step &&
-                   point.Y > step &&
-                   point.X < ScreenWidth - step &&
-                   point.X > step;
+            return point.Y > ScreenHeight - step ||
+                   point.Y < step ||
+                   point.X > ScreenWidth - step ||
+                   point.X < step;
         }
 
         protected abstract void Clear();

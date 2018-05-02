@@ -10,6 +10,8 @@
     Title="MainWindow"
     Height="365"
     Width="310"
+    MinHeight="100"
+    MinWidth="100"
     Background="{StaticResource MainBackground}">
 
     <Grid>

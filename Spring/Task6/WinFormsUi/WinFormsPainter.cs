@@ -44,6 +44,11 @@ namespace WinFormsUi
             graphics.DrawLine(pen, start.X, start.Y, start.X, end.Y);
         }
 
+        protected override void PaintDot(Point dot)
+        {
+            
+        }
+
         public void Dispose()
         {
             pen?.Dispose();
