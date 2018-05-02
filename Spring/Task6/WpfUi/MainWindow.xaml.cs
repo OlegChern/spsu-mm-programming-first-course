@@ -27,7 +27,7 @@ namespace WpfUi
 
             PlusButton.Click += (sender, args) =>
             {
-                if (pixelsInUnit < 512)
+                if (pixelsInUnit < 256)
                 {
                     pixelsInUnit *= 2;
                     PlusButton.IsEnabled = true;
@@ -35,7 +35,7 @@ namespace WpfUi
                 }
                 else
                 {
-                    pixelsInUnit = 1024;
+                    pixelsInUnit = 512;
                     PlusButton.IsEnabled = false;
                     MinusButton.IsEnabled = true;
                 }
@@ -45,7 +45,7 @@ namespace WpfUi
 
             MinusButton.Click += (sender, args) =>
             {
-                if (pixelsInUnit > 2)
+                if (pixelsInUnit > 32)
                 {
                     pixelsInUnit /= 2;
                     PlusButton.IsEnabled = true;
@@ -53,7 +53,7 @@ namespace WpfUi
                 }
                 else
                 {
-                    pixelsInUnit = 1;
+                    pixelsInUnit = 16;
                     PlusButton.IsEnabled = true;
                     MinusButton.IsEnabled = false;
                 }

@@ -89,7 +89,7 @@ namespace WinFormsUi
 
         void PlusButton_Click(Button plus, Button minus, CurveInfo curve)
         {
-            if (pixelsInUnit < 512)
+            if (pixelsInUnit < 256)
             {
                 pixelsInUnit *= 2;
                 plus.Enabled = true;
@@ -97,7 +97,7 @@ namespace WinFormsUi
             }
             else
             {
-                pixelsInUnit = 1024;
+                pixelsInUnit = 512;
                 plus.Enabled = false;
                 minus.Enabled = true;
             }
@@ -107,7 +107,7 @@ namespace WinFormsUi
 
         void MinusButton_Click(Button plus, Button minus, CurveInfo curve)
         {
-            if (pixelsInUnit > 2)
+            if (pixelsInUnit > 32)
             {
                 pixelsInUnit /= 2;
                 plus.Enabled = true;
@@ -115,7 +115,7 @@ namespace WinFormsUi
             }
             else
             {
-                pixelsInUnit = 1;
+                pixelsInUnit = 16;
                 plus.Enabled = true;
                 minus.Enabled = false;
             }

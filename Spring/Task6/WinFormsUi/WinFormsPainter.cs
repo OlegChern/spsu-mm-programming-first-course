@@ -46,7 +46,7 @@ namespace WinFormsUi
 
         protected override void PaintDot(Point dot)
         {
-            
+            graphics.DrawEllipse(pen, (int) dot.X, (int) dot.Y, LineThickness, LineThickness);
         }
 
         public void Dispose()
