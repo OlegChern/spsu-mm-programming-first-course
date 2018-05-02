@@ -9,8 +9,6 @@ namespace AlgebraicCurveLibrary.Exapmles
     /// </summary>
     public class Hyperbola : Curve
     {
-        private const float MinEpsilon = 0.1f;
-
         private const float DefaultA = 30f;
         private const float DefaultB = 20f;
 
@@ -34,15 +32,12 @@ namespace AlgebraicCurveLibrary.Exapmles
         public Hyperbola() : this(DefaultA, DefaultB) { }
         #endregion
 
-        public override PointF[][] GetDrawingPoints(Vector2 upperLeft, Vector2 lowerRight, float epsilon)
+        public override PointF[][] GetDrawingPoints(Vector2 upperLeft, Vector2 lowerRight)
         {
             List<PointF> leftPoints = new List<PointF>();
             List<PointF> rightPoints = new List<PointF>();
 
-            if (epsilon < MinEpsilon)
-            {
-                epsilon = MinEpsilon;
-            }
+            float epsilon = CalculateEpsilon(upperLeft.X);
 
             // left part
             CalculateHyberbolaPoints(leftPoints, upperLeft.X, -a, epsilon);

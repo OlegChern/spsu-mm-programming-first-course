@@ -9,7 +9,7 @@ namespace AlgebraicCurveLibrary.Exapmles
     /// </summary>
     public class Parabola : Curve
     {
-        private const float DefaultParameter = 1f;
+        private const float DefaultParameter = 5f;
 
         private float parameter;
 
@@ -29,9 +29,11 @@ namespace AlgebraicCurveLibrary.Exapmles
         public Parabola() : this(DefaultParameter) { }
         #endregion
 
-        public override PointF[][] GetDrawingPoints(Vector2 upperLeft, Vector2 lowerRight, float epsilon)
+        public override PointF[][] GetDrawingPoints(Vector2 upperLeft, Vector2 lowerRight)
         {
             List<PointF> points = new List<PointF>();
+
+            float epsilon = CalculateEpsilon(upperLeft.X);
 
             CalculateParabolaPoints(points, lowerRight.X, epsilon);
 
@@ -43,7 +45,6 @@ namespace AlgebraicCurveLibrary.Exapmles
 
         private void CalculateParabolaPoints(List<PointF> list, float bound, float epsilon)
         {
-            epsilon = Math.Abs(epsilon);
             float x = Math.Abs(bound);
 
             // upper part

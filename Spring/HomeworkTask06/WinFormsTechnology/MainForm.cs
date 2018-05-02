@@ -1,18 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using AlgebraicCurveLibrary;
-using AlgebraicCurveLibrary.Exapmles;
 
 namespace WinFormsTechnology
 {
     public partial class MainForm : Form
     {
+        #region constants
+        private const float ScaleMultiplier = 1.25f;
+        private const int MaxScalePower = 15;
+
+        private readonly float MaxScale;
+        private readonly float MinScale;
+        #endregion
+
         #region fields
-        private List<CurveBase> curves;
-        private CurveBase selected;
+        private static MainForm instance;
+        private Model model;
+
         private Graphics graphics;
         private Pen pen;
 
@@ -25,29 +31,48 @@ namespace WinFormsTechnology
         {
             get
             {
-                return (PictureBox.Width) / 2;
+                return (instance.PictureBox.Width) / 2;
             }
         }
+
         private float HalfBoxHeight
         {
             get
             {
-                return (PictureBox.Height) / 2;
+                return (instance.PictureBox.Height) / 2;
             }
         }
 
-        private float ScaledHalfBoxWidth
+        /// <summary>
+        /// Scaled PictureBox half width
+        /// </summary>
+        internal static float ScaledHalfBoxWidth
         {
             get
             {
-                return HalfBoxWidth / scale;
+                return instance.HalfBoxWidth / instance.scale;
             }
         }
-        private float ScaledHalfBoxHeight
+
+        /// <summary>
+        /// Scaled PictureBox half height
+        /// </summary>
+        internal static float ScaledHalfBoxHeight
         {
             get
             {
-                return HalfBoxHeight / scale;
+                return instance.HalfBoxHeight / instance.scale;
+            }
+        }
+
+        /// <summary>
+        /// Instance of MainForm
+        /// </summary>
+        internal static MainForm Instance
+        {
+            get
+            {
+                return instance;
             }
         }
         #endregion
@@ -55,18 +80,8 @@ namespace WinFormsTechnology
         #region initializing
         public MainForm()
         {
-            curves = new List<CurveBase>();
-            AddCurves();
-
-            string[] names = new string[curves.Count];
-
-            for (int i = 0; i < curves.Count; i++)
-            {
-                names[i] = curves[i].Name;
-            }
-
+            instance = this;
             InitializeComponent();
-            CurveListComboBox.Items.AddRange(curves.ToArray());
 
             pen = new Pen(Color.Black);
             graphics = PictureBox.CreateGraphics();
@@ -76,102 +91,53 @@ namespace WinFormsTechnology
 
             graphics.TranslateTransform(HalfBoxWidth, HalfBoxHeight);
             scale = 1f;
+
+            MaxScale = (float)Math.Pow(ScaleMultiplier, MaxScalePower);
+            MinScale = (float)Math.Pow(ScaleMultiplier, -MaxScalePower);
+
+            model = new Model();
         }
 
-        private void AddCurves()
+        /// <summary>
+        /// Adds items to combobox
+        /// </summary>
+        /// <param name="arr"></param>
+        internal void AddComboBoxItems(object[] arr)
         {
-            curves.Add(new Line());
-            curves.Add(new Circle());
-            curves.Add(new Ellipse());
-            curves.Add(new Parabola());
-            curves.Add(new Hyperbola());
+            CurveListComboBox.Items.AddRange(arr);
         }
         #endregion
 
-        #region combobox
+        #region combobox event
         private void CurveListComboBoxSelectedIndexChanged(object sender, EventArgs e)
         {
             ComboBox comboBox = (ComboBox)sender;
-            selected = (CurveBase)comboBox.SelectedItem;
 
-            Draw();
+            model.Selected = comboBox.SelectedItem;
+            model.Draw();
         }
         #endregion
 
         #region drawing
-        private void Draw()
+        internal void DrawCurve(PointF[] points)
         {
-            Clear();
-
-            if (selected == null)
-            {
-                return;
-            }
-
-            switch (selected.Type)
-            {
-                case DrawableCurveType.Curve:
-                    {
-                        Curve curve = (Curve)selected;
-                        Draw(curve);
-
-                        break;
-                    }
-                case DrawableCurveType.Ellipse:
-                    {
-                        Ellipse ellipse = (Ellipse)selected;
-                        Draw(ellipse);
-
-                        break;
-                    }
-                case DrawableCurveType.Line:
-                    {
-                        Line line = (Line)selected;
-                        Draw(line);
-
-                        break;
-                    }
-            }
+            graphics.DrawCurve(pen, points);
         }
 
-        private void Draw(Curve curve)
+        internal void DrawEllipse(float x, float y, float width, float height)
         {
-            Vector2 ul = new Vector2(-ScaledHalfBoxWidth, ScaledHalfBoxHeight);
-            Vector2 lr = new Vector2(ScaledHalfBoxWidth, -ScaledHalfBoxHeight);
-
-            PointF[][] points = curve.GetDrawingPoints(ul, lr, 5 / scale);
-
-            // foreach part
-            for (int i = 0; i < points.Length; i++)
-            {
-                if (points[i].Length < 2)
-                {
-                    continue;
-                }
-
-                graphics.DrawCurve(pen, points[i]);
-            }
+            graphics.DrawEllipse(pen, x, y, width, height);
         }
 
-        private void Draw(Ellipse ellipse)
+        internal void DrawLine(float x1, float y1, float x2, float y2)
         {
-            // center offset
-            float offsetX = -ellipse.SemiMajorAxis / 2;
-            float offsetY = -ellipse.SemiMinorAxis / 2;
-
-            graphics.DrawEllipse(pen, offsetX, offsetY, ellipse.SemiMajorAxis, ellipse.SemiMinorAxis);
+            graphics.DrawLine(pen, x1, y1, x2, y2);
         }
 
-        private void Draw(Line line)
+        internal void Clear()
         {
-            // stretch line
-            float length = (new Vector2(ScaledHalfBoxWidth * 2, ScaledHalfBoxHeight * 2)).Length;
-            Vector2 lineDir = line.Direction * length;
-
-            // just draw 2 lines
-            // inverted y axis because coords calculated from the up
-            graphics.DrawLine(pen, 0, 0, lineDir.X, -lineDir.Y);
-            graphics.DrawLine(pen, 0, 0, -lineDir.X, lineDir.Y);
+            graphics.Clear(Color.White);
+            DrawAxis();
         }
 
         private void DrawAxis()
@@ -179,25 +145,19 @@ namespace WinFormsTechnology
             graphics.DrawLine(pen, 0, -ScaledHalfBoxHeight, 0, ScaledHalfBoxHeight);
             graphics.DrawLine(pen, -ScaledHalfBoxWidth, 0, ScaledHalfBoxWidth, 0);
         }
-
-        private void Clear()
-        {
-            graphics.Clear(Color.White);
-            DrawAxis();
-        }
         #endregion
 
         #region scaling
         private void BtnScaleDownClick(object sender, EventArgs e)
         {
-            if (scale > 80f)
+            if (scale >= MaxScale)
             {
                 BtnScaleUp.Show();
             }
 
-            ScaleCurves(0.8f);
+            ScaleCurves(1 / ScaleMultiplier);
 
-            if (scale < 0.12f)
+            if (scale <= MinScale)
             {
                 BtnScaleDown.Hide();
             }
@@ -205,14 +165,14 @@ namespace WinFormsTechnology
 
         private void BtnScaleUpClick(object sender, EventArgs e)
         {
-            if (scale < 0.12f)
+            if (scale <= MinScale)
             {
                 BtnScaleDown.Show();
             }
 
-            ScaleCurves(1.25f);
+            ScaleCurves(ScaleMultiplier);
 
-            if (scale > 80f)
+            if (scale >= MaxScale)
             {
                 BtnScaleUp.Hide();
             }
@@ -229,7 +189,7 @@ namespace WinFormsTechnology
             graphics.TranslateTransform(HalfBoxWidth, HalfBoxHeight);
             graphics.ScaleTransform(this.scale, this.scale);
 
-            Draw();
+            model.Draw();
         }
         #endregion
     }
