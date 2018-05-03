@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Общие сведения об этой сборке предоставляются следующим набором
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
-[assembly: AssemblyTitle("CustomTanksLib")]
+[assembly: AssemblyTitle("CustomTankLib")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CustomTanksLib")]
+[assembly: AssemblyProduct("CustomTankLib")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Следующий GUID служит для идентификации библиотеки типов, если этот проект будет видимым для COM
-[assembly: Guid("5bb4ac3d-c874-494d-b2c5-7ed02b90fca0")]
+[assembly: Guid("b63f1365-da5b-4790-9d86-f507b4eca54f")]
 
 // Сведения о версии сборки состоят из следующих четырех значений:
 //

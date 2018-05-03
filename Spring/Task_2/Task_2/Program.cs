@@ -1,4 +1,5 @@
 ﻿using System;
+using CustomTankLib;
 
 namespace Task_2
 {
@@ -9,7 +10,7 @@ namespace Task_2
             BlitzenMTLS firstMyTank = new BlitzenMTLS();
             firstMyTank.GetInfo();
             AMXChasseurDeChars secondMyTank = new AMXChasseurDeChars();
-            secondMyTank.GetInfo(); 
+            secondMyTank.GetInfo();
             Console.ReadKey();
         }
     }

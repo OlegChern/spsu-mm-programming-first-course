@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Task_2
+namespace ATankLib
 {
     public struct TanksArmor
     {

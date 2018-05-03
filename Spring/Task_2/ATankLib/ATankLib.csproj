@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5BB4AC3D-C874-494D-B2C5-7ED02B90FCA0}</ProjectGuid>
+    <ProjectGuid>{F024E730-1227-42CF-A30E-39E4E5B6F7FD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CustomTanksLib</RootNamespace>
-    <AssemblyName>CustomTanksLib</AssemblyName>
+    <RootNamespace>ATankLib</RootNamespace>
+    <AssemblyName>ATankLib</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -32,17 +32,11 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AMXChasseurDeChars.cs" />
-    <Compile Include="BlitzenMTLS.cs" />
+    <Compile Include="ATank.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TanksArmor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

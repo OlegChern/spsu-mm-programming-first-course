@@ -1,9 +1,9 @@
-﻿
-using System;
+﻿using System;
+using ATankLib;
 
-namespace Task_2
+namespace CustomTankLib
 {
-    internal class BlitzenMTLS : ATank
+    public class AMXChasseurDeChars : ATank
     {
         public override void GetInfo()
         {
@@ -14,17 +14,16 @@ namespace Task_2
             Armor.WriteInfo();
             Console.WriteLine("Gun caliber: {0} mm", GunСaliber);
             Console.WriteLine("Speed limit: {0} km/h", SpeedLimit);
-            Console.WriteLine();
         }
 
-        public BlitzenMTLS()
+        public AMXChasseurDeChars()
         {
-            Name = "BlitzenMTLS";
-            Country = "USA";
-            Weight = 15.47;
-            Armor = new TanksArmor(38,25,25);
-            GunСaliber = 37;
-            SpeedLimit = 42;
+            Name = "AMXChasseurDeChars";
+            Country = "France";
+            Weight = 34;
+            Armor = new TanksArmor(30, 20, 20);
+            GunСaliber = 90;
+            SpeedLimit = 57;
         }
     }
 }
