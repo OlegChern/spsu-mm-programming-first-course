@@ -1,8 +1,9 @@
-﻿using System;
+﻿
+using System;
 
 namespace Task_2
 {
-    internal class BlitzenMTLS : Tank
+    internal class BlitzenMTLS : ATank
     {
         public override void GetInfo()
         {

@@ -1,6 +1,6 @@
 ﻿namespace Task_2
 {
-    internal abstract class Tank
+    internal abstract class ATank
     {
         public string Name { get; set; }
         public TanksArmor Armor { get; set; }
