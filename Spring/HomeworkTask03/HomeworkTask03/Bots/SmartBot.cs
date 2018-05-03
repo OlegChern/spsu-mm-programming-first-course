@@ -1,4 +1,4 @@
-﻿namespace BlackJack
+﻿namespace BlackJack.Bots
 {
     class SmartBot : Player
     {
@@ -11,7 +11,7 @@
                 return Decision.Stand;
             }
 
-            int dealerCardValue = Game.Dealer.FaceUpCardValue;
+            int dealerCardValue = Game.Instance.Dealer.FaceUpCardValue;
 
             if (CardsSum == 16 && dealerCardValue >= 9 && dealerCardValue <= 11)
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using BlackJack;
+using BlackJack.Bots;
 
 namespace HomeworkTask03
 {
@@ -23,8 +24,7 @@ namespace HomeworkTask03
                 bots[1] = new RiskyBot(initMoney);
                 bots[2] = new SmartBot(initMoney);
 
-                Game game = new Game(bots);
-                game.Start();
+                Game.Instance.Start(bots);
 
                 botsMoney[0] += bots[0].Money;
                 botsMoney[1] += bots[1].Money;

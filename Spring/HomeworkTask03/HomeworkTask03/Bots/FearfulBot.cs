@@ -1,4 +1,4 @@
-﻿namespace BlackJack
+﻿namespace BlackJack.Bots
 {
     class FearfulBot : Player
     {

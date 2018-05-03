@@ -1,14 +1,6 @@
 ﻿namespace BlackJack
 {
-    public enum Decision
-    {
-        Hit,
-        Stand,
-        DoubleDown,
-        Surrender
-    }
-
-    abstract class Player
+    public abstract class Player
     {
         #region fields
         private string  name;
@@ -87,11 +79,11 @@
         #endregion
 
         #region methods
-        #region public
+        #region logic
         /// <summary>
         /// Start play the game
         /// </summary>
-        public void Start()
+        internal void Start()
         {
             bet = CalculateBet();
 
@@ -122,7 +114,7 @@
         /// Update logic
         /// </summary>
         /// <returns></returns>
-        public bool Update()
+        internal bool Update()
         {
             if (cardsSum > 21 || finished)
             {
@@ -147,11 +139,13 @@
 
             return true;
         }
+        #endregion
 
+        #region money management
         /// <summary>
         /// Return bet
         /// </summary>
-        public void Win()
+        internal void Win()
         {
             money += bet;
         }
@@ -160,7 +154,7 @@
         /// Return bet with multiplier
         /// </summary>
         /// <param name="multiplier"></param>
-        public void Win(float multiplier)
+        internal void Win(float multiplier)
         {
             money += (int)(bet * multiplier);
         }
@@ -168,20 +162,24 @@
         /// <summary>
         /// Lose bet
         /// </summary>
-        public void Lose()
+        internal void Lose()
         {
-            money += bet;
+            money -= bet;
         }
         #endregion
 
         #region inheritable
-        // player's logic
+        /// <summary>
+        /// Player's logic
+        /// </summary>
+        /// <returns>player's decision</returns>
         protected abstract Decision MakeDecision();
 
-        protected virtual int CalculateBet()
-        {
-            return money / 2;
-        }
+        /// <summary>
+        /// Player's bet
+        /// </summary>
+        /// <returns>bet</returns>
+        protected abstract int CalculateBet();        
         #endregion
 
         #region decisions
@@ -214,7 +212,7 @@
 
         private void TakeCard()
         {
-            Card card = Game.Deck.GetCard();
+            Card card = Game.Instance.Deck.GetCard();
             cardsSum += Deck.GetCardValue(card, cardsSum);
         }
         #endregion

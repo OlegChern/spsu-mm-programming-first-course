@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using AlgebraicCurveLibrary;
 using AlgebraicCurveLibrary.Exapmles;
-using System.Drawing;
 
 namespace WinFormsTechnology
 {

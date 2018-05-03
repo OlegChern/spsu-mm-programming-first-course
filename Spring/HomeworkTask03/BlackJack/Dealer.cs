@@ -2,24 +2,14 @@
 
 namespace BlackJack
 {
-    class Dealer
+    public class Dealer
     {
         #region fields
-        private int money;
-
         private int cardsSum;
         private List<Card> cards;
         #endregion
 
         #region properties
-        public int Money
-        {
-            get
-            {
-                return money;
-            }
-        }
-
         public bool Lost
         {
             get
@@ -49,19 +39,10 @@ namespace BlackJack
                 return cardValue;
             }
         }
-
-        /*public Card FaceUpCard
-        {
-            get
-            {
-                return cards[0];
-            }
-        }*/
         #endregion
 
-        public Dealer()
+        internal Dealer()
         {
-            money = 0;
             cardsSum = 0;
             cards = new List<Card>();
         }
@@ -69,7 +50,7 @@ namespace BlackJack
         /// <summary>
         /// Start play the game
         /// </summary>
-        public void Start()
+        internal void Start()
         {
             TakeCard();
             TakeCard();
@@ -79,7 +60,7 @@ namespace BlackJack
         /// Update logic
         /// </summary>
         /// <returns></returns>
-        public bool Update()
+        internal bool Update()
         {
             if (cardsSum >= 17)
             {
@@ -92,7 +73,7 @@ namespace BlackJack
 
         private void TakeCard()
         {
-            Card card = Game.Deck.GetCard();
+            Card card = Game.Instance.Deck.GetCard();
             cards.Add(card);
 
             cardsSum += Deck.GetCardValue(card, cardsSum);

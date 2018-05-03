@@ -1,9 +1,12 @@
 ﻿namespace BlackJack
 {
-    class Game
+    /// <summary>
+    /// BlackJack game singleton class
+    /// </summary>
+    public class Game
     {
         #region constants
-        private const float blackjackMultiplier = 1.5f;
+        private const float BlackjackMultiplier = 1.5f;
         #endregion
 
         #region fields
@@ -19,55 +22,60 @@
         {
             get
             {
+                if (instance == null)
+                {
+                    instance = new Game();
+                }
+
                 return instance;
             }
         }
 
-        public static Deck Deck
+        public Deck Deck
         {
             get
             {
-                return instance.deck;
+                return deck;
             }
         }
 
-        public static Dealer Dealer
+        public Dealer Dealer
         {
             get
             {
-                return instance.dealer;
+                return dealer;
             }
         }
         #endregion
 
         #region constructor
-        public Game(params Player[] players)
-        {
-            instance = this;
-            this.players = players;
-
-            deck = new Deck();
-        }
+        private Game() { }
         #endregion
 
         #region game logic
         /// <summary>
-        /// Start the game
+        /// Starts new game
         /// </summary>
-        public void Start()
+        /// <param name="players">participating players</param>
+        public void Start(params Player[] players)
         {
+            deck = new Deck();
+
             dealer = new Dealer();
             dealer.Start();
 
-            for (int i = 0; i < players.Length; i++)
+            this.players = players;
+            foreach(Player player in this.players)
             {
-                players[i].Start();
+                player.Start();
             }
 
             Update();
         }
 
-        // game loop
+        /// <summary>
+        /// Game loop
+        /// </summary>
         private void Update()
         {
             while (true)
@@ -101,7 +109,7 @@
                 }
                 else if (player.BlackJack)
                 {
-                    player.Win(blackjackMultiplier);
+                    player.Win(BlackjackMultiplier);
                 }
                 else if (dealer.Lost)
                 {

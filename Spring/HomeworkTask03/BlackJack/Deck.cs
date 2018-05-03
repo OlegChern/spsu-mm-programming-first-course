@@ -3,25 +3,28 @@ using System.Collections.Generic;
 
 namespace BlackJack
 {
-    class Deck
+    public class Deck
     {
-        const int deckCount = 8;
+        const int SuitsCount = 4;
+        const int CardsCount = 13;
+        const int DeckCount = 8;
+
         private Stack<Card> deck;
 
         /// <summary>
         /// Creates and shuffles deck
         /// </summary>
-        public Deck()
+        internal Deck()
         {
             deck = new Stack<Card>();
 
-            for (int i = 0; i < deckCount; i++)
+            for (int i = 0; i < DeckCount; i++)
             {
-                for (int suit = 0; suit < 4; suit++)
+                for (int suit = 0; suit < SuitsCount; suit++)
                 {
-                    int[] shuffle = Shuffle(13);
+                    int[] shuffle = Shuffle(CardsCount);
 
-                    for (int type = 0; type < 13; type++)
+                    for (int type = 0; type < CardsCount; type++)
                     {
                         deck.Push((Card)shuffle[type]);
                     }
@@ -33,7 +36,7 @@ namespace BlackJack
         /// Get one card from the deck
         /// </summary>
         /// <returns></returns>
-        public Card GetCard()
+        internal Card GetCard()
         {
             return deck.Pop();
         }
@@ -75,15 +78,19 @@ namespace BlackJack
             }
         }
 
-        // Knuth shuffle
-        private int[] Shuffle(int count)
+        /// <summary>
+        /// Knuth shuffle
+        /// </summary>
+        /// <param name="count">amount of numbers to shuffle</param>
+        /// <returns>shuffled sequence</returns>
+        private static int[] Shuffle(int count)
         {
             Random random = new Random();
             int[] shuffle = new int[count];
 
             for (int i = 0; i < count; i++)
             {
-                shuffle[i] = i;
+                shuffle[i] = i + 1;
             }
 
             for (int i = count - 1; i > 0; i--)

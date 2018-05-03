@@ -5,8 +5,27 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPFTechnology"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Algebraic Curve" Height="600" Width="800" MinHeight="600" MinWidth="800">
     <Grid>
-        
+        <Grid.Resources>
+            <local:Model x:Key="model"/>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Label>Choose curve to draw:</Label>
+        <ComboBox Name="ComboBox" Grid.Row="1" Text="Curves" IsEditable="True"/>
+        <Label Grid.Row="2">Scale:</Label>
+        <Button Name="ScaleUp" Grid.Row="3" HorizontalAlignment="Left" Width="30" Height="30">+</Button>
+        <Button Name="ScaleDown" Grid.Row="3" HorizontalAlignment="Left" Margin="50,0" Width="30" Height="30">-</Button>
+        <Image Grid.Column="1" Grid.RowSpan="5"></Image>
     </Grid>
 </Window>
