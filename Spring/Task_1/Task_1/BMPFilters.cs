@@ -85,6 +85,12 @@ namespace Task_1
 
                         break;
                     }
+                case FilterType.Haar:
+                {
+                    Console.WriteLine("Successfully applied Haar filter");
+                    Haar(bmp);
+                    break;
+                }
             }
         }
         
@@ -184,6 +190,75 @@ namespace Task_1
         {
             return ToByte((pixel.Red + pixel.Green + pixel.Blue) / 3);
         }
+
+        private static void Haar(BMPFile bmp)
+        {
+            int width = bmp.Width;
+            int height = bmp.Height;
+
+            Pixel[,] temp = new Pixel[width, height];
+            
+            
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height - 1; y += 2)
+                {
+                    Pixel halfSum = new Pixel
+                    {
+                        Red = ToByte((bmp[x, y].Red + bmp[x, y + 1].Red) / 2),
+                        Green = ToByte((bmp[x, y].Green + bmp[x, y + 1].Green) / 2),
+                        Blue = ToByte((bmp[x, y].Blue + bmp[x, y + 1].Blue) / 2)
+                    };
+                    Pixel halfDifference = new Pixel()
+                    {
+                        Red = ToByte((bmp[x, y].Red - bmp[x, y + 1].Red) / 2),
+                        Green = ToByte((bmp[x, y].Green - bmp[x, y + 1].Green) / 2),
+                        Blue = ToByte((bmp[x, y].Blue - bmp[x, y + 1].Blue) / 2)
+                    };
+                    temp[x, y / 2] = halfSum;
+                    temp[x, (height + y) / 2] = halfDifference;
+                }
+            }
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    bmp[x, y] = temp[x, y];
+                }
+            }
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width - 1; x += 2)
+                {
+                    Pixel halfSum = new Pixel
+                    {
+                        Red = ToByte((bmp[x, y].Red + bmp[x + 1, y].Red) / 2),
+                        Green = ToByte((bmp[x, y].Green + bmp[x + 1, y].Green) / 2),
+                        Blue = ToByte((bmp[x, y].Blue + bmp[x + 1, y].Blue) / 2)
+                    };
+                    Pixel halfDifference = new Pixel()
+                    {
+                        Red = ToByte((bmp[x, y].Red - bmp[x + 1, y].Red) / 2),
+                        Green = ToByte((bmp[x, y].Green - bmp[x + 1, y].Green) / 2),
+                        Blue = ToByte((bmp[x, y].Blue - bmp[x + 1, y].Blue) / 2)
+                    };
+                    temp[x / 2, y] = halfDifference;
+                    temp[(width + x) / 2, y] = halfSum;
+                }
+            }
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    bmp[x, y] = temp[x, y];
+                }
+            }
+        }
+
+
+
         #endregion
 
         private static byte ToByte(float f)

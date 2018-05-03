@@ -5,3 +5,4 @@ Available filters : Gauss
                     SobelY
                     GrayScale
                     Average
+                    Haar

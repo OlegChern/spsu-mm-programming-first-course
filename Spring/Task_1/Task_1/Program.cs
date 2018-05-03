@@ -24,7 +24,7 @@ namespace Task_1
                         case "Gauss":
                         {
                             BMPFilters.ApplyingFilterToFile(bmp, FilterType.Gauss);
-                            break;
+                                break;
                         }
                         case "SobelX":
                         {
@@ -45,6 +45,12 @@ namespace Task_1
                         {
                             BMPFilters.ApplyingFilterToFile(bmp, FilterType.Average);
                                 break;
+                        }
+                        case "Haar":
+                        {
+                            BMPFilters.ApplyingFilterToFile(bmp, FilterType.Haar);
+                                break;
+
                         }
                         default:
                         {

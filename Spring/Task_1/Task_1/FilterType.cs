@@ -6,6 +6,7 @@
         SobelX,
         SobelY,
         GrayScale,
-        Average
+        Average,
+        Haar
     }
 }
