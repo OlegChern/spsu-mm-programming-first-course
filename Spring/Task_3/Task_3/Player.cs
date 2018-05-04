@@ -9,7 +9,7 @@ namespace Task_3
 
         private Deck GameDeck { get; }
 
-        protected int Sum { get; set; }
+        public int Sum { get; protected set; }
         public double Money { get; private set; }
         public double Rate { get; private set; }
         public bool IsBlackjack { get; protected set; }

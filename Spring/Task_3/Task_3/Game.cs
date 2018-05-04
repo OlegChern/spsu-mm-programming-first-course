@@ -10,7 +10,7 @@
             GameDeck.ShuffleDeck();
         }
 
-        internal static void PlayGame(Deck gameDeck, params Bot[] BotsArr)
+        internal void PlayGame(Deck gameDeck, params Bot[] BotsArr)
         {
             int dealersFirstCard = (int)gameDeck.DeckContent[gameDeck.DeckContent.Count - 1];
             Dealer dealerPlayer = new Dealer(gameDeck);
@@ -22,7 +22,7 @@
             }
         }
 
-        private static void Payment(Bot player, Dealer dealer, int dealersFirstCard, Deck gameDeck)
+        private void Payment(Bot player, Dealer dealer, int dealersFirstCard, Deck gameDeck)
         {
             int playerSum = player.Strategy(dealersFirstCard);
 

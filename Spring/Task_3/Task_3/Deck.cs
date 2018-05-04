@@ -7,8 +7,7 @@ namespace Task_3
     {
         public List<CardsValue> DeckContent { get; private set; }
 
-        private readonly int NumberOfDecks;
-        private const int NumberOfCards = 13;
+        private int NumberOfDecks { get; }
 
         public Deck(int numberOfDecks)
         {

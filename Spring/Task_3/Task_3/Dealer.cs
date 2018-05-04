@@ -5,24 +5,24 @@ namespace Task_3
 {
     internal sealed class Dealer
     {
-        private readonly List <CardsValue> _dealersHand;
-        private int _sum;
-        public bool IsBlackjack { get; set; }
+        private List <CardsValue> DealersHand { get; }
+        private int Sum { get; set; }
+        public bool IsBlackjack { get; }
 
         public Dealer(Deck gameDeck)
         {
-            _dealersHand = new List<CardsValue>
+            DealersHand = new List<CardsValue>
             {
                 gameDeck.DeckContent.Last()
             };
             gameDeck.DeckContent.RemoveAt(gameDeck.DeckContent.Count -1);
-            _sum += (int)_dealersHand[_dealersHand.Count - 1];
+            Sum += (int)DealersHand[DealersHand.Count - 1];
 
-            _dealersHand.Add(gameDeck.DeckContent[gameDeck.DeckContent.Count - 1]);
+            DealersHand.Add(gameDeck.DeckContent[gameDeck.DeckContent.Count - 1]);
             gameDeck.DeckContent.RemoveAt(gameDeck.DeckContent.Count - 1);
-            _sum += (int)_dealersHand[(_dealersHand.Count - 1)];
+            Sum += (int)DealersHand[DealersHand.Count - 1];
 
-            if (_sum == 21)
+            if (Sum == 21)
             {
                 IsBlackjack = true;
             }
@@ -30,18 +30,18 @@ namespace Task_3
 
         public int DealersPlay(Deck gameDeck)
         {
-            while (_sum <= 17)
+            while (Sum <= 17)
             {
-                _dealersHand.Add(gameDeck.DeckContent.Last());
+                DealersHand.Add(gameDeck.DeckContent.Last());
                 gameDeck.DeckContent.RemoveAt(gameDeck.DeckContent.Count - 1);
-                _sum += (int)_dealersHand[(_dealersHand.Count - 1)];
-                if (_sum > 21 && (_dealersHand.IndexOf(CardsValue.Ace) >= 0))
+                Sum += (int)DealersHand[(DealersHand.Count - 1)];
+                if (Sum > 21 && (DealersHand.IndexOf(CardsValue.Ace) >= 0))
                 {
-                    _dealersHand[_dealersHand.IndexOf(CardsValue.Ace)] = _dealersHand[_dealersHand.IndexOf(CardsValue.Ace)] - 10;
-                    _sum -= 10;
+                    DealersHand[DealersHand.IndexOf(CardsValue.Ace)] = DealersHand[DealersHand.IndexOf(CardsValue.Ace)] - 10;
+                    Sum -= 10;
                 }
             }
-            return _sum;
+            return Sum;
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Task_3
 
             for (int i = 0; i < 40; ++i)
             {
-                Game.PlayGame(thisGame.GameDeck, firstPlayer, secondPlayer);
+                thisGame.PlayGame(thisGame.GameDeck, firstPlayer, secondPlayer);
                 sum2 += secondPlayer.Money;
                 sum1 += firstPlayer.Money;
             }
