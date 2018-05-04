@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Task_3
+﻿namespace Task_3
 {
     internal sealed class Bot : Player
     {
@@ -12,8 +6,6 @@ namespace Task_3
         private int StopHitValue { get; }
         private bool IsDoubleDown { get; }
         private bool IsSurrender { get; }
-
-
 
         public Bot(
                     double money, 

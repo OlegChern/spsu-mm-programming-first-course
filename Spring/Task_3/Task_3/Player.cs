@@ -1,25 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlTypes;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Security.AccessControl;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Task_3
 {
     internal class Player
     {
-        public List<CardsValue> Hand { get; set; }
+        public List<CardsValue> Hand { get; }
 
-        private Deck GameDeck { get; set; }
+        private Deck GameDeck { get; }
 
-        public int Sum { get; set; }
-        public double Money { get; set; }
+        protected int Sum { get; set; }
+        public double Money { get; private set; }
         public double Rate { get; private set; }
-        public bool IsBlackjack { get; set; }
-
+        public bool IsBlackjack { get; protected set; }
 
         public Player(double money, Deck gameDeck)
         {
@@ -28,7 +21,6 @@ namespace Task_3
             Money = money;
             Hand = new List<CardsValue>();
         }
-
 
         public void Hit()
         {
@@ -82,7 +74,9 @@ namespace Task_3
             Money -= Rate;
         }
 
-
-        
+        public void AddMoney(double valueMoney)
+        {
+            Money += valueMoney;
+        }
     }
 }

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Task_3
 {
@@ -32,7 +28,6 @@ namespace Task_3
             }
         }
 
-
         public int DealersPlay(Deck gameDeck)
         {
             while (_sum <= 17)
@@ -48,6 +43,5 @@ namespace Task_3
             }
             return _sum;
         }
-
     }
 }

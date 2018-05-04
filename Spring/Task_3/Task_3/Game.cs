@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Task_3
+﻿namespace Task_3
 {
     internal class Game
     {
@@ -41,28 +35,26 @@ namespace Task_3
 
             if (player.IsBlackjack)
             {
-                player.Money += player.Rate;
+                player.AddMoney(player.Rate);
                 if (!dealer.IsBlackjack)
                 {
-                    player.Money += 3 * player.Rate / 2;
+                    player.AddMoney(3 * player.Rate / 2);
                 }
             }
 
             else if (playerSum <= 21 && dealerSum > 21)
             {
-                player.Money += 2 * player.Rate;
+                player.AddMoney(2 * player.Rate);
             }
 
             else if (playerSum <= 21 && dealerSum <= 21 && playerSum >= dealerSum)
             {
-                player.Money += player.Rate;
+                player.AddMoney(player.Rate);
                 if (playerSum != dealerSum)
                 {
-                    player.Money += player.Rate;
+                    player.AddMoney(player.Rate);
                 }
             }
-
-
         }
     }
 }
