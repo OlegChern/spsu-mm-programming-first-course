@@ -8,60 +8,41 @@ namespace Task_3
 {
     internal sealed class Bot : Player
     {
-        public Bot(double money, List<int> gameDeck) : base(money, gameDeck)
+        private int BaseRateValue { get; }
+        private int StopHitValue { get; }
+        private bool IsDoubleDown { get; }
+        private bool IsSurrender { get; }
+
+
+
+        public Bot(
+                    double money, 
+                    Deck gameDeck, 
+                    int baseRateValue, 
+                    int stopHitValue, 
+                    bool isDoubleDown = false,
+                    bool isSurrender = false
+                   ) : base(money, gameDeck)
         {
+            BaseRateValue = baseRateValue;
+            StopHitValue = stopHitValue;
+            IsDoubleDown = isDoubleDown;
+            IsSurrender = isSurrender;
         }
 
-        public int FirstStrategy(int dealersCard)
+        public int Strategy(int dealersCard)
         {
             Sum = 0;
             IsBlackjack = false;
             Hit();
             Hit();
-            MakeRate(30);
+            MakeRate(BaseRateValue);
 
-            if (Sum == 21)
-            {
-                IsBlackjack = true;
-                return Stand();
-            }
-
-
-            if (Sum == 11 || Sum == 10)
-            {
-                return DoubleDown();
-            }
-
-            while (true)
-            {
-                if (Sum >= 17)
-                {
-                    return Stand();
-                }
-
-                if ((dealersCard <= 6) && (Sum >= 13))
-                {
-                    return Stand();
-                }
-
-                Hit();
-            }
-
-        }
-
-        public int SecondStrategy(int dealersCard)
-        {
-            Sum = 0;
-            IsBlackjack = false;
-            Hit();
-            Hit();
-            MakeRate(25);
-            if (dealersCard == 11 && Sum == 13 && Sum == 12)
+            if ((dealersCard == 11 && Sum == 13 && Sum == 12) && IsSurrender)
             {
                 return Surrender();
             }
 
-
             if (Sum == 21)
             {
                 IsBlackjack = true;
@@ -69,28 +50,17 @@ namespace Task_3
             }
 
 
-            if (Sum == 11 || Sum == 10 || Sum == 9)
+            if ((Sum == 11 || Sum == 10) && IsDoubleDown)
             {
                 return DoubleDown();
             }
 
-            while (true)
+            while (Sum < StopHitValue)
             {
-                if (Sum >= 16)
-                {
-                    return Stand();
-                }
-
-                if ((dealersCard <= 5) && (Sum >= 13))
-                {
-                    return Stand();
-                }
-                
-
                 Hit();
             }
 
+            return Stand();
         }
-
     }
 }

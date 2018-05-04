@@ -5,154 +5,54 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace Task_3
 {
     internal class Deck
     {
-        private const int NumberOfDecks = 8;
+        public List<CardsValue> DeckContent { get; private set; }
+
+        private readonly int NumberOfDecks;
         private const int NumberOfCards = 13;
-        public static readonly int DeckSize = NumberOfCards * NumberOfDecks;
-        private int _cardsInDeckNow = NumberOfCards * NumberOfDecks;
 
-        private int _two = NumberOfDecks;
-        private int _three = NumberOfDecks;
-        private int _four = NumberOfDecks;
-        private int _five = NumberOfDecks;
-        private int _six = NumberOfDecks;
-        private int _seven = NumberOfDecks;
-        private int _eight = NumberOfDecks;
-        private int _nine = NumberOfDecks;
-        private int _ten = NumberOfDecks;
-        private int _jack = NumberOfDecks;
-        private int _queen = NumberOfDecks;
-        private int _king = NumberOfDecks;
-        private int _ace = NumberOfDecks;
-
-        public int TakeRandomCard(Random r)
+        public Deck(int numberOfDecks)
         {
-            int selectedValue = 0;
-            int indCardPos = r.Next(_cardsInDeckNow);
-
-            selectedValue += _two;
-
-            if (selectedValue > indCardPos)
-            {
-                _cardsInDeckNow--;
-                _two--;
-                return (int)CardsValue.Two;
-            }
-
-            selectedValue += _three;
-
-            if (selectedValue > indCardPos)
-            {
-                _cardsInDeckNow--;
-                _three--;
-                return (int)CardsValue.Three;
-            }
-
-            selectedValue += _four;
-
-            if (selectedValue  > indCardPos)
-            {
-                _cardsInDeckNow--;
-                _four--;
-                return (int)CardsValue.Four;
-            }
-
-            selectedValue += _five;
-
-            if (selectedValue  > indCardPos)
-            {
-                _cardsInDeckNow--;
-                _five--;
-                return (int)CardsValue.Five;
-            }
-
-            selectedValue += _six;
-
-            if (selectedValue  > indCardPos)
-            {
-                _cardsInDeckNow--;
-                _six--;
-                return (int)CardsValue.Six;
-            }
-
-            selectedValue += _seven;
-
-            if (selectedValue  > indCardPos)
-            {
-                _cardsInDeckNow--;
-                _seven--;
-                return (int)CardsValue.Seven;
-            }
-
-            selectedValue += _eight;
-
-            if (selectedValue  > indCardPos)
-            {
-                _cardsInDeckNow--;
-                _eight--;
-                return (int)CardsValue.Eight;
-            }
-
-            selectedValue += _nine;
-
-            if (selectedValue  > indCardPos)
-            {
-                _cardsInDeckNow--;
-                _nine--;
-                return (int)CardsValue.Nine;
-            }
-
-            selectedValue += _ten;
-
-            if (selectedValue  > indCardPos)
-            {
-                _cardsInDeckNow--;
-                _ten--;
-                return (int)CardsValue.Ten;
-            }
-
-            selectedValue += _jack;
-
-            if (selectedValue  > indCardPos)
-            {
-                _cardsInDeckNow--;
-                _jack--;
-                return (int)CardsValue.Jack;
-            }
-
-            selectedValue += _queen;
-
-            if (selectedValue  > indCardPos)
-            {
-                _cardsInDeckNow--;
-                _queen--;
-                return (int)CardsValue.Queen;
-            }
-
-            selectedValue += _king;
-
-            if (selectedValue  > indCardPos)
-            {
-                _cardsInDeckNow--;
-                _king--;
-                return (int)CardsValue.King;
-            }
-
-            selectedValue += _ace;
-
-            if (selectedValue  > indCardPos)
-            {
-                _cardsInDeckNow--;
-                _ace--;
-                return (int)CardsValue.Ace;
-            }
-
-            return -1;
+            NumberOfDecks = numberOfDecks;
+            DeckContent = new List<CardsValue>();
         }
 
+        public void ShuffleDeck()
+        {
+            List<CardsValue> temp = new List<CardsValue>();
+            Random deckRandomer = new Random();
+
+            DeckContent.Clear();
+            for (int i = 0; i < NumberOfDecks; ++i)
+            {
+                DeckContent.Add(CardsValue.Two);
+                DeckContent.Add(CardsValue.Three);
+                DeckContent.Add(CardsValue.Four);
+                DeckContent.Add(CardsValue.Five);
+                DeckContent.Add(CardsValue.Six);
+                DeckContent.Add(CardsValue.Seven);
+                DeckContent.Add(CardsValue.Eight);
+                DeckContent.Add(CardsValue.Nine);
+                DeckContent.Add(CardsValue.Ten);
+                DeckContent.Add(CardsValue.Jack);
+                DeckContent.Add(CardsValue.Queen);
+                DeckContent.Add(CardsValue.King);
+                DeckContent.Add(CardsValue.Ace);
+            }
+
+            while (DeckContent.Count != 0)
+            {
+                int takenCardsPos = deckRandomer.Next(DeckContent.Count - 1);
+                temp.Add(DeckContent[takenCardsPos]);
+                DeckContent.RemoveAt(takenCardsPos);
+            }
+
+            DeckContent = temp;
+        }
     }
 }

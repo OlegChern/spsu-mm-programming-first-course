@@ -11,34 +11,34 @@ namespace Task_3
 {
     internal class Player
     {
-        public List<int> Hand { get; set; }
+        public List<CardsValue> Hand { get; set; }
 
-        private readonly List<int> _gameDeck;
+        private Deck GameDeck { get; set; }
 
         public int Sum { get; set; }
         public double Money { get; set; }
-        public double Rate { get; set; }
+        public double Rate { get; private set; }
         public bool IsBlackjack { get; set; }
 
 
-        public Player(double money, List<int> gameDeck)
+        public Player(double money, Deck gameDeck)
         {
             Sum = 0;
-            _gameDeck = gameDeck;
+            GameDeck = gameDeck;
             Money = money;
-            Hand = new List<int>();
+            Hand = new List<CardsValue>();
         }
 
 
         public void Hit()
         {
-            Hand.Add(_gameDeck.Last());
-            _gameDeck.RemoveAt(_gameDeck.Count - 1);
-            Sum += Hand[(Hand.Count - 1)];
+            Hand.Add(GameDeck.DeckContent.Last());
+            GameDeck.DeckContent.RemoveAt(GameDeck.DeckContent.Count - 1);
+            Sum += (int)Hand[(Hand.Count - 1)];
 
-            if ((Sum > 21) && (Hand.IndexOf((int)CardsValue.Ace) >= 0))
+            if ((Sum > 21) && (Hand.IndexOf(CardsValue.Ace) >= 0))
             {
-                Hand[Hand.IndexOf((int)CardsValue.Ace)] = Hand[Hand.IndexOf((int)CardsValue.Ace)] - 10;
+                Hand[Hand.IndexOf(CardsValue.Ace)] = Hand[Hand.IndexOf(CardsValue.Ace)] - 10;
                 Sum -= 10;
             }
 
@@ -54,8 +54,8 @@ namespace Task_3
         public Player Split()
         {
             Money -= Rate;
-            Player newPlayer = new Player(Rate,_gameDeck);
-            _gameDeck.Add(Hand[Hand.Count -1]);
+            Player newPlayer = new Player(Rate,GameDeck);
+            GameDeck.DeckContent.Add(Hand[Hand.Count -1]);
             Hand.RemoveAt(Hand.Count - 1);
             newPlayer.Hit();
             return newPlayer;
