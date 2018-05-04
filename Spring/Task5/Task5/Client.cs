@@ -51,8 +51,7 @@ namespace Task5
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show($"One of devices must have been disconnected:{Environment.NewLine}{e}",
-                        "Error reading data");
+                    // MessageBox.Show($"One of devices must have been disconnected:{Environment.NewLine}{e}", "Error reading data");
                     StopHandling(socket);
                     return;
                 }
@@ -93,7 +92,8 @@ namespace Task5
                 return;
             }
             
-            throw new InvalidOperationException("StopHandling() was given a socket that doesn't belong to client");
+            // throw new InvalidOperationException("StopHandling() was given a socket that doesn't belong to client");
+            // MessageBox.Show("StopHandling() was given a socket that doesn't belong to client", "Warning");
         }
 
         #endregion private members
@@ -215,7 +215,6 @@ namespace Task5
             var ipAddress = ipHostInfo.AddressList[0];
             var remoteEp = new IPEndPoint(ipAddress, port);
 
-            // Check local end point
             var localHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             
             if (IsListening && ListeningPort == port &&
@@ -232,12 +231,12 @@ namespace Task5
 
             outcomingConnection = client;
 
+            StartReceivingMessages(client);
+            
             // This action should terminate current connection if loops are present
             await Send(IpAddressMessage);
 
             ConnectionsCountChanged?.Invoke(this, new ConnectionsCountChangedEventArgs(ConnectionsCount));
-
-            StartReceivingMessages(client);
         }
 
         public override void Disconnect()
