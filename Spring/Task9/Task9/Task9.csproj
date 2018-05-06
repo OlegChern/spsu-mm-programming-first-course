@@ -45,8 +45,14 @@
     <Compile Include="CommandHandller.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="ExecutionFinishedException.cs" />
+    <Compile Include="Execution\Cat.cs" />
+    <Compile Include="Execution\Echo.cs" />
+    <Compile Include="Execution\CommandExecuter.cs" />
+    <Compile Include="Execution\Exit.cs" />
+    <Compile Include="Execution\Pwd.cs" />
+    <Compile Include="Execution\SystemCallInvoker.cs" />
+    <Compile Include="Execution\Wc.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="Parsing\Executer.cs" />
     <Compile Include="Parsing\ExecutionType.cs" />
     <Compile Include="Parsing\InvalidSyntaxException.cs" />
     <Compile Include="Parsing\Parser.cs" />

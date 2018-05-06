@@ -127,6 +127,7 @@ namespace Task9Tests
         [InlineData("'$v a$r'", true)]
         [InlineData("99bottles", false)]
         [InlineData("bottles99", true)]
+        [InlineData("Process.Start", true)]
         public static void TestIsValidToken(string tokenString, bool valid)
         {
             bool result = Lexer.IsValidToken(tokenString);

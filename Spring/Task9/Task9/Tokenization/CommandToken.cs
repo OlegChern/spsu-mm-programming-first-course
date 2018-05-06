@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Task9.Execution;
 using Task9.Parsing;
 
 namespace Task9.Tokenization
@@ -16,15 +17,15 @@ namespace Task9.Tokenization
             switch (Command)
             {
                 case Command.Echo:
-                    return Executer.Echo(args);
+                    return CommandExecuter.Echo(args);
                 case Command.Exit:
-                    return Executer.Exit();
+                    return CommandExecuter.Exit();
                 case Command.Pwd:
-                    return Executer.Pwd(args, context);
+                    return CommandExecuter.Pwd(args, context);
                 case Command.Cat:
-                    return Executer.Cat(args, context);
+                    return CommandExecuter.Cat(args);
                 case Command.Wc:
-                    return Executer.Wc(args, context);
+                    return CommandExecuter.Wc(args, context);
                 default:
                     throw new ArgumentOutOfRangeException();
             }

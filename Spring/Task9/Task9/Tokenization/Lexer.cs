@@ -91,8 +91,14 @@ namespace Task9.Tokenization
         public static bool IsValidToken(string tokenString)
         {
             return !string.IsNullOrEmpty(tokenString) &&
-                   // Oh my god, what have I done...
-                   Regex.IsMatch(tokenString, @"^-?\d*\z|^\$?[a-zA-Z_]\w*\z|^[\|=]\z|^(['""])(?!.*\1.*\1).*\1\z");
+                   // Is positive or negetive integer...
+                   (Regex.IsMatch(tokenString, @"^-?\d*\z") ||
+                    // ... or is properly named variable...
+                    Regex.IsMatch(tokenString, @"^\$?[a-zA-Z_][a-zA-Z0-9_\.]*\z") ||
+                    // ... or is one of known operators...
+                    Regex.IsMatch(tokenString, @"^[\|=]\z") ||
+                    // ... or is properly quoted string
+                    Regex.IsMatch(tokenString, @"^(['""])(?!.*\1.*\1).*\1\z"));
         }
 
         [Pure]
