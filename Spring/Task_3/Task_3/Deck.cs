@@ -5,6 +5,8 @@ namespace Task_3
 {
     internal class Deck
     {
+        private const byte numberOfSuits = 4;
+
         public List<CardsValue> DeckContent { get; private set; }
 
         private int NumberOfDecks { get; }
@@ -21,7 +23,7 @@ namespace Task_3
             Random deckRandomer = new Random();
 
             DeckContent.Clear();
-            for (int i = 0; i < NumberOfDecks; ++i)
+            for (int i = 0; i < NumberOfDecks * numberOfSuits; ++i)
             {
                 DeckContent.Add(CardsValue.Two);
                 DeckContent.Add(CardsValue.Three);

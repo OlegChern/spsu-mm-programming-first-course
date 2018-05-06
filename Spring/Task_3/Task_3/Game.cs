@@ -28,7 +28,7 @@
 
             int dealerSum = dealer.DealersPlay(gameDeck);
 
-            if (gameDeck.DeckContent.Count <= 35)
+            if (gameDeck.DeckContent.Count <= gameDeck.DeckContent.Count/4)
             {
                 gameDeck.ShuffleDeck();
             }
