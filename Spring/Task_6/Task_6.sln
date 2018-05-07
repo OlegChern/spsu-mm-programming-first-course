@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurvesMath", "CurvesMath\Cu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurvesWPF", "CurvesWPF\CurvesWPF.csproj", "{57F9CE61-DA83-4822-B3E7-E36CD6673424}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurvesWinForms", "CurvesWinForms\CurvesWinForms.csproj", "{6CA00BA2-64EA-4405-B937-7C667F185E0A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurvesWinForms", "CurvesWinForms\CurvesWinForms.csproj", "{3D8F2179-DAD7-4206-8D63-ADD1FB0F1898}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{57F9CE61-DA83-4822-B3E7-E36CD6673424}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57F9CE61-DA83-4822-B3E7-E36CD6673424}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57F9CE61-DA83-4822-B3E7-E36CD6673424}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6CA00BA2-64EA-4405-B937-7C667F185E0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6CA00BA2-64EA-4405-B937-7C667F185E0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6CA00BA2-64EA-4405-B937-7C667F185E0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6CA00BA2-64EA-4405-B937-7C667F185E0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D8F2179-DAD7-4206-8D63-ADD1FB0F1898}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D8F2179-DAD7-4206-8D63-ADD1FB0F1898}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D8F2179-DAD7-4206-8D63-ADD1FB0F1898}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D8F2179-DAD7-4206-8D63-ADD1FB0F1898}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

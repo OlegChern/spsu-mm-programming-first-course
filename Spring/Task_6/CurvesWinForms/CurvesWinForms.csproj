@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6CA00BA2-64EA-4405-B937-7C667F185E0A}</ProjectGuid>
+    <ProjectGuid>{3D8F2179-DAD7-4206-8D63-ADD1FB0F1898}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>CurvesWinForms</RootNamespace>
     <AssemblyName>CurvesWinForms</AssemblyName>
@@ -43,16 +43,20 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs">
+    <Compile Include="CurvesWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="CurvesWindow.Designer.cs">
+      <DependentUpon>CurvesWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="CurvesWindow.resx">
+      <DependentUpon>CurvesWindow.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -77,7 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CurvesMath\CurvesMath.csproj">
-      <Project>{eb57a59f-7959-4352-8e75-7f2a1648f5fd}</Project>
+      <Project>{EB57A59F-7959-4352-8E75-7F2A1648F5FD}</Project>
       <Name>CurvesMath</Name>
     </ProjectReference>
   </ItemGroup>

@@ -1,6 +1,6 @@
 ﻿namespace CurvesWinForms
 {
-    partial class Form1
+    partial class CurvesWindow
     {
         /// <summary>
         /// Обязательная переменная конструктора.
@@ -28,10 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "Form1";
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CurvesWindow));
+            this.SuspendLayout();
+            // 
+            // CurvesWindow
+            // 
+            this.ClientSize = new System.Drawing.Size(800, 600);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Name = "CurvesWindow";
+            this.Text = "CurvesWindow";
+            this.Load += new System.EventHandler(this.CurvesWindow_Load);
+            this.ResumeLayout(false);
+
         }
 
         #endregion
