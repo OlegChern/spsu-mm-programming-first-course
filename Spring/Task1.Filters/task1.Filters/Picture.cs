@@ -125,6 +125,19 @@ namespace Task1.Filters
             }
         }
 
+        public static byte DoubleToByte(double value)
+        {
+            if(value > 255)
+            {
+                return 255;
+            }
+            if(value < 0)
+            {
+                return 0;
+            }
+            return (byte)value;
+        }
+
         public void ApplyFilter(IFilter filter)
         {
             RGB[,] newRGB = filter.Apply(rgb);

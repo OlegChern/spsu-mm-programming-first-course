@@ -9,7 +9,8 @@ namespace Task1.Filters
         {
             if (args.Length != 3)
             {
-                throw new ArgumentException("Incorrect Input");
+                Console.WriteLine("Incorrect Input");
+                return;
             }
 
             FileStream fileInput = File.Open(args[0], FileMode.Open);

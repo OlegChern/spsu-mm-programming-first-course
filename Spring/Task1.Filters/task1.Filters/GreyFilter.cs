@@ -10,7 +10,7 @@
             {
                 for (int j = 0; j < startRGB.GetLength(1); j++)
                 {
-                    double newColor = (startRGB[i, j].rgbBlue + startRGB[i, j].rgbRed + startRGB[i, j].rgbGreen) / 3;
+                    double newColor = 0.072 * startRGB[i, j].rgbBlue + 0.213 * startRGB[i, j].rgbRed + 0.0715 * startRGB[i, j].rgbGreen;
                     result[i, j].rgbBlue = (byte)newColor;
                     result[i, j].rgbRed = (byte)newColor;
                     result[i, j].rgbGreen = (byte)newColor;

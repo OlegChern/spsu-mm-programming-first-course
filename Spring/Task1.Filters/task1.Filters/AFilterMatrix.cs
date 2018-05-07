@@ -31,9 +31,9 @@
                         }
                     }
 
-                    result[i, j].rgbRed = (byte)rgbRed;
-                    result[i, j].rgbGreen = (byte)rgbGreen;
-                    result[i, j].rgbBlue = (byte)rgbBlue;
+                    result[i, j].rgbRed = Picture.DoubleToByte(rgbRed);
+                    result[i, j].rgbGreen = Picture.DoubleToByte(rgbGreen);
+                    result[i, j].rgbBlue = Picture.DoubleToByte(rgbBlue);
                 }
             }
             return result;
