@@ -1,4 +1,6 @@
-package icecream;
+package IceCreamChoice;
+
+import icecream.*;
 
 public class Sundae extends IceCream {
 
