@@ -1,0 +1,29 @@
+﻿<Window x:Class="CurvesWPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CurvesWPF"
+        mc:Ignorable="d"
+        Title="CurvesRendering" Height="450" Width="800"
+        MouseWheel="ScaleChangedByMouseWheel"
+        SizeChanged="RewriteCoordinateSystemAfterResize">
+    <Grid Name="CurvesRendering">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition  Height="*"/>
+        </Grid.RowDefinitions>
+
+
+        <ComboBox Name="CurvesList" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" SelectionChanged="CurveChoosed" Panel.ZIndex = "1"/>
+
+        <Canvas  Name ="Rendering" Grid.Row="1">
+            <Canvas Name= "AxesOfCoordinates"/>
+            <Canvas Name= "PositiveHorizontalDashes"/>
+            <Canvas Name ="NegativeVerticalDashes" />
+            <Canvas Name= "NegativeHorizontalDashes"/>
+            <Canvas Name ="PositiveVerticalDashes"/>
+            <Path Name ="Graph" Stroke="Red"/>
+        </Canvas>
+    </Grid>
+</Window>
