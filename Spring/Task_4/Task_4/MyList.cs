@@ -94,11 +94,6 @@ namespace Task_4
 
             Console.WriteLine();
         }
-
-        public void DeleteList()
-        {
-            _first = null;
-        }
     }
 }
 

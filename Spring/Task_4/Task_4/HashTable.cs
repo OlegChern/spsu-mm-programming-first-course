@@ -45,16 +45,6 @@ namespace Task_4
                 _lists[i].PrintList();
             }
         }
-
-        public void DeleteTable()
-        {
-            for (int i = 0; i < _numberOfLists; ++i)
-            {
-                _lists[i].DeleteList();
-            }
-
-            _lists = null;
-        }
     }
 
 }

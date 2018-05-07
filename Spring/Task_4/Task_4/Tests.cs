@@ -42,8 +42,7 @@ namespace Task_4
                 checkDelete = checkDelete && !table.Contains(testKeysList[i]);
                 testKeysList.RemoveAt(i);
             }
-
-            table.DeleteTable();
+            
 
             return (checkContains && checkDelete && checkValueByKey);
         }
@@ -83,8 +82,6 @@ namespace Task_4
                 testKeysList.RemoveAt(i);
             }
 
-            table.DeleteTable();
-
             return (checkContains && checkValueByKey);
         }
 
@@ -118,9 +115,7 @@ namespace Task_4
                                   tableString.Contains(5));
 
             bool checkGetValueByKey = (tableString.GetValueByKey(15) == "нахальный и едкий.");
-
-            tableString.DeleteTable();
-
+            
             return (checkDelete && checkContains && checkGetValueByKey);
         }
         
