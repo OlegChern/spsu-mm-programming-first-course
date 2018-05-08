@@ -24,8 +24,15 @@ namespace BlackJack
             Deck = new Deck();
             Player = player;
             ExitGame = false;
-            Clear += () => Console.Clear();
-            Clear += () => Console.Write("Ваши фишки: {0}", Player.Chips);
+            Clear += () =>
+            {
+                if (Player.IsBot == false)
+                {
+                    Console.Clear();
+                    Console.Write("Ваши фишки: {0}", Player.Chips);
+                    PrintCards();
+                }
+            };
         }
 
         public event Action Clear;
@@ -45,9 +52,9 @@ namespace BlackJack
             while (!ExitGame)
             {
                 StartParty();
-                if (Player is Bot)
+                if (Player.IsBot == true)
                 {
-                    if ((Player as Bot).CountParty == 40)
+                    if (Player.CountParty == 40)
                     ExitGame = true;
                 }        
                 if (Player.Chips == 0)
@@ -59,41 +66,27 @@ namespace BlackJack
 
         public void StartParty()
         {
-            if (Player is Player)
-            {
-                Clear();
-            }
+            Clear();  
             while (!Player.MakeBet())
             {
                 Clear();
                 Console.SetCursorPosition(10, 11);
                 Console.Write("Ошибка! Попробуйте еще раз.");
             }
-            if (Player is Player)
+            Clear += () =>
             {
-                Clear += () =>
+                if (Player.IsBot == false)
                 {
                     Console.SetCursorPosition(10, 12);
                     Console.Write("Ваша ставка: {0}", Player.Bet);
-                };
-                Clear();
-            }
-
-            if (Player is Bot)
-            {
-                (Player as Bot).CountParty++;
-            }
-            else
-            {
-                 Clear += () => PrintCards();
-            }
+                }
+            };
+            Clear();
+            Player.CountParty++;           
             Dealer.HitMe(Deck);
             Player.HitMe(Deck);
             Player.HitMe(Deck);
-            if (Player is Player)
-            {
-                Clear();
-            }
+            Clear();            
             ProcessParty();
         }
 
@@ -105,19 +98,13 @@ namespace BlackJack
                 var next = player.IsNext();
                 if ((next == "Нет") || (player.Sum > 21))
                 {
-                    if (Player is Player)
-                    {
-                        Clear();
-                    }
+                    Clear();                   
                     break;
                 }
                 else if (next == "Да")
                 {
                     player.HitMe(Deck);
-                    if (Player is Player)
-                    {
-                        Clear();
-                    }
+                    Clear();                   
                 }
                 else
                 {
@@ -144,10 +131,7 @@ namespace BlackJack
                         }
                         else if (answer == "Нет")
                         {
-                            if (Player is Player)
-                            {
-                                Clear();
-                            }
+                            Clear();                            
                             break;
                         }
                         Clear();
@@ -200,7 +184,7 @@ namespace BlackJack
             if (win == true)
             {
                 Player.Chips += (int)Math.Round(k * Player.Bet);
-                if (Player is Player)
+                if (Player.IsBot == false)
                 {
                     Clear(); 
                     Console.SetCursorPosition(10, 16);
@@ -210,14 +194,14 @@ namespace BlackJack
             else
             {
                 Player.Chips -= Player.Bet;
-                if (Player is Player)
+                if (Player.IsBot == false)
                 {
                     Clear();
                     Console.SetCursorPosition(10, 16);
                     Console.Write("Вы проиграли!");
                 }
             }
-            if (Player is Player)
+            if (Player.IsBot == false)
             {
                 Console.SetCursorPosition(10, 17);
                 Console.Write("Нажмите любую клавишу для продолжения.");
@@ -225,15 +209,7 @@ namespace BlackJack
             }
             ClearHand(Player);
             ClearHand(Dealer);
-            if (Player is Player)
-            {
-                Clear -= () =>
-                {
-                    Console.SetCursorPosition(10, 12);
-                    Console.Write("Ваша ставка: {0}", Player.Bet);
-                };
-                Clear();
-            }
+            Clear();
         }
     }
 }

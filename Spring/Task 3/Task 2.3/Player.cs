@@ -11,6 +11,7 @@ namespace BlackJack
         public Player() : base()
         {
             Chips = 1000;
+            IsBot = false;
         }
 
         public bool MakeBet()

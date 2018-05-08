@@ -8,6 +8,10 @@ namespace BlackJack
 {
     public abstract class Human
     {
+        public bool IsBot { get; set; }
+
+        public int CountParty { get; set; }
+
         public List<Card> Cards { get; set; }
 
         public bool HaveAce { get; set; }
@@ -41,6 +45,7 @@ namespace BlackJack
         {
             Cards = new List<Card>();
             HaveAce = false;
+            CountParty = 0;
         }
 
         public void Print()
