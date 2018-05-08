@@ -17,7 +17,8 @@ namespace CurvesWPF
     public partial class MainWindow : Window
     {
         #region Fields
-        private ACurve _choosenCurve;
+
+        private ViewModel ViewModel;
 
         private double _scale;
 
@@ -46,24 +47,26 @@ namespace CurvesWPF
         public MainWindow()
         {
             InitializeComponent();
-            List<ACurve> curves = new List<ACurve> { new EllipseCurve(9, 4), new HyperbolaCurve(3,2), new ParabolaCurve(2) };
+            ViewModel = new ViewModel();
             Scale = 15;
-            CurvesList.ItemsSource = curves;
         }
 
         #region Event Handlers
         private void CurveChoosed(object sender, SelectionChangedEventArgs e)
         {
-            ComboBox curvesList = (ComboBox) sender;
-            _choosenCurve = (ACurve) curvesList.SelectedItem;
+            if (ViewModel.ChoosenCurve != null)
+            {
+                DrawGraph();
+            }
             DrawGraph();
+
         }
 
         private void ScaleChangedByMouseWheel(object sender, MouseWheelEventArgs e)
         {
             Scale += e.Delta < 0 ? Scale / 10 : -Scale / 10;
             DrawCoordinateSystem(Scale);
-            if (_choosenCurve != null)
+            if (ViewModel.ChoosenCurve != null)
             {
                 DrawGraph();
             }
@@ -72,7 +75,7 @@ namespace CurvesWPF
         private void RewriteCoordinateSystemAfterResize(object sender,  SizeChangedEventArgs sizeChangedEventArgs)
         {
             DrawCoordinateSystem(Scale);
-            if (_choosenCurve != null)
+            if (ViewModel.ChoosenCurve != null)
             {
                 DrawGraph();
             }
@@ -152,42 +155,42 @@ namespace CurvesWPF
         {
             
             double step = 1 / Scale / Math.Sqrt(Scale);
-            _choosenCurve.RecalculateIntervals(Rendering.ActualWidth / 2 / Scale);
+            ViewModel.ChoosenCurve.RecalculateIntervals(Rendering.ActualWidth / 2 / Scale);
 
             PathGeometry graphGeometry = new PathGeometry();
             
             List<PolyLineSegment> segments = new List<PolyLineSegment>();
 
-            for (byte i = 0; i < _choosenCurve.MaxNumberOfSolutions * _choosenCurve.CurvesDefinedIntervals.Count; ++i)
+            for (byte i = 0; i < ViewModel.ChoosenCurve.MaxNumberOfSolutions * ViewModel.ChoosenCurve.CurvesDefinedIntervals.Count; ++i)
             {
                 segments.Add(new PolyLineSegment());
             }
 
-            for (int ind = 0; ind < _choosenCurve.CurvesDefinedIntervals.Count; ++ind)
+            for (int ind = 0; ind < ViewModel.ChoosenCurve.CurvesDefinedIntervals.Count; ++ind)
             {
-                Interval currentInterval = _choosenCurve.CurvesDefinedIntervals[ind];
+                Interval currentInterval = ViewModel.ChoosenCurve.CurvesDefinedIntervals[ind];
                 for (double i = currentInterval.Begin; i < currentInterval.End; i += step)
                 {
-                    List<Point> solutions = _choosenCurve.FindSolutions(i);
+                    List<Point> solutions = ViewModel.ChoosenCurve.FindSolutions(i);
                     if (solutions.Count != 1)
                     {
                         for (int k = 0; k < solutions.Count; ++k)
                         {
-                            segments[ind * _choosenCurve.MaxNumberOfSolutions + k].Points.Add(ConvertPoint(solutions[k]));
+                            segments[ind * ViewModel.ChoosenCurve.MaxNumberOfSolutions + k].Points.Add(ConvertPoint(solutions[k]));
                         }
                     }
 
                     else
                     {
-                        for (int k = 0; k < _choosenCurve.MaxNumberOfSolutions; ++k)
+                        for (int k = 0; k < ViewModel.ChoosenCurve.MaxNumberOfSolutions; ++k)
                         {
-                            segments[ind * _choosenCurve.MaxNumberOfSolutions + k].Points.Add(ConvertPoint(solutions[0]));
+                            segments[ind * ViewModel.ChoosenCurve.MaxNumberOfSolutions + k].Points.Add(ConvertPoint(solutions[0]));
                         }
                     }
                 }
             }
 
-            foreach (var interval in _choosenCurve.CurvesDefinedIntervals)
+            foreach (var interval in ViewModel.ChoosenCurve.CurvesDefinedIntervals)
             {
                 for (byte i = 0; i < segments.Count; ++i)
                 {

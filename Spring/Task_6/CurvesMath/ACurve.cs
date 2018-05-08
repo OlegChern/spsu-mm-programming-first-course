@@ -5,6 +5,8 @@ namespace CurvesMath
 {
     public abstract class ACurve
     {
+        public abstract string Name { get;}
+
         public abstract List<Interval> CurvesDefinedIntervals { get; protected set; }
 
         public abstract byte MaxNumberOfSolutions { get; }

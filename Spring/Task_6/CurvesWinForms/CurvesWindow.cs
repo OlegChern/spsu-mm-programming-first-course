@@ -11,27 +11,11 @@ namespace CurvesWinForms
     {
         private ACurve _choosenCurve;
 
-        private Graphics renderer;
-        private Pen pen;
-
-
-        public CurvesWindow()
-        {
-            InitializeComponent();
-            Scale = 20;
-            renderer = CreateGraphics();
-            pen = new Pen(Color.Red, 2);
-            MouseWheel += delegate(object sender, MouseEventArgs args) {
-                Scale += args.Delta < 0 ? Scale / 10 : -Scale / 10;
-                if (_choosenCurve != null)
-                {
-                    DrawGraph();
-                }
-            };
-        }
+        private readonly Graphics _renderer;
+        private readonly Pen _pen;
 
         private int _scale;
-        
+
         private int Scale
         {
             get { return _scale; }
@@ -53,6 +37,22 @@ namespace CurvesWinForms
             }
         }
 
+
+        public CurvesWindow()
+        {
+            InitializeComponent();
+            Scale = 20;
+            _renderer = CreateGraphics();
+            _pen = new Pen(Color.Red, 2);
+            MouseWheel += delegate(object sender, MouseEventArgs args) {
+                Scale += args.Delta < 0 ? Scale / 10 : -Scale / 10;
+                if (_choosenCurve != null)
+                {
+                    DrawGraph();
+                }
+            };
+        }
+        
         private void CurvesWindow_Load(object sender, EventArgs e)
         {
             var comboBox = new ComboBox
@@ -79,7 +79,7 @@ namespace CurvesWinForms
 
         private void DrawGraph()
         {
-            renderer.Clear(BackColor);
+            _renderer.Clear(BackColor);
             DrawCoordinateSystem();
             double step = 1.0/Scale/Math.Sqrt(Scale);
             _choosenCurve.RecalculateIntervals(Size.Width/2/Scale);
@@ -93,7 +93,7 @@ namespace CurvesWinForms
                     List<System.Windows.Point> secondSolutions = _choosenCurve.FindSolutions(i + step);
                     for (int k = 0; k < solutions.Count && (solutions.Count == secondSolutions.Count); ++k)
                     {
-                        renderer.DrawLine(pen,
+                        _renderer.DrawLine(_pen,
                             (float) ConvertPoint(solutions[k]).X, 
                             (float) ConvertPoint(solutions[k]).Y,
                             (float) (ConvertPoint(secondSolutions[k]).X), 
@@ -107,7 +107,7 @@ namespace CurvesWinForms
                     k < nearTheEndSoulutions.Count && (nearTheEndSoulutions.Count == endIntervalSolution.Count);
                     ++k)
                 {
-                    renderer.DrawLine(pen,
+                    _renderer.DrawLine(_pen,
                         (float) ConvertPoint(nearTheEndSoulutions[k]).X,
                         (float) ConvertPoint(nearTheEndSoulutions[k]).Y,
                         (float) (ConvertPoint(endIntervalSolution[k]).X),
@@ -119,19 +119,19 @@ namespace CurvesWinForms
         private void DrawCoordinateSystem()
         {
             var tmpPen = new Pen(Color.Black, 1);
-            renderer.DrawLine(tmpPen, 0, ClientSize.Height / 2, ClientSize.Width, ClientSize.Height / 2);
-            renderer.DrawLine(tmpPen, ClientSize.Width / 2, 0, ClientSize.Width / 2, ClientSize.Height);
+            _renderer.DrawLine(tmpPen, 0, ClientSize.Height / 2, ClientSize.Width, ClientSize.Height / 2);
+            _renderer.DrawLine(tmpPen, ClientSize.Width / 2, 0, ClientSize.Width / 2, ClientSize.Height);
 
             for (int i = 0; i < ClientSize.Width / 2; i += Scale)
             {
-                renderer.DrawLine(tmpPen, ClientSize.Width / 2 + i, ClientSize.Height / 2 + 2, ClientSize.Width / 2 + i, ClientSize.Height / 2 - 2);
-                renderer.DrawLine(tmpPen, ClientSize.Width / 2 - i, ClientSize.Height / 2 + 2, ClientSize.Width / 2 - i, ClientSize.Height / 2 - 2);
+                _renderer.DrawLine(tmpPen, ClientSize.Width / 2 + i, ClientSize.Height / 2 + 2, ClientSize.Width / 2 + i, ClientSize.Height / 2 - 2);
+                _renderer.DrawLine(tmpPen, ClientSize.Width / 2 - i, ClientSize.Height / 2 + 2, ClientSize.Width / 2 - i, ClientSize.Height / 2 - 2);
             }
 
             for (int i = 0; i < ClientSize.Height / 2; i += Scale)
             {
-                renderer.DrawLine(tmpPen, ClientSize.Width / 2 - 2, ClientSize.Height / 2 + i, ClientSize.Width / 2 + 2, ClientSize.Height / 2 + i);
-                renderer.DrawLine(tmpPen, ClientSize.Width / 2 - 2, ClientSize.Height / 2 - i, ClientSize.Width / 2 + 2, ClientSize.Height / 2 - i);
+                _renderer.DrawLine(tmpPen, ClientSize.Width / 2 - 2, ClientSize.Height / 2 + i, ClientSize.Width / 2 + 2, ClientSize.Height / 2 + i);
+                _renderer.DrawLine(tmpPen, ClientSize.Width / 2 - 2, ClientSize.Height / 2 - i, ClientSize.Width / 2 + 2, ClientSize.Height / 2 - i);
             }
         }
 

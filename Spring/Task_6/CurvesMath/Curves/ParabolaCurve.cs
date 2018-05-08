@@ -6,14 +6,16 @@ namespace CurvesMath.Curves
 {
     public class ParabolaCurve : ACurve
     {
-        private readonly double _2p;
+        private readonly double _doubleCoefficientP;
 
+        public override string Name { get; }
         public override List<Interval> CurvesDefinedIntervals { get; protected set; }
         public override byte MaxNumberOfSolutions { get; }
 
         public ParabolaCurve(double p)
         {
-            _2p = 2 * p;
+            _doubleCoefficientP = 2* p;
+            Name = "y^2 =" + 2 * _doubleCoefficientP + "x";
             MaxNumberOfSolutions = 2;
         }
 
@@ -23,8 +25,8 @@ namespace CurvesMath.Curves
         {
             return new List<Point>
             {
-                new Point(x, Math.Sqrt(_2p * x)),
-                new Point(x, -Math.Sqrt(_2p * x))
+                new Point(x, Math.Sqrt(_doubleCoefficientP * x)),
+                new Point(x, -Math.Sqrt(_doubleCoefficientP * x))
             };
         }
 
@@ -36,7 +38,7 @@ namespace CurvesMath.Curves
 
         public override string ToString()
         {
-            return "y^2 =" + _2p + "x";
+            return Name;
         }
     }
 }

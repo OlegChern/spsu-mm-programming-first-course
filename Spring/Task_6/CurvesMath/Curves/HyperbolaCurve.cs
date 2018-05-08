@@ -6,22 +6,24 @@ namespace CurvesMath.Curves
 {
     public class HyperbolaCurve : ACurve
     {
-        private readonly double _sqrA;
-        private readonly double _sqrB;
+        private readonly double _sqrCoefficientA;
+        private readonly double _sqrCoefficientB;
 
+        public override string Name { get; }
         public override List<Interval> CurvesDefinedIntervals { get; protected set; }
         public override byte MaxNumberOfSolutions { get; }
 
         public HyperbolaCurve(double a, double b)
         {
-            _sqrA = a*a;
-            _sqrB = b*b;        
+            _sqrCoefficientA = a*a;
+            _sqrCoefficientB = b*b;
+            Name = "x^2/" + _sqrCoefficientA + " - y^2/" + _sqrCoefficientB + " = 1";
             MaxNumberOfSolutions = 2;
         }
 
         public override List<Point> FindSolutions(double x)
         {
-            double y = Math.Sqrt(-_sqrB + x * x * _sqrB / _sqrA);
+            double y = Math.Sqrt(-_sqrCoefficientB + x * x * _sqrCoefficientB / _sqrCoefficientA);
 
             if (y < 0.1)
             {
@@ -38,12 +40,12 @@ namespace CurvesMath.Curves
 
         public override void RecalculateIntervals(double DashesAmount)
         {
-            CurvesDefinedIntervals = new List<Interval> { new Interval(-DashesAmount, -Math.Sqrt(_sqrA)), new Interval(Math.Sqrt(_sqrA), DashesAmount) };
+            CurvesDefinedIntervals = new List<Interval> { new Interval(-DashesAmount, -Math.Sqrt(_sqrCoefficientA)), new Interval(Math.Sqrt(_sqrCoefficientA), DashesAmount) };
         }
 
         public override string ToString()
         {
-            return "x^2/" + _sqrA + " - y^2/" + _sqrB + " = 1";
+            return Name;
         }
     }
 }

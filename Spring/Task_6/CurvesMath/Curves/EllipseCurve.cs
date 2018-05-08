@@ -6,17 +6,19 @@ namespace CurvesMath.Curves
 {
     public class EllipseCurve : ACurve
     {
-        private readonly double _sqrA;
-        private readonly double _sqrB;
+        private readonly double _sqrCoefficientA;
+        private readonly double _sqrCoefficientB;
 
+        public override string Name { get; }
         public override List<Interval> CurvesDefinedIntervals { get; protected set; }
         public override byte MaxNumberOfSolutions { get; }
 
 
         public EllipseCurve(double a, double b)
         {
-            _sqrA = a * a;
-            _sqrB = b * b;
+            _sqrCoefficientA = a * a;
+            _sqrCoefficientB = b * b;
+            Name = "x^2/" + _sqrCoefficientA + " + y^2/" + _sqrCoefficientB + " = 1";
             CurvesDefinedIntervals = new List<Interval>{new Interval(-a,a)};
             MaxNumberOfSolutions = 2;
         }
@@ -25,8 +27,8 @@ namespace CurvesMath.Curves
         {
             return new List<Point>
             {
-                new Point(x, Math.Sqrt(_sqrB - x * x * _sqrB / _sqrA)),
-                new Point(x, -Math.Sqrt(_sqrB - x * x * _sqrB / _sqrA))
+                new Point(x, Math.Sqrt(_sqrCoefficientB - x * x * _sqrCoefficientB / _sqrCoefficientA)),
+                new Point(x, -Math.Sqrt(_sqrCoefficientB - x * x * _sqrCoefficientB / _sqrCoefficientA))
             };
         }
 
@@ -36,7 +38,7 @@ namespace CurvesMath.Curves
 
         public override string ToString()
         {
-            return "x^2/" + _sqrA + " + y^2/" + _sqrB + " = 1";
+            return Name;
         }
 
     }

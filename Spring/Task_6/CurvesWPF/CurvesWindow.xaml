@@ -15,7 +15,12 @@
         </Grid.RowDefinitions>
 
 
-        <ComboBox Name="CurvesList" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" SelectionChanged="CurveChoosed" Panel.ZIndex = "1"/>
+        <ComboBox Name="CurvesListBox" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" SelectionChanged="CurveChoosed" Panel.ZIndex = "1"
+                  SelectedItem="{Binding ChoosenCurve, Mode=TwoWay}" ItemsSource="{Binding CurvesList}">
+            <ComboBox.DataContext>
+                <local:ViewModel/>
+            </ComboBox.DataContext>
+        </ComboBox>
 
         <Canvas  Name ="Rendering" Grid.Row="1">
             <Canvas Name= "AxesOfCoordinates"/>
