@@ -1,4 +1,6 @@
-package Canvas;
+package SwingApplication;
+
+import Shapes.Plottable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,7 +12,7 @@ import java.util.Arrays;
 
 
 /**
- * Canvas for plots paintings.
+ * Class for plots paintings based on Swing API.
  * <p>
  * To paint a plot {@linkplain #setPlot(Plottable)} must be called with desired plot
  * as argument and then {@linkplain #repaint()} must be invoked to display results.
@@ -227,6 +229,7 @@ public class MyCanvas extends JPanel {
         for (int dx = -ZOOM_REGION / 2; dx < ZOOM_REGION / 2; dx++) {
             double realX = (x * ZOOM_REGION + dx - center.getX() * ZOOM_REGION) / (pixelsPerOneDivision * ZOOM_REGION);
             Point[] plotPoints = Arrays.stream(shape.getPointsByX(realX))
+                    .map(p -> new Point2D.Double(p.x, p.y))
                     .map(this::convertRealPointToPixel)
                     .distinct()
                     .toArray(Point[]::new);
@@ -289,6 +292,7 @@ public class MyCanvas extends JPanel {
         for (int x = 0; x < size.width; x++) {
             double realX = convertPixelToRealPoint(new Point(x, 0)).getX();
             Point[] plotPoints = Arrays.stream(shape.getPointsByX(realX))
+                    .map(p -> new Point2D.Double(p.x, p.y))
                     .map(this::convertRealPointToPixel)
                     .distinct() // removes pixels duplicates
                     .toArray(Point[]::new);

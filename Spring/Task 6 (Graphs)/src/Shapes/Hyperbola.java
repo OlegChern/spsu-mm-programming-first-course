@@ -1,12 +1,6 @@
 package Shapes;
 
 
-import Canvas.Plottable;
-import Utils.Computations;
-
-import java.awt.geom.Point2D;
-
-
 public class Hyperbola implements Plottable {
     private double a;
     private double b;
@@ -20,14 +14,14 @@ public class Hyperbola implements Plottable {
     }
     
     @Override
-    public Point2D.Double[] getPointsByX(double x) {
+    public Point[] getPointsByX(double x) {
         if (satisfiesDomain(x)) {
             double t = x * x - a * a;
             double y = Computations.equal(t, 0) ? 0 : b / a * Math.sqrt(t);
-            return new Point2D.Double[]{new Point2D.Double(x, y), new Point2D.Double(x, -y)};
+            return new Point[]{new Point(x, y), new Point(x, -y)};
         }
     
-        return new Point2D.Double[0];
+        return new Point[0];
     }
     
     public boolean satisfiesDomain(double x) {

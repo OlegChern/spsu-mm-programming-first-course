@@ -1,6 +1,6 @@
-package Canvas;
+package Shapes;
 
-import java.awt.geom.Point2D;
+import SwingApplication.MyCanvas;
 
 /**
  * Main interface for plots paintings.
@@ -11,5 +11,5 @@ import java.awt.geom.Point2D;
  * of a shape and a line x = givenX.
  */
 public interface Plottable {
-    Point2D.Double[] getPointsByX(double x);
+    Point[] getPointsByX(double x);
 }
