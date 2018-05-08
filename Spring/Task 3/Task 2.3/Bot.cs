@@ -9,12 +9,15 @@ namespace BlackJack
     public abstract class Bot : Human, IPlayer
     {
         public int CountParty { get; set; }
+
         public Bot() : base()
         {
             CountParty = 0;
-            Chips = 1024;
+            Chips = 1000;
         }
-        public abstract void MakeBet();
-        public abstract bool TakeProfit();       
+
+        public abstract bool MakeBet();
+
+        public abstract string TakeProfit();       
     }
 }

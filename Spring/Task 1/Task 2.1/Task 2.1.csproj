@@ -43,7 +43,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BMPImage.cs" />
-    <Compile Include="Filters.cs" />
+    <Compile Include="Filter.cs" />
+    <Compile Include="Filters\SobelXFilter.cs" />
+    <Compile Include="Filters\SobelYFilter.cs" />
+    <Compile Include="Filters\GaussFilter.cs" />
+    <Compile Include="Filters\MedianFilter.cs" />
+    <Compile Include="Filters\GrayFilter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

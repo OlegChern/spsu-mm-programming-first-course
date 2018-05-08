@@ -9,8 +9,11 @@ namespace BlackJack
     public class Card
     {
         public string Suit { get; set; }
+
         public string Name { get; set; }
+
         public int Value { get; set; }
+
         public Card(string name, string suit)
         {
             Suit = suit;
@@ -28,6 +31,7 @@ namespace BlackJack
                 Value = Int32.Parse(Name);
             }
         }
+
         public void Print()
         {
             Console.BackgroundColor = ConsoleColor.White;

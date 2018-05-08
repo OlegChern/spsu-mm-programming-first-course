@@ -9,12 +9,14 @@ namespace BlackJack
     public class Deck
     {
         public List<Card> Cards { get; set; }
+
         public Card GiveCard()
         {
             var card = Cards.First();
             Cards.RemoveAt(0);
             return card;
         }
+
         public Deck()
         {
             Cards = new List<Card>();

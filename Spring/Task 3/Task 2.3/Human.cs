@@ -9,9 +9,13 @@ namespace BlackJack
     public abstract class Human
     {
         public List<Card> Cards { get; set; }
+
         public bool HaveAce { get; set; }
+
         public int Bet { get; set; }
+
         public int Chips { get; set; }
+
         public int Sum
         {
             get
@@ -32,11 +36,13 @@ namespace BlackJack
               
             }
         }
+
         public Human()
         {
             Cards = new List<Card>();
             HaveAce = false;
         }
+
         public void Print()
         {
             foreach (var e in Cards)
@@ -44,6 +50,7 @@ namespace BlackJack
                 e.Print();
             }
         }
+
         public void HitMe(Deck deck)
         {
             var card = deck.GiveCard();
@@ -53,6 +60,7 @@ namespace BlackJack
                 HaveAce = true;
             }
         }
-        public abstract bool IsNext(Deck deck);
+
+        public abstract string IsNext();
     }
 }

@@ -11,30 +11,30 @@ namespace BlackJack
         static void Main(string[] args)
         {
             Console.WriteLine("У обоих ботов изначально 1000 фишек.\n");
-            var resultBot1 = new List<int>();
+            var resultFirstBot = new List<int>();
             for (int i = 0; i < 1000; i++)
             {
-                var bot1 = new Bot1();
-                var game1 = new Game<Bot1>(bot1);
-                game1.StartGame();
-                resultBot1.Add(bot1.Chips);
+                var firstBot = new BotWithFirstAlgorithm();
+                var gameBot = new Game<BotWithFirstAlgorithm>(firstBot);
+                gameBot.StartGame();
+                resultFirstBot.Add(firstBot.Chips);
             }
-            Console.WriteLine("За 1000 игр у первого бота остается в среденем {0} фишек.\n", resultBot1.Average());
-            var resultBot2 = new List<int>();
+            Console.WriteLine("За 1000 игр у первого бота остается в среденем {0} фишек.\n", resultFirstBot.Average());
+            var resultSecondBot = new List<int>();
             for (int i = 0; i < 1000; i++)
             {
-                var bot2 = new Bot2();
-                var game2 = new Game<Bot2>(bot2);
-                game2.StartGame();
-                resultBot2.Add(bot2.Chips);
+                var secondBot = new BotWithSecondAlgorithm();
+                var gameBot = new Game<BotWithSecondAlgorithm>(secondBot);
+                gameBot.StartGame();
+                resultSecondBot.Add(secondBot.Chips);
             }
-            Console.WriteLine("У второго бота остается в среденем {0} фишек.\n", resultBot2.Average());
+            Console.WriteLine("У второго бота остается в среденем {0} фишек.\n", resultSecondBot.Average());
             Console.WriteLine("Для начала игры нажмите любую клавишу.");
             Console.ReadKey();
             Console.Clear();
             var player = new Player();
-            var game = new Game<Player>(player);
-            game.StartGame();
+            var gamePlayer = new Game<Player>(player);
+            gamePlayer.StartGame();
         }
     }
 }

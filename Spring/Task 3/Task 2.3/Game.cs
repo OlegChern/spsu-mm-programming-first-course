@@ -11,17 +11,25 @@ namespace BlackJack
         where T : Human, IPlayer
     {
         public Dealer Dealer { get; set; }
+
         public T Player { get; set; }
+
         public Deck Deck { get; set; }
+
         public bool ExitGame { get; set; }
+
         public Game(T player)
         {
             Dealer = new Dealer();
             Deck = new Deck();
             Player = player;
             ExitGame = false;
+            Clear += () => Console.Clear();
+            Clear += () => Console.Write("Ваши фишки: {0}", Player.Chips);
         }
-               
+
+        public event Action Clear;
+
         public void PrintCards()
         {
             Console.SetCursorPosition(10, 5);
@@ -48,49 +56,104 @@ namespace BlackJack
                 }
             }
         }
+
         public void StartParty()
         {
-            Player.MakeBet();
+            if (Player is Player)
+            {
+                Clear();
+            }
+            while (!Player.MakeBet())
+            {
+                Clear();
+                Console.SetCursorPosition(10, 11);
+                Console.Write("Ошибка! Попробуйте еще раз.");
+            }
+            if (Player is Player)
+            {
+                Clear += () =>
+                {
+                    Console.SetCursorPosition(10, 12);
+                    Console.Write("Ваша ставка: {0}", Player.Bet);
+                };
+                Clear();
+            }
+
             if (Player is Bot)
             {
                 (Player as Bot).CountParty++;
             }
             else
             {
-                (Player as Player).Clear += () => PrintCards();
-            }            
-            Player.HitMe(Deck);
-            Player.HitMe(Deck);
+                 Clear += () => PrintCards();
+            }
             Dealer.HitMe(Deck);
+            Player.HitMe(Deck);
+            Player.HitMe(Deck);
+            if (Player is Player)
+            {
+                Clear();
+            }
             ProcessParty();
         }
+
         public void StepParty<U>(U player)
             where U : Human
         {
             while (true)
             {
-                var next = player.IsNext(Deck);               
-                if ((next == false) || (player.Sum > 21))
+                var next = player.IsNext();
+                if ((next == "Нет") || (player.Sum > 21))
                 {
+                    if (Player is Player)
+                    {
+                        Clear();
+                    }
                     break;
+                }
+                else if (next == "Да")
+                {
+                    player.HitMe(Deck);
+                    if (Player is Player)
+                    {
+                        Clear();
+                    }
+                }
+                else
+                {
+                    Clear();
+                    Console.SetCursorPosition(10, 14);
+                    Console.Write("Ошибка! Попробуйте еще раз.");
                 }
             }
         }
+
         public void ProcessParty()
-        {
-            if (Player is Player)
-            {
-                (Player as Player).GetClear();
-            }
+        {            
             if (Player.Sum == 21)
             {
                 if (Dealer.Sum == 11)
                 {
-                    if (Player.TakeProfit() == true)
+                    while (true)
                     {
-                        EndParty(true, 1);
-                        return;
-                    }      
+                        var answer = Player.TakeProfit();
+                        if (answer == "Да")
+                        {
+                            EndParty(true, 1);
+                            return;
+                        }
+                        else if (answer == "Нет")
+                        {
+                            if (Player is Player)
+                            {
+                                Clear();
+                            }
+                            break;
+                        }
+                        Clear();
+                        Console.SetCursorPosition(10, 14);
+                        Console.Write("Ошибка! Попробуйте еще раз.");
+                    }
                 }
                 else if (Dealer.Sum != 10)
                 {
@@ -104,11 +167,7 @@ namespace BlackJack
                 EndParty(false, 0);
                 return;
             }           
-            StepParty(Dealer);
-            if (Player is Player)
-            {
-                (Player as Player).GetClear();
-            }
+            StepParty(Dealer);           
             if (Dealer.Sum > 21)
             {
                 EndParty(true, 1.5);
@@ -127,6 +186,7 @@ namespace BlackJack
             }
 
         }
+
         public void ClearHand<U>(U human)
             where U : Human
         {
@@ -134,6 +194,7 @@ namespace BlackJack
             human.HaveAce = false;
             human.Cards = new List<Card>();
         }
+
         public void EndParty(bool win, double k)
         {
             if (win == true)
@@ -141,6 +202,7 @@ namespace BlackJack
                 Player.Chips += (int)Math.Round(k * Player.Bet);
                 if (Player is Player)
                 {
+                    Clear(); 
                     Console.SetCursorPosition(10, 16);
                     Console.Write("Вы выиграли!");
                 }
@@ -150,24 +212,27 @@ namespace BlackJack
                 Player.Chips -= Player.Bet;
                 if (Player is Player)
                 {
+                    Clear();
                     Console.SetCursorPosition(10, 16);
                     Console.Write("Вы проиграли!");
                 }
+            }
+            if (Player is Player)
+            {
+                Console.SetCursorPosition(10, 17);
+                Console.Write("Нажмите любую клавишу для продолжения.");
+                Console.ReadKey();
             }
             ClearHand(Player);
             ClearHand(Dealer);
             if (Player is Player)
             {
-                (Player as Player).Clear -= () =>
+                Clear -= () =>
                 {
                     Console.SetCursorPosition(10, 12);
                     Console.Write("Ваша ставка: {0}", Player.Bet);
                 };
-                Console.SetCursorPosition(10, 17);
-                Console.Write("Нажмите любую клавишу для продолжения.");
-                Console.ReadKey();
-                (Player as Player).GetClear();
-
+                Clear();
             }
         }
     }

@@ -8,16 +8,15 @@ namespace BlackJack
 {
     public class Dealer : Human
     {
-        public override bool IsNext(Deck deck)
+        public override string IsNext()
         {
             if (Sum < 17)
             {
-                HitMe(deck);
-                return true;
+                return "Да";
             }
             else
             {
-                return false;
+                return "Нет";
             }
         }
     }

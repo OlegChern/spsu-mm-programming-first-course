@@ -8,7 +8,8 @@ namespace BlackJack
 {
     public interface IPlayer
     {
-        void MakeBet();
-        bool TakeProfit();
+        bool MakeBet();
+
+        string TakeProfit();
     }
 }

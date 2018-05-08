@@ -6,26 +6,26 @@ using System.Threading.Tasks;
 
 namespace BlackJack
 {
-    public class Bot1 : Bot
+    public class BotWithFirstAlgorithm : Bot
     {
-        public override bool IsNext(Deck deck)
+        public override string IsNext()
         {
             if (Sum < 16)
             {
-                HitMe(deck);
-                return true;
+                return "Да";
             }
-            return false;
+            return "Нет";
         }
 
-        public override void MakeBet()
+        public override bool MakeBet()
         {
             Bet = Chips / 2;
+            return true;
         }
 
-        public override bool TakeProfit()
+        public override string TakeProfit()
         {
-            return true;
+            return "Да";
         }
     }
 }

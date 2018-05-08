@@ -45,8 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bot.cs" />
-    <Compile Include="Bot1.cs" />
-    <Compile Include="Bot2.cs" />
+    <Compile Include="BotWithFirstAlgorithm.cs" />
+    <Compile Include="BotWithSecondAlgorithm.cs" />
     <Compile Include="Card.cs" />
     <Compile Include="Dealer.cs" />
     <Compile Include="Game.cs" />
