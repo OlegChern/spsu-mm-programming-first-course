@@ -1,4 +1,5 @@
 ﻿using System;
+using ATankLib;
 using CustomTankLib;
 
 namespace Task_2
@@ -8,10 +9,15 @@ namespace Task_2
         static void Main(string[] args)
         {
             BlitzenMTLS firstMyTank = new BlitzenMTLS();
-            firstMyTank.GetInfo();
             AMXChasseurDeChars secondMyTank = new AMXChasseurDeChars();
-            secondMyTank.GetInfo();
+            PrintInfoAboutTank(firstMyTank);
+            PrintInfoAboutTank(secondMyTank);
             Console.ReadKey();
+        }
+
+        static void PrintInfoAboutTank(ATank tank)
+        {
+            tank.GetInfo();
         }
     }
 }
