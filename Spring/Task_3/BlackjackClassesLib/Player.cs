@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using BlackjackClassesLib.PlayingEvents;
 
-namespace Task_3
+namespace BlackjackClassesLib
 {
-    internal class Player
+    public class Player
     {
         public List<CardsValue> Hand { get; }
 
@@ -13,6 +14,10 @@ namespace Task_3
         public double Money { get; private set; }
         public double Rate { get; private set; }
         public bool IsBlackjack { get; protected set; }
+
+        public delegate void TakingCardHandler(object sender, TakingCardEventArgs e);
+
+        public event TakingCardHandler CardWasTaked;
 
         public Player(double money, Deck gameDeck)
         {
@@ -25,7 +30,8 @@ namespace Task_3
         public void Hit()
         {
             Hand.Add(GameDeck.DeckContent.Last());
-            GameDeck.DeckContent.RemoveAt(GameDeck.DeckContent.Count - 1);
+            CardWasTaked?.Invoke(this, new TakingCardEventArgs());
+
             Sum += (int)Hand[(Hand.Count - 1)];
 
             if ((Sum > 21) && (Hand.IndexOf(CardsValue.Ace) >= 0))
@@ -42,17 +48,16 @@ namespace Task_3
             return Sum;
 
         }
-
+        /*
         public Player Split()
         {
             Money -= Rate;
-            Player newPlayer = new Player(Rate,GameDeck);
-            GameDeck.DeckContent.Add(Hand[Hand.Count -1]);
+            Player newPlayer = new Player(Rate);
             Hand.RemoveAt(Hand.Count - 1);
             newPlayer.Hit();
             return newPlayer;
         }
-
+        */
         public int DoubleDown()
         {
             Money -= Rate;

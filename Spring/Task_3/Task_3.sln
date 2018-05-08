@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27428.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Task_3", "Task_3\Task_3.csproj", "{A092F22D-87E9-4638-A284-B1EC3B8E9563}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackjackClassesLib", "BlackjackClassesLib\BlackjackClassesLib.csproj", "{566F3FE0-65E0-4609-8484-3E00BC7C1B3A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{A092F22D-87E9-4638-A284-B1EC3B8E9563}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A092F22D-87E9-4638-A284-B1EC3B8E9563}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A092F22D-87E9-4638-A284-B1EC3B8E9563}.Release|Any CPU.Build.0 = Release|Any CPU
+		{566F3FE0-65E0-4609-8484-3E00BC7C1B3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{566F3FE0-65E0-4609-8484-3E00BC7C1B3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{566F3FE0-65E0-4609-8484-3E00BC7C1B3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{566F3FE0-65E0-4609-8484-3E00BC7C1B3A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

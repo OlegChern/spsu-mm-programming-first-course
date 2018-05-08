@@ -1,6 +1,6 @@
-﻿namespace Task_3
+﻿namespace BlackjackClassesLib
 {
-    internal enum CardsValue : int
+    public enum CardsValue : int
     {
         Two = 2,
         Three = 3,

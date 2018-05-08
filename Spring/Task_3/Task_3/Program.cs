@@ -1,4 +1,5 @@
 ﻿using System;
+using BlackjackClassesLib;
 
 namespace Task_3
 {
@@ -10,13 +11,13 @@ namespace Task_3
             double sum2 = 0;
 
             Game thisGame = new Game(8);
-            Bot firstPlayer = new Bot(500, thisGame.GameDeck,30,17,true,false);
-            Bot secondPlayer = new Bot(500, thisGame.GameDeck,25,16,false,true);
+            Bot firstPlayer = new Bot(500,thisGame.GameDeck,30,17,true,false);
+            Bot secondPlayer = new Bot(500,thisGame.GameDeck,25,16,false,true);
 
 
             for (int i = 0; i < 40; ++i)
             {
-                thisGame.PlayGame(thisGame.GameDeck, firstPlayer, secondPlayer);
+                thisGame.PlayGame(firstPlayer,secondPlayer);
                 sum2 += secondPlayer.Money;
                 sum1 += firstPlayer.Money;
             }

@@ -1,6 +1,6 @@
-﻿namespace Task_3
+﻿namespace BlackjackClassesLib
 {
-    internal sealed class Bot : Player
+    public sealed class Bot : Player
     {
         private int BaseRateValue { get; }
         private int StopHitValue { get; }
@@ -9,7 +9,7 @@
 
         public Bot(
                     double money, 
-                    Deck gameDeck, 
+                    Deck gameDeck,
                     int baseRateValue, 
                     int stopHitValue, 
                     bool isDoubleDown = false,
@@ -22,7 +22,7 @@
             IsSurrender = isSurrender;
         }
 
-        public int Strategy(int dealersCard)
+        public void Strategy(CardsValue dealersCard)
         {
             Sum = 0;
             IsBlackjack = false;
@@ -30,21 +30,23 @@
             Hit();
             MakeRate(BaseRateValue);
 
-            if ((dealersCard == 11 && Sum == 13 && Sum == 12) && IsSurrender)
-            {
-                return Surrender();
-            }
 
             if (Sum == 21)
             {
                 IsBlackjack = true;
-                return Stand();
+                Sum = Stand();
             }
+
+            if (((int)dealersCard == 11 && Sum == 13 && Sum == 12) && IsSurrender)
+            {
+                Sum = Surrender();
+            }
+            
 
 
             if ((Sum == 11 || Sum == 10) && IsDoubleDown)
             {
-                return DoubleDown();
+                Sum = DoubleDown();
             }
 
             while (Sum < StopHitValue)
@@ -52,7 +54,7 @@
                 Hit();
             }
 
-            return Stand();
+            Sum = Stand();
         }
     }
 }

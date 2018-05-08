@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Task_3
+namespace BlackjackClassesLib
 {
-    internal class Deck
+    public class Deck
     {
         private const byte numberOfSuits = 4;
 
