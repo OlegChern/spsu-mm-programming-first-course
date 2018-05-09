@@ -147,10 +147,11 @@ public class WeakHashMapWithCertainDelay<K, V> implements Map<K, V> {
         Iterator<Entry<K, V>> nodeIterator = getNodeIteratorInBin(bin, key);
         
         timer.schedule(new TimerTask() {
+            // this simple line will store strong link until the task execution
+            K temp = key;
             @Override
             public void run() {
-                // this simple line will store strong link until the task execution
-                K temp = key;
+                temp = null;
             }
         }, delay);
         
