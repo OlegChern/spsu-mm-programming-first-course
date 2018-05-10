@@ -14,9 +14,22 @@ namespace WinFormsTechnology
         public delegate void Enable(bool enabled);
         public delegate void SetFloat(float value);
 
+        public delegate void CurveDrawingHandler(PointF[] points);
+        public delegate void EllipseDrawingHandler(float x, float y, float width, float height);
+        public delegate void LineDrawingHandler(float x1, float y1, float x2, float y2);
+
+        public delegate void ClearingHandler();
+        public delegate void AxisDrawingHandler(float halfWidth, float halfHeight);
+
         public event Enable EnableScaleUpBtn;
         public event Enable EnableScaleDownBtn;
         public event SetFloat SetPenWidth;
+
+        public event CurveDrawingHandler DrawCurve;
+        public event EllipseDrawingHandler DrawEllipse;
+        public event LineDrawingHandler DrawLine;
+        public event ClearingHandler Clear;
+        public event AxisDrawingHandler DrawAxis;
 
         #region constants
         private const float ScaleMultiplier = 1.25f;
@@ -30,14 +43,17 @@ namespace WinFormsTechnology
         private List<CurveBase> curves;
         private CurveBase selected;
 
+        private PictureBox pictureBox;
         private Graphics graphics;
+
         private Matrix originalTransform;
         private float scale;
-
-        private MainForm view;
         #endregion
 
         #region properties
+        /// <summary>
+        /// Array of all curves
+        /// </summary>
         public CurveBase[] Curves
         {
             get
@@ -46,19 +62,25 @@ namespace WinFormsTechnology
             }
         }
 
+        /// <summary>
+        /// PictureBox half width
+        /// </summary>
         private float HalfBoxWidth
         {
             get
             {
-                return (view.PictureBox.Width) / 2;
+                return (pictureBox.Width) / 2;
             }
         }
 
+        /// <summary>
+        /// PictureBox half height
+        /// </summary>
         private float HalfBoxHeight
         {
             get
             {
-                return (view.PictureBox.Height) / 2;
+                return (pictureBox.Height) / 2;
             }
         }
 
@@ -85,8 +107,11 @@ namespace WinFormsTechnology
         }
         #endregion
 
-        public Model(MainForm view, Graphics graphics)
+        public Model(PictureBox pictureBox, Graphics graphics)
         {
+            this.pictureBox = pictureBox;
+            this.graphics = graphics;
+
             curves = new List<CurveBase>();
 
             curves.Add(new Line());
@@ -95,24 +120,24 @@ namespace WinFormsTechnology
             curves.Add(new Parabola());
             curves.Add(new Hyperbola());
 
-            this.view = view;
-            this.graphics = graphics;
-            this.graphics.TranslateTransform(HalfBoxWidth, HalfBoxHeight);
-
-            originalTransform = this.graphics.Transform.Clone();
+            graphics.TranslateTransform(HalfBoxWidth, HalfBoxHeight);
+            originalTransform = graphics.Transform.Clone();
 
             scale = 1f;
             MaxScale = (float)Math.Pow(ScaleMultiplier, MaxScalePower);
             MinScale = (float)Math.Pow(ScaleMultiplier, -MaxScalePower);
         }
 
-        #region drawing
-        public void Draw(object selected)
+        /// <summary>
+        /// ComboBox event
+        /// </summary>
+        public void ComboBoxSelectedIndexChanged(object sender, EventArgs e)
         {
-            this.selected = (CurveBase)selected;
+            selected = (CurveBase)((ComboBox)sender).SelectedItem;
             Draw();
         }
 
+        #region drawing
         /// <summary>
         /// Draws selected curve
         /// </summary>
@@ -123,8 +148,8 @@ namespace WinFormsTechnology
                 return;
             }
 
-            view.Clear();
-            view.DrawAxis(ScaledHalfBoxWidth, ScaledHalfBoxHeight);
+            Clear();
+            DrawAxis(ScaledHalfBoxWidth, ScaledHalfBoxHeight);
 
             switch (selected.Type)
             {
@@ -167,7 +192,7 @@ namespace WinFormsTechnology
                     continue;
                 }
 
-                view.DrawCurve(points[i]);
+                DrawCurve(points[i]);
             }
         }
 
@@ -177,7 +202,7 @@ namespace WinFormsTechnology
             float offsetX = -ellipse.SemiMajorAxis / 2;
             float offsetY = -ellipse.SemiMinorAxis / 2;
 
-            view.DrawEllipse(offsetX, offsetY, ellipse.SemiMajorAxis, ellipse.SemiMinorAxis);
+            DrawEllipse(offsetX, offsetY, ellipse.SemiMajorAxis, ellipse.SemiMinorAxis);
         }
 
         private void Draw(Line line)
@@ -186,12 +211,15 @@ namespace WinFormsTechnology
             float length = 2 * (new Vector2(ScaledHalfBoxWidth, ScaledHalfBoxHeight)).Length;
             Vector2 lineDir = line.Direction * length;
 
-            view.DrawLine(-lineDir.X, lineDir.Y, lineDir.X, -lineDir.Y);
+            DrawLine(-lineDir.X, lineDir.Y, lineDir.X, -lineDir.Y);
         }
         #endregion
 
         #region scaling
-        public void ScaleUp()
+        /// <summary>
+        /// Scaling up event
+        /// </summary>
+        public void BtnScaleUpClick(object sender, EventArgs e)
         {
             if (scale <= MinScale)
             {
@@ -206,7 +234,10 @@ namespace WinFormsTechnology
             }
         }
 
-        public void ScaleDown()
+        /// <summary>
+        /// Scaling down event
+        /// </summary>
+        public void BtnScaleDownClick(object sender, EventArgs e)
         {
             if (scale >= MaxScale)
             {
