@@ -28,6 +28,30 @@ namespace Task_8
 
                         IEnumerable<Type> typesList = Assembly.LoadFile(dll).DefinedTypes;
 
+                        List<Type> neenedTypesList = new List<Type>();
+                        List<ConstructorInfo> constructorsList = new List<ConstructorInfo>();
+                        List<ITest> objectsList = new List<ITest>();
+
+                        foreach (Type type in typesList)
+                        {
+                            if (type.GetInterfaces().Contains(typeof(ITest)))
+                            {
+                                neenedTypesList.Add(type);
+                            }
+                        }
+
+
+                        foreach (Type type in neenedTypesList)
+                        {
+                            constructorsList.Add(type.GetConstructor(new Type[0]));
+                        }
+
+
+                        foreach (ConstructorInfo constructor in constructorsList)
+                        {
+                            objectsList.Add((ITest)constructor.Invoke(new object[0]));
+                        }
+                        /*
                         IEnumerable<Type> neenedTypesList =
                             from type in typesList
                             where type.GetInterfaces().Contains(typeof(ITest))
@@ -40,6 +64,7 @@ namespace Task_8
                         IEnumerable<ITest> objectsList =
                             from constructor in constructorsList
                             select (ITest) constructor.Invoke(new object[0]);
+                        */
 
                         foreach (var obj in objectsList)
                         {
