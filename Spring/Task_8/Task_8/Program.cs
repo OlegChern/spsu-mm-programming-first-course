@@ -13,26 +13,42 @@ namespace Task_8
         {
             try
             {
-                IEnumerable<Type> typesList = Assembly.LoadFile(args[0]).ExportedTypes;
-                
-                IEnumerable<Type> neenedTypesList =
-                    from type in typesList
-                    where type.GetInterfaces().Contains(typeof(ITest))
-                    select type;
+                string path = Console.ReadLine();
 
-                IEnumerable<ConstructorInfo> constructorsList =
-                    from type in neenedTypesList
-                    select type.GetConstructor(new Type[0]);
+                IEnumerable<string> dllsList = Directory.EnumerateFiles(path, "*.dll");
 
-                IEnumerable<ITest> objectsList =
-                    from constructor in constructorsList
-                    select (ITest) constructor.Invoke(new object[0]);
-
-                foreach (var obj in objectsList)
+                if (!dllsList.Any())
                 {
-                    obj.PrintInfo();
+                    Console.WriteLine("There are no dll files!");
+                }
+                else
+                {
+                    foreach (var dll in dllsList)
+                    {
+
+                        IEnumerable<Type> typesList = Assembly.LoadFile(dll).DefinedTypes;
+
+                        IEnumerable<Type> neenedTypesList =
+                            from type in typesList
+                            where type.GetInterfaces().Contains(typeof(ITest))
+                            select type;
+
+                        IEnumerable<ConstructorInfo> constructorsList =
+                            from type in neenedTypesList
+                            select type.GetConstructor(new Type[0]);
+
+                        IEnumerable<ITest> objectsList =
+                            from constructor in constructorsList
+                            select (ITest) constructor.Invoke(new object[0]);
+
+                        foreach (var obj in objectsList)
+                        {
+                            obj.PrintInfo();
+                        }
+                    }
                 }
             }
+
 
             catch (IOException e)
             {
@@ -42,6 +58,8 @@ namespace Task_8
             {
                 Console.WriteLine(e.Message);
             }
+
+            Console.ReadKey();
         }
     }
 }
