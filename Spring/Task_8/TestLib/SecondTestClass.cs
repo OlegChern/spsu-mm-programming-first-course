@@ -9,5 +9,10 @@ namespace TestLib
         {
             Console.WriteLine("It works for {0}", ToString());
         }
+
+        public SecondTestClass(int val)
+        {
+
+        }
     }
 }

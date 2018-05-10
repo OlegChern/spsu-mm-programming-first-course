@@ -43,7 +43,10 @@ namespace Task_8
 
                         foreach (Type type in neenedTypesList)
                         {
-                            constructorsList.Add(type.GetConstructor(new Type[0]));
+                            if (type.GetConstructor(new Type[0]) != null)
+                            {
+                                constructorsList.Add(type.GetConstructor(new Type[0]));
+                            }
                         }
 
 
