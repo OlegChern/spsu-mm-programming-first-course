@@ -9,14 +9,14 @@ namespace BlackJack
         const int CardsCount = 13;
         const int DeckCount = 8;
 
-        private Stack<Card> deck;
+        private Stack<Card> cards;
 
         /// <summary>
         /// Creates and shuffles deck
         /// </summary>
         internal Deck()
         {
-            deck = new Stack<Card>();
+            cards = new Stack<Card>();
 
             for (int i = 0; i < DeckCount; i++)
             {
@@ -26,7 +26,7 @@ namespace BlackJack
 
                     for (int type = 0; type < CardsCount; type++)
                     {
-                        deck.Push((Card)shuffle[type]);
+                        cards.Push((Card)shuffle[type]);
                     }
                 }
             }
@@ -38,7 +38,7 @@ namespace BlackJack
         /// <returns></returns>
         internal Card GetCard()
         {
-            return deck.Pop();
+            return cards.Pop();
         }
 
         /// <summary>
@@ -105,5 +105,9 @@ namespace BlackJack
             return shuffle;
         }
 
+        ~Deck()
+        {
+            cards.Clear();
+        }
     }
 }

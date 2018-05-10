@@ -3,7 +3,7 @@
     public abstract class Player
     {
         #region fields
-        private string  name;
+        private readonly string  name;
 
         private bool    finished;
         private bool    lost;

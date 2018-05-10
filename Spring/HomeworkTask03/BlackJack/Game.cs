@@ -59,6 +59,11 @@
         /// <param name="players">participating players</param>
         public void Start(params Player[] players)
         {
+            if (players.Length == 0)
+            {
+                return;
+            }
+
             deck = new Deck();
 
             dealer = new Dealer();
@@ -93,8 +98,7 @@
                 }
             }
 
-            // dealer's decisions
-            while (dealer.Update()) { }
+            dealer.Finish();
 
             Finish();
         }

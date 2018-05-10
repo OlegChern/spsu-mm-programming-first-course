@@ -57,18 +57,14 @@ namespace BlackJack
         }
 
         /// <summary>
-        /// Update logic
+        /// Take necessary number of cards
         /// </summary>
-        /// <returns></returns>
-        internal bool Update()
+        internal void Finish()
         {
-            if (cardsSum >= 17)
+            while (cardsSum < 17)
             {
-                return false;
+                TakeCard();
             }
-
-            TakeCard();
-            return true;
         }
 
         private void TakeCard()

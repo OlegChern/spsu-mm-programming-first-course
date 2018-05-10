@@ -1,6 +1,6 @@
 ﻿namespace BlackJack.Bots
 {
-    class FearfulBot : Player
+    public class FearfulBot : Player
     {
         public FearfulBot(int startMoney) : base(startMoney, "FearfulBot") { }
 
