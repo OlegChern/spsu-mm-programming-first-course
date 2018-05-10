@@ -64,7 +64,6 @@
             this.CurveListComboBox.Name = "CurveListComboBox";
             this.CurveListComboBox.Size = new System.Drawing.Size(149, 24);
             this.CurveListComboBox.TabIndex = 0;
-            this.CurveListComboBox.SelectedIndexChanged += new System.EventHandler(this.CurveListComboBoxSelectedIndexChanged);
             // 
             // PictureBox
             // 
@@ -84,7 +83,6 @@
             this.BtnScaleUp.TabIndex = 3;
             this.BtnScaleUp.Text = "+";
             this.BtnScaleUp.UseVisualStyleBackColor = true;
-            this.BtnScaleUp.Click += new System.EventHandler(this.BtnScaleUpClick);
             // 
             // BtnScaleDown
             // 
@@ -94,7 +92,6 @@
             this.BtnScaleDown.TabIndex = 5;
             this.BtnScaleDown.Text = "-";
             this.BtnScaleDown.UseVisualStyleBackColor = true;
-            this.BtnScaleDown.Click += new System.EventHandler(this.BtnScaleDownClick);
             // 
             // MainForm
             // 
@@ -123,7 +120,7 @@
         #endregion
 
         private System.Windows.Forms.ComboBox CurveListComboBox;
-        private System.Windows.Forms.PictureBox PictureBox;
+        public System.Windows.Forms.PictureBox PictureBox;
         private System.Windows.Forms.Button BtnScaleUp;
         private System.Windows.Forms.Button BtnScaleDown;
     }
