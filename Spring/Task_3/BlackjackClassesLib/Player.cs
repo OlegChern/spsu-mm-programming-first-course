@@ -15,10 +15,6 @@ namespace BlackjackClassesLib
         public double Rate { get; private set; }
         public bool IsBlackjack { get; protected set; }
 
-        public delegate void TakingCardHandler(object sender, TakingCardEventArgs e);
-
-        public event TakingCardHandler CardWasTaked;
-
         public Player(double money, Deck gameDeck)
         {
             Sum = 0;
@@ -29,9 +25,7 @@ namespace BlackjackClassesLib
 
         public void Hit()
         {
-            Hand.Add(GameDeck.DeckContent.Last());
-            CardWasTaked?.Invoke(this, new TakingCardEventArgs());
-
+            Hand.Add(GameDeck.GiveCard());
             Sum += (int)Hand[(Hand.Count - 1)];
 
             if ((Sum > 21) && (Hand.IndexOf(CardsValue.Ace) >= 0))

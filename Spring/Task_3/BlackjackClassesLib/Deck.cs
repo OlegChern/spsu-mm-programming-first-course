@@ -49,5 +49,12 @@ namespace BlackjackClassesLib
 
             DeckContent = temp;
         }
+
+        public CardsValue GiveCard()
+        {
+            CardsValue result = DeckContent[DeckContent.Count - 1];
+            DeckContent.RemoveAt(DeckContent.Count - 1);
+            return result;
+        }
     }
 }
