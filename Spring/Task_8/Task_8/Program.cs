@@ -13,7 +13,7 @@ namespace Task_8
         {
             try
             {
-                IEnumerable<Type> typesList = Assembly.LoadFile(args[0]).DefinedTypes;
+                IEnumerable<Type> typesList = Assembly.LoadFile(args[0]).ExportedTypes;
                 
                 IEnumerable<Type> neenedTypesList =
                     from type in typesList
