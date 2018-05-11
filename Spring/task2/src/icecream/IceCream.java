@@ -2,20 +2,16 @@ package icecream;
 
 public abstract class IceCream {
 
-    protected String type;
+    protected IceCreamType type;
     protected String taste;
     protected String firstElement;
     protected int NumOfFirst;
 
-    public IceCream(String type, String taste, String firstElement, int NumOfFirst) {
+    public IceCream(IceCreamType type, String taste, String firstElement, int NumOfFirst) {
         this.type = type;
         this.taste = taste;
         this.firstElement = firstElement;
         this.NumOfFirst = NumOfFirst;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public void setTaste(String taste) {

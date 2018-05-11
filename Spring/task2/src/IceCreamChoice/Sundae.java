@@ -8,8 +8,8 @@ public class Sundae extends IceCream {
     private String secondElement;
     private int NumOfSecond;
 
-    public Sundae(String type, String taste, String firstElement, String secondElement, int NumOfFirst, int NumOfSecond, String syrup) {
-        super(type, taste, firstElement, NumOfFirst);
+    public Sundae(String secondElement, int NumOfSecond, String syrup) {
+        super(IceCreamType.Cone, "original","vanilla ice cream", 3);
         this.secondElement = secondElement;
         this.NumOfSecond = NumOfSecond;
         this.syrup = syrup;

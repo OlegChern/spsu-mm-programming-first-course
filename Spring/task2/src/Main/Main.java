@@ -1,18 +1,23 @@
 package Main;
 
 import IceCreamChoice.*;
+import icecream.*;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class Main {
 
     public static void main(String[] args) {
-        Sundae CookieDoughSundae = new Sundae("original recipe","cookie dough", "vanilla ice cream",
-                "cookie dough", 2, 1, "caramel");
-        CookieDoughSundae.printInfo();
 
-        FruitIce originalFruitIce = new FruitIce("ice cream with fruits","strawberry",
-                "strawberry fruit ice",3, "whipping cream");
+        List <IceCream> IceCreamList = new ArrayList<>();
 
-        originalFruitIce.printInfo();
+        IceCreamList.add(new Sundae("cookie dough",5, "caramel"));
+        IceCreamList.add(new FruitIce("ice cream with fruits","strawberry"));
+
+        for (IceCream IceCream : IceCreamList) {
+            IceCream.printInfo();
+        }
 
     }
 }
