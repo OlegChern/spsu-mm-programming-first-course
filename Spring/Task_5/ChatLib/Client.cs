@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Exception = System.Exception;
 
 namespace ChatLib
 {
@@ -76,9 +77,18 @@ namespace ChatLib
                         case "Connect":
                         {
                             IPEndPoint tmpIP = GetIPEndPoint();
-                            connectedClientsIP.Add(tmpIP);
-                            SendIPs(tmpIP);
-                            break;
+
+                            try
+                            {
+                                connectedClientsIP.Add(tmpIP);
+                                SendIPs(tmpIP);
+                                break;
+                            }
+                            catch (Exception e)
+                            {
+                                connectedClientsIP.Remove(tmpIP);
+                                throw new IOException();
+                            }
                         }
                         case "Disconnect":
                         {
@@ -109,7 +119,7 @@ namespace ChatLib
                 }
                 catch (IOException e)
                 {
-                    Console.WriteLine("Input something");
+                    Console.WriteLine("Incorrect input");
                 }
                 catch (ArgumentException e)
                 {
@@ -137,21 +147,30 @@ namespace ChatLib
 
         private void SendIPs(IPEndPoint ip)
         {
-            StringBuilder ipList = new StringBuilder("*");
-            ipList.Append(listeningIPEndPoint.Address.ToString());
-            ipList.Append(':');
-            ipList.Append(listeningIPEndPoint.Port.ToString());
-            ipList.Append(" ");
-            foreach (IPEndPoint tmpIP in connectedClientsIP)
+            try
             {
-                ipList.Append(tmpIP.Address.ToString());
+                StringBuilder ipList = new StringBuilder("*");
+                ipList.Append(listeningIPEndPoint.Address.ToString());
                 ipList.Append(':');
-                ipList.Append(tmpIP.Port.ToString());
+                ipList.Append(listeningIPEndPoint.Port.ToString());
                 ipList.Append(" ");
-            }
+                foreach (IPEndPoint tmpIP in connectedClientsIP)
+                {
+                    ipList.Append(tmpIP.Address.ToString());
+                    ipList.Append(':');
+                    ipList.Append(tmpIP.Port.ToString());
+                    ipList.Append(" ");
+                }
 
-            byte[] data = Encoding.Unicode.GetBytes(ipList.ToString());
-            listeningSocket.SendTo(data, ip);
+                byte[] data = Encoding.Unicode.GetBytes(ipList.ToString());
+
+
+                listeningSocket.SendTo(data, ip);
+            }
+            catch (Exception e)
+            {
+                throw new IOException();
+            }
         }
 
         private void SendMessage(string message)
@@ -269,15 +288,10 @@ namespace ChatLib
                     }
                 }
             }
-
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Console.WriteLine(ex.Message);
-            }
-
-            finally
-            {
-                LeaveChat();
+                Console.WriteLine("Error connection, try again");
+                Disconnect();
             }
         }
 
