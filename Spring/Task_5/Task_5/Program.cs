@@ -6,8 +6,8 @@ namespace Task_5
     {
         static void Main(string[] args)
         {
-            Client First = new Client();
-            First.StartChating();
+            Client first = new Client();
+            first.StartChating();
         }
     }
 }

@@ -80,8 +80,11 @@ namespace ChatLib
 
                             try
                             {
-                                connectedClientsIP.Add(tmpIP);
-                                SendIPs(tmpIP);
+                                if (!connectedClientsIP.Contains(tmpIP))
+                                {
+                                    connectedClientsIP.Add(tmpIP);
+                                    SendIPs(tmpIP);
+                                }
                                 break;
                             }
                             catch (Exception e)
@@ -90,6 +93,7 @@ namespace ChatLib
                                 throw new IOException();
                             }
                         }
+
                         case "Disconnect":
                         {
                             Disconnect();
@@ -288,10 +292,20 @@ namespace ChatLib
                     }
                 }
             }
-            catch (Exception e)
+            catch (SocketException e)
             {
-                Console.WriteLine("Error connection, try again");
-                Disconnect();
+                if (e.ErrorCode == 10048)
+                {
+                    Disconnect();
+                    IsLeave = true;
+                    Console.WriteLine("You can't use this port");
+                }
+
+                else
+                {
+                    Console.WriteLine("Error connection");
+                    Disconnect();
+                }
             }
         }
 
