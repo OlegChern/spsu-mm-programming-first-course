@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -16,6 +17,7 @@ namespace ChatLib
         private readonly List<IPEndPoint> connectedClientsIP;
         private readonly Socket listeningSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
         private bool IsLeave { get; set; }
+        private IPEndPoint LastConnect { get; set; }
         #endregion
         
         public Client()
@@ -23,7 +25,7 @@ namespace ChatLib
             IsLeave = false;
             connectedClientsIP = new List<IPEndPoint>();
             string host = Dns.GetHostName();
-            IPAddress tmpIP = Dns.GetHostAddresses(host)[2].MapToIPv4();
+            IPAddress tmpIP = Dns.GetHostEntry(host).AddressList.Last();
             bool isInitCorrect = false;
             while (!isInitCorrect)
             {
@@ -76,22 +78,13 @@ namespace ChatLib
                         }
                         case "Connect":
                         {
-                            IPEndPoint tmpIP = GetIPEndPoint();
-
-                            try
+                            LastConnect = GetIPEndPoint();
+                            if (!connectedClientsIP.Contains(LastConnect))
                             {
-                                if (!connectedClientsIP.Contains(tmpIP))
-                                {
-                                    connectedClientsIP.Add(tmpIP);
-                                    SendIPs(tmpIP);
-                                }
-                                break;
+                                connectedClientsIP.Add(LastConnect);
+                                SendIPs(LastConnect);
                             }
-                            catch (Exception e)
-                            {
-                                connectedClientsIP.Remove(tmpIP);
-                                throw new IOException();
-                            }
+                            break;
                         }
 
                         case "Disconnect":
@@ -140,58 +133,42 @@ namespace ChatLib
 
         private void ShowHelp()
         {
-            Console.WriteLine();
-            Console.WriteLine("Connect  -  to connect to other clients");
-            Console.WriteLine("Disconnect  -  to disconnect from this lobby");
-            Console.WriteLine("Clients  -  to show who is in this lobby now");
-            Console.WriteLine("Exit  -  to exit from chat");
-            Console.WriteLine("Help  -  to show this help window");
-            Console.WriteLine();
+            Console.WriteLine("\n" +
+                              "Connect  -  to connect to other clients\n" +
+                              "Disconnect  -  to disconnect from this lobby\n" +
+                              "Clients  -  to show who is in this lobby now\n" +
+                              "Exit  -  to exit from chat\n" +
+                              "Help  -  to show this help window\n");
         }
 
         private void SendIPs(IPEndPoint ip)
         {
-            try
+            StringBuilder ipList = new StringBuilder("*");
+            ipList.Append(listeningIPEndPoint.Address.ToString());
+            ipList.Append(':');
+            ipList.Append(listeningIPEndPoint.Port.ToString());
+            ipList.Append(" ");
+            foreach (IPEndPoint tmpIP in connectedClientsIP)
             {
-                StringBuilder ipList = new StringBuilder("*");
-                ipList.Append(listeningIPEndPoint.Address.ToString());
+                ipList.Append(tmpIP.Address.ToString());
                 ipList.Append(':');
-                ipList.Append(listeningIPEndPoint.Port.ToString());
+                ipList.Append(tmpIP.Port.ToString());
                 ipList.Append(" ");
-                foreach (IPEndPoint tmpIP in connectedClientsIP)
-                {
-                    ipList.Append(tmpIP.Address.ToString());
-                    ipList.Append(':');
-                    ipList.Append(tmpIP.Port.ToString());
-                    ipList.Append(" ");
-                }
-
-                byte[] data = Encoding.Unicode.GetBytes(ipList.ToString());
-
-
-                listeningSocket.SendTo(data, ip);
             }
-            catch (Exception e)
-            {
-                throw new IOException();
-            }
+
+            byte[] data = Encoding.Unicode.GetBytes(ipList.ToString());
+
+            listeningSocket.SendTo(data, ip);
         }
 
         private void SendMessage(string message)
         {
-            try
-            {
-                Byte[] data = Encoding.Unicode.GetBytes(message);
 
-                foreach (IPEndPoint tmpClientIP in connectedClientsIP)
-                {
-                    listeningSocket.SendTo(data, tmpClientIP);
-                }
-            }
-            catch (Exception e)
+            Byte[] data = Encoding.Unicode.GetBytes(message);
+
+            foreach (IPEndPoint tmpClientIP in connectedClientsIP)
             {
-                Console.WriteLine(e.Message);
-                throw;
+                listeningSocket.SendTo(data, tmpClientIP);
             }
         }
 
@@ -206,8 +183,7 @@ namespace ChatLib
         {
             try
             {
-                IPEndPoint localIP = listeningIPEndPoint;
-                listeningSocket.Bind(localIP);
+                listeningSocket.Bind(listeningIPEndPoint);
                 while (true)
                 {
                     StringBuilder builder = new StringBuilder();
@@ -222,7 +198,6 @@ namespace ChatLib
                     } while (listeningSocket.Available > 0);
 
                     IPEndPoint senderIP = tmpIP as IPEndPoint;
-
 
                     if (builder[0] == '*')
                     {
@@ -275,6 +250,7 @@ namespace ChatLib
                             Console.Write(ip.ToString() + " ");
                         }
 
+
                         Console.WriteLine();
                     }
 
@@ -290,23 +266,16 @@ namespace ChatLib
                         Console.WriteLine("[{0}:{1}] - {2}", senderIP.Address.ToString(),
                             senderIP.Port, builder.ToString());
                     }
+
                 }
             }
             catch (SocketException e)
             {
-                if (e.ErrorCode == 10048)
-                {
-                    Disconnect();
-                    IsLeave = true;
-                    Console.WriteLine("You can't use this port");
-                }
-
-                else
-                {
-                    Console.WriteLine("Error connection");
-                    Disconnect();
-                }
+                Disconnect();
+                IsLeave = true;
+                Console.WriteLine(e.Message);
             }
+
         }
 
         private List<IPEndPoint> GetListOfIPs(StringBuilder builder)
@@ -318,19 +287,12 @@ namespace ChatLib
             {
                 if (builder[i] == ' ')
                 {
-                    try
-                    {
-                        int ipAddressLength = tmpIP.LastIndexOf(':');
-                        result.Add(new IPEndPoint(
-                            IPAddress.Parse(tmpIP.Substring(0, ipAddressLength)),
-                            Convert.ToInt32(tmpIP.Substring(ipAddressLength + 1))));
-                        tmpIP = "";
-                        i++;
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                    }
+                    int ipAddressLength = tmpIP.LastIndexOf(':');
+                    result.Add(new IPEndPoint(
+                        IPAddress.Parse(tmpIP.Substring(0, ipAddressLength)),
+                        Convert.ToInt32(tmpIP.Substring(ipAddressLength + 1))));
+                    tmpIP = "";
+                    i++;
                 }
                 else
                 {
@@ -352,10 +314,9 @@ namespace ChatLib
                     Console.Write("Input IP:port ");
                     string inStr = Console.ReadLine();
                     IsCorrectFormatIPAndPort(inStr);
-                    //Console.WriteLine("Correct Input");
                     return ConvertToIP(inStr);
                 }
-                catch (Exception exception)
+                catch (Exception e)
                 {
                     Console.WriteLine("Input IP & port in this format: X.X.X.X:Y");
                 }
