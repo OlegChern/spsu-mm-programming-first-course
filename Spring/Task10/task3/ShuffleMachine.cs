@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Unity;
 
 namespace Task3
 {
@@ -24,13 +25,11 @@ namespace Task3
             var list = new List<Card>();
             foreach (Suit suit in Enum.GetValues(typeof(Suit)))
             {
+                Program.Container.RegisterInstance("Suit", suit);
                 foreach (Value value in Enum.GetValues(typeof(Value)))
                 {
-                    var card = new Card
-                    {
-                        Suit = suit,
-                        Value = value
-                    };
+                    Program.Container.RegisterInstance("Value", value);
+                    var card = Program.Container.Resolve<Card>();
                     for (int i = 0; i < decks; i++)
                     {
                         list.Add(card);

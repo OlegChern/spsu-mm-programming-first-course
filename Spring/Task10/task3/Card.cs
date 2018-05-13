@@ -27,9 +27,15 @@
 
     public struct Card
     {
-        internal Suit Suit;
-        internal Value Value;
+        internal readonly Suit Suit;
+        internal readonly Value Value;
 
+        public Card(Suit suit, Value value)
+        {
+            Suit = suit;
+            Value = value;
+        }
+        
         public override string ToString()
         {
             return $"{Value} of {Suit}";

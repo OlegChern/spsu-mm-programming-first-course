@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity;
 
 namespace Task3
 {
@@ -49,7 +50,8 @@ namespace Task3
             Console.WriteLine();
 
             var hands = GetHands(players, bets, deck);
-            var dealer = new Dealer(deck);
+            Program.Container.RegisterInstance("Deck", deck);
+            var dealer = Program.Container.Resolve<Dealer>();
             Console.WriteLine($"Dealer's card is {dealer.FirstCard} (score: {dealer.FirstCard.Score()})");
             Console.WriteLine();
 
@@ -216,15 +218,15 @@ namespace Task3
                     Console.WriteLine();
                     Console.WriteLine($"Card added to first hand: {deck[0]}");
                     Console.WriteLine($"Card added to second hand: {deck[1]}");
-                    var half = new Hand(
-                        hands[index].Owner,
-                        new List<Card>
-                        {
-                            hands[index].Cards[0],
-                            deck[1]
-                        },
-                        hands[index].InitialBet
-                    );
+                    
+                    Program.Container.RegisterInstance("Owner", hands[index].Owner);
+                    Program.Container.RegisterInstance("Cards", new List<Card>
+                    {
+                        hands[index].Cards[0],
+                        deck[1]
+                    });
+                    Program.Container.RegisterInstance("InitialBet", hands[index].InitialBet);
+                    var half = Program.Container.Resolve<Hand>();
                     hands.Insert(index + 1, half);
                     hands[index].Cards.RemoveAt(0);
                     hands[index].Cards.Add(deck[0]);
@@ -245,7 +247,6 @@ namespace Task3
             Console.WriteLine($"New card is {deck[0]}.");
             hands[index].Cards.Add(deck[0]);
             deck.RemoveAt(0);
-            // Console.WriteLine($"New Score is {Card.GetScore(hands[index].Cards)}.");
         }
 
         static List<Hand> GetHands(IList<AbstractPlayer> players, IReadOnlyList<uint> bets, IList<Card> deck)
@@ -253,15 +254,15 @@ namespace Task3
             var hands = new List<Hand>();
             for (int i = 0; i < players.Count; i++)
             {
-                hands.Add(new Hand(
-                    players[i],
-                    new List<Card>
-                    {
-                        deck[0],
-                        deck[1]
-                    },
-                    bets[i]
-                ));
+                Program.Container.RegisterInstance("Owner", players[i]);
+                Program.Container.RegisterInstance("Cards", new List<Card>
+                {
+                    deck[0],
+                    deck[1]
+                });
+                Program.Container.RegisterInstance("InitialBet", bets[i]);
+                var hand = Program.Container.Resolve<Hand>();
+                hands.Add(hand);
                 Console.WriteLine(
                     $"{players[i].Name} got {deck[0]} and {deck[1]} (score: {CardUtils.GetScore(hands[i].Cards)})");
                 deck.RemoveAt(0);

@@ -10,14 +10,16 @@ namespace Task3
     {
         const uint MaxPlayers = 10;
 
+        public static IUnityContainer Container { get; private set; }
+
         static void Main()
         {
-            var container = new UnityContainer().LoadConfiguration();
-
-            PlayGame(container);
+            Container = new UnityContainer().LoadConfiguration();
+            
+            PlayGame();
         }
 
-        static void PlayGame(IUnityContainer container)
+        static void PlayGame()
         {
             Console.WriteLine("==-== BlackJack ==-==");
             Console.WriteLine();
@@ -30,7 +32,7 @@ namespace Task3
             uint nonHumanplayers;
             if (humanParticipates)
             {
-                var humanPlayer = container.Resolve<AbstractPlayer>("HumanPlayer");
+                var humanPlayer = Container.Resolve<AbstractPlayer>("HumanPlayer");
                 players.Add(humanPlayer);
                 nonHumanplayers = playerCount - 1;
             }
@@ -52,15 +54,15 @@ namespace Task3
                     case 1:
                         count = players.OfType<SameAsDealerBotPlayer>().Count();
                         name = $"Same-as-dealer bot{(count == 0 ? "" : $" #{count + 1}")}";
-                        container.RegisterInstance("BotName", name);
-                        player = container.Resolve<AbstractPlayer>("SameAsDealerBotPlayer");
+                        Container.RegisterInstance("BotName", name);
+                        player = Container.Resolve<AbstractPlayer>("SameAsDealerBotPlayer");
                         players.Add(player);
                         break;
                     case 2:
                         count = players.OfType<VeryBraveBotPlayer>().Count();
                         name = $"Very brave bot{(count == 0 ? "" : $" #{count + 1}")}";
-                        container.RegisterInstance("BotName", name);
-                        player = container.Resolve<AbstractPlayer>("VeryBraveBotPlayer");
+                        Container.RegisterInstance("BotName", name);
+                        player = Container.Resolve<AbstractPlayer>("VeryBraveBotPlayer");
                         players.Add(player);
                         break;
                     default:

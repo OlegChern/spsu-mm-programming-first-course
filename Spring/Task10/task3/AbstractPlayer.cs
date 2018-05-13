@@ -40,6 +40,7 @@ namespace Task3
                     list.Add(action);
                 }
             }
+
             return list;
         }
 
@@ -49,6 +50,7 @@ namespace Task3
             {
                 Console.Write(message);
             }
+
             for (int i = 0; i < hand.Count; i++)
             {
                 Console.Write(hand[i]);
@@ -74,7 +76,8 @@ namespace Task3
             {
                 throw new ArgumentException($"{Name} can't afford to pay that!");
             }
-            Money = (uint)(newSum);
+
+            Money = (uint) newSum;
             Console.WriteLine("{0} now {1} {2}$", Name, Name == "You" ? "have" : "has", Money);
         }
 
