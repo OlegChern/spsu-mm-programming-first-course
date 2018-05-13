@@ -65,7 +65,7 @@ public class BitMapInfoHeader {
     }
 
     public byte[] toByte(ByteOrder byteOrder) {
-        ByteBuffer buffer = ByteBuffer.allocate(50);
+        ByteBuffer buffer = ByteBuffer.allocate(40);
         buffer.order(byteOrder);
 
         buffer.putInt(Size);

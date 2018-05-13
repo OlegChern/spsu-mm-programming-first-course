@@ -1,7 +1,6 @@
 package Image;
 
 import java.security.InvalidParameterException;
-import java.util.function.BiFunction;
 
 
 public class
