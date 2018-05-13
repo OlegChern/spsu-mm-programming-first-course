@@ -118,6 +118,10 @@ namespace ChatLib
                         result = tmpPortVal;
                         isInitCorrect = true;
                     }
+                    else
+                    {
+                        throw new Exception();
+                    }
                 }
                 catch (Exception e)
                 {

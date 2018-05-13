@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Exception = System.Exception;
 
 namespace ChatLib
 {
@@ -20,11 +16,25 @@ namespace ChatLib
         public bool IsLeave { get; private set; }
         public IPEndPoint LastConnect { get; private set; }
         #endregion
-        
+
         public Client()
         {
             connectedClientsIP = new List<IPEndPoint>();
             listeningIPEndPoint = GetLocalIPEndPoint(ChatWindow.GetPortValue());
+            bool isPortCorrect = false;
+            while (!isPortCorrect)
+            {
+                try
+                {
+                    listeningSocket.Bind(listeningIPEndPoint);
+                    isPortCorrect = true;
+                }
+                catch (SocketException e)
+                {
+                    Console.WriteLine("This port is used by someone else");
+                    listeningIPEndPoint = GetLocalIPEndPoint(ChatWindow.GetPortValue());
+                }
+            }
         }
 
         public void StartWaiting()
@@ -94,12 +104,11 @@ namespace ChatLib
 
             listeningSocket.SendTo(data, ip);
         }
-        
+
         private void Wait()
         {
             try
             {
-                listeningSocket.Bind(listeningIPEndPoint);
                 while (true)
                 {
                     StringBuilder inputMessage = new StringBuilder();
@@ -115,25 +124,30 @@ namespace ChatLib
 
                     IPEndPoint senderIP = tmpIP as IPEndPoint;
 
-                    ConnectionManager.ProccessMessage(inputMessage,this);
+                    ConnectionManager.ProccessMessage(inputMessage, this);
 
                     if (inputMessage[0] != '*' && inputMessage[0] != '+' && inputMessage[0] != '-')
                     {
                         Console.WriteLine("[{0}:{1}] - {2}", senderIP.Address.ToString(),
                             senderIP.Port, inputMessage.ToString());
                     }
-
                 }
             }
             catch (SocketException e)
             {
-                Disconnect();
-                IsLeave = true;
-                Console.WriteLine(e.Message);
+                if (e.ErrorCode == 10054)
+                {
+                    connectedClientsIP.Remove(LastConnect);
+                    Console.WriteLine("This address is not used by anyone");
+                    StartWaiting();
+                }
+                else
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
-
         }
-        
+
         private IPEndPoint GetLocalIPEndPoint(int port)
         {
             IPEndPoint result = null;
@@ -159,6 +173,3 @@ namespace ChatLib
         }
     }
 }
-
-
-
