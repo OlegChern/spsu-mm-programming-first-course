@@ -3,8 +3,7 @@ package Image;
 import java.security.InvalidParameterException;
 
 
-public class
-Filter {
+public class Filter {
 
     private final double[][] coefficients;
     private final int sizeX;
