@@ -63,6 +63,7 @@ namespace WindowsForms
             {
                 Dock = DockStyle.Fill
             };
+            box.DropDownStyle = ComboBoxStyle.DropDownList;
             box.Items.AddRange(new Curve[] { new Ellips(), new Hyperbola(), new Parabola()});
             box.MouseWheel += (sender, args) =>
             {
@@ -104,7 +105,7 @@ namespace WindowsForms
             PaintSystem();
             if ((PositivePoints.Count() != 0) && (NegativePoints.Count() != 0))
             {
-                if (Curve is Ellips)
+                if (Curve.IsClosed)
                 {
                     Graphic.DrawClosedCurve(penGraph, PositivePoints.Concat(NegativePoints).ToArray());
                 }

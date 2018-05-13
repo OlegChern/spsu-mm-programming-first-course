@@ -8,6 +8,8 @@ namespace BlackJack
 {
     public class Dealer : Human
     {
+        public override bool IsBot => true;
+
         public override string IsNext()
         {
             if (Sum < 17)

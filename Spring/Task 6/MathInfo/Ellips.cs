@@ -8,7 +8,9 @@ namespace MathInfo
 {
     public class Ellips : Curve
     {
-        public override string Name { get => "Эллипс"; }
+        public override string Name => "Эллипс"; 
+
+        public override bool IsClosed => true;
 
         protected override double RightPart(double x)
         {

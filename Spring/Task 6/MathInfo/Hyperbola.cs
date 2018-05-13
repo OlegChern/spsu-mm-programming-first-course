@@ -8,7 +8,9 @@ namespace MathInfo
 {
     public class Hyperbola : Curve
     {
-        public override string Name { get => "Сопряженная гипербола"; }
+        public override string Name => "Сопряженная гипербола";
+
+        public override bool IsClosed => false;
 
         protected override double RightPart(double x)
         {

@@ -13,6 +13,8 @@ namespace MathInfo
     {
         protected abstract double RightPart(double x);
 
+        public abstract bool IsClosed { get; }
+
         public List<Point> PositivePoints { get; private set; }
 
         public List<Point> NegativePoints { get; private set; }

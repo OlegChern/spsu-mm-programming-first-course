@@ -8,7 +8,9 @@ namespace MathInfo
 {
     public class Parabola : Curve
     {
-        public override string Name { get => "Парабола"; }
+        public override string Name => "Парабола";
+
+        public override bool IsClosed => false;
 
         protected override double RightPart(double x)
         {

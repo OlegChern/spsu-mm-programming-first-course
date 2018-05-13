@@ -10,7 +10,7 @@ namespace Wpf
     public class CurveInfo
 
     {
-        public Curve BoxCurve { get; set; }
+        public static Curve BoxCurve { get; set; }
 
         public List<Curve> ListCurves { get; set; }
 

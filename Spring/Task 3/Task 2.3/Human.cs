@@ -8,7 +8,7 @@ namespace BlackJack
 {
     public abstract class Human
     {
-        public bool IsBot { get; set; }
+        public abstract bool IsBot { get; }
 
         public int CountParty { get; set; }
 

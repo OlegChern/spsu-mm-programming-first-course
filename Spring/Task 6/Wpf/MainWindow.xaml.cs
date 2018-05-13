@@ -26,8 +26,6 @@ namespace Wpf
 
         public PointCollection NegativePoints { get; private set; }
 
-        public CurveInfo Curve { get; private set; }
-
         public System.Windows.Size StartSize { get; private set; }
 
         private double scalePaint;
@@ -57,7 +55,6 @@ namespace Wpf
         public MainWindow()
         {
             InitializeComponent();
-            Curve = new CurveInfo();
             ScalePaint = 0.5;
             Loaded += (sender, args) => StartSize = new System.Windows.Size(graphic.ActualWidth, graphic.ActualHeight);
             MouseWheel += (sender, args) => 
@@ -79,7 +76,7 @@ namespace Wpf
 
         public void ChangeGraphic(object sender, EventArgs args)
         {
-            Curve.BoxCurve = (Curve)(((ComboBox)sender).SelectedItem);
+            CurveInfo.BoxCurve = (Curve)(((ComboBox)sender).SelectedItem);
             Paint();
         }
 
@@ -88,9 +85,9 @@ namespace Wpf
             var region = new MathInfo.Region(new System.Drawing.Point(0, 0), new System.Drawing.Point((int)gridColumn.ActualWidth, (int)gridRow.ActualHeight));
             PositivePoints = new PointCollection();
             NegativePoints = new PointCollection();
-            Curve.BoxCurve.BuildCurve(region, ScalePaint);
-            Curve.BoxCurve.PositivePoints.ForEach(p => PositivePoints.Add(new System.Windows.Point(p.X, p.Y)));
-            Curve.BoxCurve.NegativePoints.ForEach(p => NegativePoints.Add(new System.Windows.Point(p.X, p.Y)));
+            CurveInfo.BoxCurve.BuildCurve(region, ScalePaint);
+            CurveInfo.BoxCurve.PositivePoints.ForEach(p => PositivePoints.Add(new System.Windows.Point(p.X, p.Y)));
+            CurveInfo.BoxCurve.NegativePoints.ForEach(p => NegativePoints.Add(new System.Windows.Point(p.X, p.Y)));
             graphic.RenderTransform = new TranslateTransform(region.Width / 2, region.Height / 2);
             graphicSystem.RenderTransform = new TranslateTransform(region.Width / 2, region.Height / 2);
         }
@@ -109,9 +106,9 @@ namespace Wpf
             if ((PositivePoints.Count != 0) && (NegativePoints.Count != 0))
             {
                 PolyLineSegment segmentPositive = new PolyLineSegment() { Points = PositivePoints };
-                LineSegment segmentInvisible = new LineSegment() { Point = NegativePoints.First(), IsStroked = (Curve.BoxCurve is Ellips) ? true : false };
+                LineSegment segmentInvisible = new LineSegment() { Point = NegativePoints.First(), IsStroked = CurveInfo.BoxCurve.IsClosed};
                 PolyLineSegment segmentNegative = new PolyLineSegment() { Points = NegativePoints };
-                PathFigure graph = new PathFigure() { IsClosed = (Curve.BoxCurve is Ellips) ? true : false, StartPoint = segmentPositive.Points.First() };
+                PathFigure graph = new PathFigure() { IsClosed = CurveInfo.BoxCurve.IsClosed, StartPoint = segmentPositive.Points.First() };
                 graph.Segments.Add(segmentPositive);
                 graph.Segments.Add(segmentInvisible);
                 graph.Segments.Add(segmentNegative);

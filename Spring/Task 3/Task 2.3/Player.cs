@@ -8,10 +8,11 @@ namespace BlackJack
 {
     public class Player : Human, IPlayer
     {
+        public override bool IsBot => false;
+
         public Player() : base()
         {
             Chips = 1000;
-            IsBot = false;
         }
 
         public bool MakeBet()
