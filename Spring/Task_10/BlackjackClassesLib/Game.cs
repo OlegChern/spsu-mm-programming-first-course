@@ -2,7 +2,7 @@
 {
     public class Game
     {
-        public Deck GameDeck { get; }
+        public Deck GameDeck { get; set; }
 
         public Game(int numberOfDecks)
         {
