@@ -25,8 +25,8 @@ namespace WinFormsTechnology
 
             // events
             CurveListComboBox.SelectedIndexChanged += new EventHandler(model.ComboBoxSelectedIndexChanged);
-            BtnScaleUp.Click += new EventHandler(model.BtnScaleUpClick);
-            BtnScaleDown.Click += new EventHandler(model.BtnScaleDownClick);
+            BtnScaleUp.Click += new EventHandler(model.ScaleUp);
+            BtnScaleDown.Click += new EventHandler(model.ScaleDown);
 
             // events
             model.EnableScaleDownBtn += (bool x) => BtnScaleDown.Enabled = x;

@@ -219,7 +219,7 @@ namespace WinFormsTechnology
         /// <summary>
         /// Scaling up event
         /// </summary>
-        public void BtnScaleUpClick(object sender, EventArgs e)
+        public void ScaleUp(object sender, EventArgs e)
         {
             if (scale <= MinScale)
             {
@@ -237,7 +237,7 @@ namespace WinFormsTechnology
         /// <summary>
         /// Scaling down event
         /// </summary>
-        public void BtnScaleDownClick(object sender, EventArgs e)
+        public void ScaleDown(object sender, EventArgs e)
         {
             if (scale >= MaxScale)
             {
