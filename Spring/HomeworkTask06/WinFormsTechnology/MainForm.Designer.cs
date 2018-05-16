@@ -59,6 +59,7 @@
             // 
             // CurveListComboBox
             // 
+            this.CurveListComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.CurveListComboBox.FormattingEnabled = true;
             this.CurveListComboBox.Location = new System.Drawing.Point(11, 43);
             this.CurveListComboBox.Name = "CurveListComboBox";
