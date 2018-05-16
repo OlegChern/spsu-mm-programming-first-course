@@ -24,9 +24,12 @@ namespace AlgebraicCurveLibrary
         /// <summary>
         /// Returns step for calculation
         /// </summary>
-        protected float CalculateEpsilon(float bound)
+        protected float CalculateEpsilon(Vector2 upperLeft, Vector2 lowerRight)
         {
-            return Math.Abs(bound) / PointsCount;
+            float maxX = Math.Max(Math.Abs(upperLeft.X), Math.Abs(lowerRight.X));
+            float maxY = Math.Max(Math.Abs(upperLeft.Y), Math.Abs(lowerRight.Y));
+
+            return Math.Max(maxX, maxY) / PointsCount;
         }
     }
 }

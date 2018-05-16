@@ -37,10 +37,10 @@ namespace AlgebraicCurveLibrary.Exapmles
             List<PointF> leftPoints = new List<PointF>();
             List<PointF> rightPoints = new List<PointF>();
 
-            float epsilon = CalculateEpsilon(upperLeft.X);
+            float epsilon = CalculateEpsilon(upperLeft, lowerRight);
 
             // left part
-            CalculateHyberbolaPoints(leftPoints, upperLeft.X, -a, epsilon);
+            CalculateHyberbolaPoints(leftPoints, upperLeft.X > lowerRight.X ? upperLeft.X : lowerRight.X, -a, epsilon);
 
             // right part, just invert x axis
             for (int i = 0; i < leftPoints.Count; i++)
@@ -57,7 +57,7 @@ namespace AlgebraicCurveLibrary.Exapmles
 
         private void CalculateHyberbolaPoints(List<PointF> list, float bound, float vertex, float epsilon)
         {
-            float x = bound;
+            float x = bound > 0 ? -bound : bound;
 
             // upper part
             while (Math.Abs(x) > Math.Abs(vertex))

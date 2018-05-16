@@ -33,7 +33,7 @@ namespace AlgebraicCurveLibrary.Exapmles
         {
             List<PointF> points = new List<PointF>();
 
-            float epsilon = CalculateEpsilon(upperLeft.X);
+            float epsilon = CalculateEpsilon(upperLeft, lowerRight);
 
             CalculateParabolaPoints(points, lowerRight.X, epsilon);
 
