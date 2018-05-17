@@ -44,6 +44,16 @@
         }
 
         /// <summary>
+        /// Creates ellipse
+        /// </summary>
+        /// <param name="a">semi-major axis</param>
+        /// <param name="b">semi-minor axis</param>
+        public Ellipse(float a, float b) : base("Ellipse", DrawableCurveType.Ellipse)
+        {
+            boundingBox = new Vector2(a, b);
+        }
+
+        /// <summary>
         /// Creates ellipse with default parameters
         /// </summary>
         public Ellipse() : this("Ellipse", DefaultBoundingBox) { }
