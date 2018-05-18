@@ -51,5 +51,7 @@ namespace Task5
         /// <param name="message">Text to be sent</param>
         /// <param name="ignore">Connection with device to be ignored</param>
         public abstract Task Send(string message, Socket ignore);
+
+        public abstract void SendDisconnectNotifications();
     }
 }

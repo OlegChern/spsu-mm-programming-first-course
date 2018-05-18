@@ -1,16 +1,19 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using Task5.Events;
 
 namespace Task5
 {
-    sealed class Client : AbstractClient
+    public sealed class Client : AbstractClient
     {
         const int BufferSize = 1024;
 
@@ -31,6 +34,68 @@ namespace Task5
 
         string IpAddressMessage => outcomingConnection?.LocalEndPoint?.ToString();
 
+        // ==== disconnection management ====
+
+        Socket GetAnyConnectedDevice()
+        {
+            if (!HasConnections)
+            {
+                throw new InvalidOperationException("No connections");
+            }
+
+            // Doesn't throw
+            return HasOutcomingConnection ? outcomingConnection : incomingConnections[0];
+        }
+
+        const string DisconnectingMessageStart = "I am disconnecting and politely ask you to connect to ";
+        const string DisconnectingMessagePattern = DisconnectingMessageStart + @"'(.{1,})':'(\d{1,})'";
+
+        [Pure]
+        public static bool IsDisconnectingMessage(string message)
+        {
+            return Regex.IsMatch(message, DisconnectingMessagePattern);
+        }
+
+        [Pure]
+        public static IPEndPoint ParseIpEndPoint(string message)
+        {
+            var match = Regex.Match(message, DisconnectingMessagePattern);
+
+            if (match.Success)
+            {
+                var address = IPAddress.Parse(match.Groups[1].Value);
+                int port = int.Parse(match.Groups[2].Value);
+                
+                var endPoint = new IPEndPoint(address, port);
+
+                return endPoint;
+            }
+            
+            throw new ArgumentException(nameof(message));
+        }
+
+        [Pure]
+        public static string MakeDisconnectingNotification(Socket target)
+        {
+            return DisconnectingMessageStart + '\'' + (target.RemoteEndPoint as IPEndPoint)?.Address + "':'" +
+                   (target.RemoteEndPoint as IPEndPoint)?.Port + '\'';
+        }
+
+        public override void SendDisconnectNotifications()
+        {
+            if (!HasConnections)
+            {
+                return;
+            }
+
+            var target = GetAnyConnectedDevice();
+            string message = MakeDisconnectingNotification(target);
+
+            Send(message, target).Ignore();
+        }
+
+        // ==== ====
+
         async void StartReceivingMessages(Socket socket)
         {
             byte[] array = new byte[BufferSize];
@@ -49,9 +114,8 @@ namespace Task5
                 {
                     bytesRead = await socket.ReceiveAsync(segment, SocketFlags.None);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    // MessageBox.Show($"One of devices must have been disconnected:{Environment.NewLine}{e}", "Error reading data");
                     StopHandling(socket);
                     return;
                 }
@@ -73,6 +137,13 @@ namespace Task5
                     return;
                 }
 
+                if (IsDisconnectingMessage(message))
+                {
+                    Disconnect();
+                    var remoteEndPoint = ParseIpEndPoint(message);
+                    await Connect(remoteEndPoint);
+                }
+
                 MessageReceived?.Invoke(this, new MessageReceivedEventArgs(message));
                 await Send(message, socket);
             }
@@ -91,7 +162,7 @@ namespace Task5
                 ConnectionsCountChanged?.Invoke(this, new ConnectionsCountChangedEventArgs(ConnectionsCount));
                 return;
             }
-            
+
             // throw new InvalidOperationException("StopHandling() was given a socket that doesn't belong to client");
             // MessageBox.Show("StopHandling() was given a socket that doesn't belong to client", "Warning");
         }
@@ -187,7 +258,7 @@ namespace Task5
 
         public override void TerminateIncomingConnections()
         {
-            // TODO: do I really need to lock?
+            // do I really need to lock?
             // Probably not, but I'm afraid to modify this old code
             lock (incomingConnections)
             {
@@ -213,26 +284,31 @@ namespace Task5
             // Establish the remote endpoint for the socket.    
             var ipHostInfo = Dns.GetHostEntry(ip);
             var ipAddress = ipHostInfo.AddressList[0];
-            var remoteEp = new IPEndPoint(ipAddress, port);
+            var remoteEndPoint = new IPEndPoint(ipAddress, port);
 
             var localHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            
+
             if (IsListening && ListeningPort == port &&
                 Equals(ipHostInfo.AddressList[0], localHostInfo.AddressList[0]))
             {
                 throw new InvalidOperationException("Cannot connect to itself");
             }
-            
-            // Create a TCP/IP socket.  
-            var client = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+
+            await Connect(remoteEndPoint);
+        }
+
+        async Task Connect(EndPoint remoteEndPoint)
+        {
+            // Create a TCP/IP socket.
+            var client = new Socket(remoteEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
             // Connect to the remote endpoint. 
-            await client.ConnectAsync(remoteEp);
+            await client.ConnectAsync(remoteEndPoint);
 
             outcomingConnection = client;
 
             StartReceivingMessages(client);
-            
+
             // This action should terminate current connection if loops are present
             await Send(IpAddressMessage);
 
@@ -241,16 +317,16 @@ namespace Task5
 
         public override void Disconnect()
         {
-            if (!HasOutcomingConnection)
-            {
-                throw new InvalidOperationException("Should connect before disconnecting.");
-            }
+            bool actuallyDisconnecting = HasOutcomingConnection;
 
-            outcomingConnection.Shutdown(SocketShutdown.Both);
-            outcomingConnection.Close();
+            outcomingConnection?.Shutdown(SocketShutdown.Both);
+            outcomingConnection?.Close();
             outcomingConnection = null;
 
-            ConnectionsCountChanged?.Invoke(this, new ConnectionsCountChangedEventArgs(ConnectionsCount));
+            if (actuallyDisconnecting)
+            {
+                ConnectionsCountChanged?.Invoke(this, new ConnectionsCountChangedEventArgs(ConnectionsCount));
+            }
         }
 
         public override Task Send(string message)

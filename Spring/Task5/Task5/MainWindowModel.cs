@@ -38,6 +38,8 @@ namespace Task5
 
         void OnWindowClosing(object sender, CancelEventArgs args)
         {
+            Client.SendDisconnectNotifications();
+            
             if (Client.IsListening)
             {
                 Client.StopListening();
