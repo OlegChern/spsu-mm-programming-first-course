@@ -1,0 +1,11 @@
+x64
+
+Debug
+.vs
+*.filters
+*.user
+*.bmp
+*.txt
+bin
+obj
+*.*db
