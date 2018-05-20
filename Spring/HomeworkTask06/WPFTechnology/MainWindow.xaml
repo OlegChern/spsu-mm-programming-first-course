@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPFTechnology"
         mc:Ignorable="d"
-        Title="Algebraic Curve" Height="400" Width="600" MinHeight="400" MinWidth="600">
+        Title="Algebraic Curve" Height="400" Width="600" ResizeMode="NoResize">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="150"/>
@@ -38,6 +38,8 @@
                 HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,-450,-250" 
                 ClipToBounds="True"
                 Height="300" Width="300">
+            <Line X1="150" X2="150" Y1="0" Y2="300" Stroke="Gray"></Line>
+            <Line X1="0" X2="300" Y1="150" Y2="150" Stroke="Gray"></Line>
             <Path Name="DrawingPath" Stroke="Black" StrokeThickness="1"/>
         </Canvas>
     </Grid>

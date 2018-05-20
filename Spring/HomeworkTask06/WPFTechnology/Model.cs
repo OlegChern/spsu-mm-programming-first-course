@@ -26,8 +26,8 @@ namespace WPFTechnology
 
         #region constants
         const float ScaleMultiplier = 1.25f;
-        const int MaxScalePower = 10;
-        const int MinScalePower = -10;
+        const int MaxScalePower = 5;
+        const int MinScalePower = -5;
         #endregion
 
         #region fields
