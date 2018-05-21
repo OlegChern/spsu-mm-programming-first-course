@@ -25,9 +25,9 @@ namespace HomeworkTask10
 
             for (int i = 0; i < 40; i++)
             {
-                bots[0] = container.Resolve<FearfulBot>();
-                bots[1] = container.Resolve<RiskyBot>();
-                bots[2] = container.Resolve<SmartBot>();
+                bots[0] = container.Resolve<Player>("fearfulBot");
+                bots[1] = container.Resolve<Player>("riskyBot");
+                bots[2] = container.Resolve<Player>("smartBot");
 
                 Game.Instance.Start(bots);
 
