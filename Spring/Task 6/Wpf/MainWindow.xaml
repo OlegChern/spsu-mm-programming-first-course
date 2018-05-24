@@ -7,10 +7,10 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="550" Width="1000">
 
+    <Window.Resources>
+        <local:CurveInfo x:Key="Curves"/>
+    </Window.Resources>
     <Grid>
-        <Grid.Resources>
-            <local:CurveInfo x:Key="Curves"/>
-        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="22"></RowDefinition>
             <RowDefinition Name="gridRow" Height="*"></RowDefinition>
@@ -19,7 +19,7 @@
             <ColumnDefinition Name="gridColumn" Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <ComboBox Name="Box" SelectionChanged = "ChangeGraphic" Grid.Row="0"
-                  DataContext="{StaticResource Curves}" Panel.ZIndex="1"
+                  DataContext="{DynamicResource Curves}" Panel.ZIndex="1"
                   SelectedItem="{Binding BoxCurve , Mode=TwoWay}" ItemsSource="{Binding ListCurves}">
         </ComboBox>
         <Path Name="graphicSystem" Grid.Row="1" Stroke="Black"/>

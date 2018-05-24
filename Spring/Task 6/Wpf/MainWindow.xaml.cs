@@ -76,7 +76,7 @@ namespace Wpf
 
         public void ChangeGraphic(object sender, EventArgs args)
         {
-            CurveInfo.BoxCurve = (Curve)(((ComboBox)sender).SelectedItem);
+            ((CurveInfo)Resources["Curves"]).BoxCurve = (Curve)(((ComboBox)sender).SelectedItem);
             Paint();
         }
 
@@ -85,9 +85,9 @@ namespace Wpf
             var region = new MathInfo.Region(new System.Drawing.Point(0, 0), new System.Drawing.Point((int)gridColumn.ActualWidth, (int)gridRow.ActualHeight));
             PositivePoints = new PointCollection();
             NegativePoints = new PointCollection();
-            CurveInfo.BoxCurve.BuildCurve(region, ScalePaint);
-            CurveInfo.BoxCurve.PositivePoints.ForEach(p => PositivePoints.Add(new System.Windows.Point(p.X, p.Y)));
-            CurveInfo.BoxCurve.NegativePoints.ForEach(p => NegativePoints.Add(new System.Windows.Point(p.X, p.Y)));
+            ((CurveInfo)Resources["Curves"]).BoxCurve.BuildCurve(region, ScalePaint);
+            ((CurveInfo)Resources["Curves"]).BoxCurve.PositivePoints.ForEach(p => PositivePoints.Add(new System.Windows.Point(p.X, p.Y)));
+            ((CurveInfo)Resources["Curves"]).BoxCurve.NegativePoints.ForEach(p => NegativePoints.Add(new System.Windows.Point(p.X, p.Y)));
             graphic.RenderTransform = new TranslateTransform(region.Width / 2, region.Height / 2);
             graphicSystem.RenderTransform = new TranslateTransform(region.Width / 2, region.Height / 2);
         }
@@ -106,9 +106,9 @@ namespace Wpf
             if ((PositivePoints.Count != 0) && (NegativePoints.Count != 0))
             {
                 PolyLineSegment segmentPositive = new PolyLineSegment() { Points = PositivePoints };
-                LineSegment segmentInvisible = new LineSegment() { Point = NegativePoints.First(), IsStroked = CurveInfo.BoxCurve.IsClosed};
+                LineSegment segmentInvisible = new LineSegment() { Point = NegativePoints.First(), IsStroked = ((CurveInfo)Resources["Curves"]).BoxCurve.IsClosed};
                 PolyLineSegment segmentNegative = new PolyLineSegment() { Points = NegativePoints };
-                PathFigure graph = new PathFigure() { IsClosed = CurveInfo.BoxCurve.IsClosed, StartPoint = segmentPositive.Points.First() };
+                PathFigure graph = new PathFigure() { IsClosed = ((CurveInfo)Resources["Curves"]).BoxCurve.IsClosed, StartPoint = segmentPositive.Points.First() };
                 graph.Segments.Add(segmentPositive);
                 graph.Segments.Add(segmentInvisible);
                 graph.Segments.Add(segmentNegative);
