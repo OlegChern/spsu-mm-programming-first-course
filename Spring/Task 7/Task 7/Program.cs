@@ -17,27 +17,27 @@ namespace Program
             hashTable.Print();
 
             Console.WriteLine("Добавление элементов:");
-            hashTable.SetValue("Ключ", new TestClass());
-            hashTable.SetValue("Собака", new TestClass());
-            hashTable.SetValue("Монета", new TestClass());
-            hashTable.SetValue("Стол", new TestClass());
-            hashTable.SetValue("Стул", new TestClass());
-            hashTable.SetValue("Задача", new TestClass());
+            hashTable.SetValue("Ключ", new TestClass(2));
+            hashTable.SetValue("Собака", new TestClass(3));
+            hashTable.SetValue("Монета", new TestClass(4));
+            hashTable.SetValue("Стол", new TestClass(5));
+            hashTable.SetValue("Стул", new TestClass(1));
+            hashTable.SetValue("Задача", new TestClass(4));
             hashTable.Print();
-
+           
             Console.WriteLine("Перебалансировка таблицы:");
-            hashTable.SetValue("qwerty", new TestClass());
-            hashTable.SetValue("1234", new TestClass());
-            hashTable.SetValue("wasd", new TestClass());
-            hashTable.SetValue("GGGGG", new TestClass());
-            hashTable.SetValue("777", new TestClass());
-            hashTable.SetValue("****", new TestClass());
+            hashTable.SetValue("qwerty", new TestClass(35));
+            hashTable.SetValue("1234", new TestClass(45));
+            hashTable.SetValue("wasd", new TestClass(23));
+            hashTable.SetValue("GGGGG", new TestClass(15));
+            hashTable.SetValue("777", new TestClass(46));
+            hashTable.SetValue("****", new TestClass(33));
             hashTable.Print();
-
+            
             Console.WriteLine("Переопределение значений: qwerty, 1234 и ****");
-            hashTable.SetValue("qwerty", new TestClass());
-            hashTable.SetValue("1234", new TestClass());
-            hashTable.SetValue("****", new TestClass());
+            hashTable.SetValue("qwerty", new TestClass(54));
+            hashTable.SetValue("1234", new TestClass(34));
+            hashTable.SetValue("****", new TestClass(9));
             hashTable.Print();
 
             Console.WriteLine("Удаление элементов: Собака и Стол");
@@ -49,7 +49,17 @@ namespace Program
             Console.WriteLine("Элемент по ключу \"Ключ\": {0}", hashTable.ContainsKey("Ключ"));
             Console.WriteLine("Элемент по ключу \"Кошка\": {0}", hashTable.ContainsKey("Кошка"));
             Console.WriteLine("Элемент по ключу \"wasd\": {0}", hashTable.ContainsKey("wasd"));
-            Console.WriteLine("Элемент по ключу \"Стол\": {0}", hashTable.ContainsKey("Стол"));
+            Console.WriteLine("Элемент по ключу \"Стол\": {0}\n", hashTable.ContainsKey("Стол"));
+
+            Console.WriteLine("Хэш-таблица после сборки мусора, до истечения TimeStorage");
+            GC.Collect();
+            hashTable.Print();
+
+            Thread.Sleep(3000);
+
+            Console.WriteLine("Хэш-таблица после сборки мусора, после истечения TimeStorage");
+            GC.Collect();
+            hashTable.Print();
         }
     }
 }

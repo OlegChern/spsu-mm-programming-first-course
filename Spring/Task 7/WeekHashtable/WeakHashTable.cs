@@ -12,9 +12,9 @@ namespace WeakHashtable
     {       
         public int TableSize { get; private set; }
 
-        public int MaxSizeRow { get; private set; }
+        public int MaxSizeRow { get; }
       
-        public int TimeStorage { get; private set; }
+        public int TimeStorage { get; }
 
         public  List<Element<T>>[] HashTable { get; private set; }
 
@@ -48,10 +48,12 @@ namespace WeakHashtable
             {
                 z.ForEach(e =>
                 {
-                    if (e.RefValue.TryGetTarget(out T value))
+                    e.RefValue.TryGetTarget(out var value);
+                    if (value != null)
                     {
                         Add(newHashTable, e.Key, value);
                     }
+                    value = null;
                 });
             });
             HashTable = newHashTable;
@@ -70,7 +72,7 @@ namespace WeakHashtable
             table[Hash(key)].Add(new Element<T>(key, value));
         }
 
-        public void SetValue(string key, T value)
+        public async void SetValue(string key, T value)
         {
             Add(HashTable, key, value);
 
@@ -79,7 +81,7 @@ namespace WeakHashtable
                 Rebalanced();
             }
 
-            //await Task.Delay(TimeStorage);
+            await Task.Delay(TimeStorage);
         }
 
         public bool Remove(string key)
@@ -107,7 +109,8 @@ namespace WeakHashtable
             {
                 if (z.Key == key)
                 {
-                    result = z.RefValue.TryGetTarget(out T target);
+                    result = z.RefValue.TryGetTarget(out var target);
+                    target = null;
                     break;
                 }
             };
@@ -137,14 +140,8 @@ namespace WeakHashtable
                 foreach(var e in HashTable[i])
                 {
                     Console.Write(" -> (\"{0}\"", e.Key);
-                    if (e.RefValue.TryGetTarget(out T value))
-                    {
-                        Console.Write(", {0})", value);
-                    }
-                    else
-                    {
-                        Console.Write(", )");
-                    }
+                    e.RefValue.TryGetTarget(out T value);
+                    Console.Write(", {0})", value);
                 }
                 Console.WriteLine();
             }

@@ -8,13 +8,11 @@ namespace Program
 {
     public class TestClass
     {
-        static Random random = new Random();
-
         public int Value { get; set; }
 
-        public TestClass()
+        public TestClass(int value)
         {
-            Value = random.Next() % 100;
+            Value = value;
         }
 
         public override string ToString()
