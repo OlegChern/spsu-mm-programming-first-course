@@ -16,7 +16,12 @@ namespace Bash.Commands
         {
             try
             {
-                Process.Start(argument);
+                var process = new Process();
+
+                process.StartInfo = new ProcessStartInfo(argument);
+                process.StartInfo.UseShellExecute = false;
+
+                process.Start();
             }
             catch
             {

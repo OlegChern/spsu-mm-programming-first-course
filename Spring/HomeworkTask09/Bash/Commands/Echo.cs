@@ -1,7 +1,8 @@
-﻿using System;
-
-namespace Bash.Commands
+﻿namespace Bash.Commands
 {
+    /// <summary>
+    /// Shows argument(-s)
+    /// </summary>
     class Echo : ICommand
     {
         string argument;
@@ -13,7 +14,7 @@ namespace Bash.Commands
 
         public void Execute()
         {
-            Console.WriteLine(argument);
+            Bash.Instance.Printer.Print(argument);
         }
     }
 }

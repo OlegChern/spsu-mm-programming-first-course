@@ -1,18 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Bash.Commands
 {
+    /// <summary>
+    /// Shows number of strings, words and bytes
+    /// </summary>
     class Wc : ICommand
     {
         string path;
 
         public Wc(string path)
         {
+            if (path.Length == 0)
+            {
+                throw new ArgumentException("No arguments!");
+            }
+
             this.path = path;
         }
 
@@ -37,9 +41,9 @@ namespace Bash.Commands
                 wordsCount += (line.Split(' ')).Length;
             }
 
-            Console.WriteLine("Number of lines: " + lines.Length);
-            Console.WriteLine("Number of words: " + wordsCount);
-            Console.WriteLine("Number of bytes: " + bytesCount);
+            Bash.Instance.Printer.Print("Number of lines: " + lines.Length);
+            Bash.Instance.Printer.Print("Number of words: " + wordsCount);
+            Bash.Instance.Printer.Print("Number of bytes: " + bytesCount);
         }
     }
 }

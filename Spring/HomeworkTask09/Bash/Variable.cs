@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Bash
 {
-    struct Variable
+    class Variable
     {
         string name;
         string value;

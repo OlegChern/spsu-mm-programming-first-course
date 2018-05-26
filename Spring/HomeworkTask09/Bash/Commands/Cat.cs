@@ -1,18 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 
 namespace Bash.Commands
 {
+    /// <summary>
+    /// Shows file content
+    /// </summary>
     class Cat : ICommand
     {
         string path;
 
         public Cat(string path)
         {
+            if (path.Length == 0)
+            {
+                throw new ArgumentException("No arguments!");
+            }
+
             this.path = path;
         }
 
@@ -31,7 +35,7 @@ namespace Bash.Commands
 
             foreach (string line in lines)
             {
-                Console.WriteLine(line);
+                Bash.Instance.Printer.Print(line);
             }
         }
     }

@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Bash.Printing;
 
 namespace Bash
 {
     public class Bash
     {
         private bool isExecuting;
+
+        private IPrinter printer;
+        private IReader reader;
         private Context context;
+        private VariableContainer variables;
 
         private static Bash instance;
 
@@ -27,18 +28,65 @@ namespace Bash
             }
         }
 
+        public IReader Reader
+        {
+            get
+            {
+                return reader;
+            }
+            set
+            {
+                reader = value;
+            }
+        }
+
+        public IPrinter Printer
+        {
+            get
+            {
+                return printer;
+            }
+            set
+            {
+                printer = value;
+            }
+        }
+
+        internal VariableContainer Variables
+        {
+            get
+            {
+                return variables;
+            }
+        }
+
         private Bash()
         {
             isExecuting = false;
+
+            ConsoleUserInterface ui = new ConsoleUserInterface();
+            printer = ui;
+            reader = ui;
+
             context = new Context();
+            variables = new VariableContainer();
+        }
+
+        private Bash(IPrinter printer, IReader reader)
+        {
+            isExecuting = false;
+
+            this.printer = printer;
+            this.reader = reader;
+
+            context = new Context();
+            variables = new VariableContainer();
         }
 
         public void Start()
         {
-            Console.WriteLine("Bash started.");
+            printer.Print("Bash started.");
             ShowHelp();
-
-            List<Variable> variables = new List<Variable>();
 
             isExecuting = true;
 
@@ -46,10 +94,11 @@ namespace Bash
             {
                 try
                 {
-                    string str = Console.ReadLine();
+                    string str = reader.Read();
 
-                    ICommand command;
-                    if (Parser.Parse(str, out command))
+                    List<ICommand> commands = Parser.Parse(str);
+                    
+                    foreach(ICommand command in commands)
                     {
                         context.SetCommand(command);
                         context.ExecuteCommand();
@@ -57,7 +106,7 @@ namespace Bash
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("> " + ex.Message);
+                    printer.Print("> " + ex.Message);
                 }
             }
         }
@@ -69,16 +118,16 @@ namespace Bash
 
         private void ShowHelp()
         {
-            Console.WriteLine("Commands:");
-            Console.WriteLine("  echo - show argument(-s)");
-            Console.WriteLine("  exit - stop Bash");
-            Console.WriteLine("  pwd - show current directory");
-            Console.WriteLine("  cat[FILENAME] - show file content");
-            Console.WriteLine("  wc[FILENAME] - show number of strings, words and bytes");
+            printer.Print("Commands:");
+            printer.Print("  echo - show argument(-s)");
+            printer.Print("  exit - stop Bash");
+            printer.Print("  pwd - show current directory");
+            printer.Print("  cat[FILENAME] - show file content");
+            printer.Print("  wc[FILENAME] - show number of strings, words and bytes");
 
-            Console.WriteLine("Operators:");
-            Console.WriteLine("  $ - assigning and using of local variables");
-            Console.WriteLine("  | - commmands pipelining");
+            printer.Print("Operators:");
+            printer.Print("  $ - assigning and using of local variables");
+            printer.Print("  | - commmands pipelining");
         }
     }
 }

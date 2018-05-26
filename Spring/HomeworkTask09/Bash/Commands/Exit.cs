@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Bash.Commands
 {
+    /// <summary>
+    /// Stops Bash
+    /// </summary>
     class Exit : ICommand
     {
         public void Execute()
