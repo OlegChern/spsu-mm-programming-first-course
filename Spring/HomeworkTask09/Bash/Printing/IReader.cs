@@ -1,4 +1,4 @@
-﻿namespace Bash.Printing
+﻿namespace Bash
 {
     public interface IReader
     {

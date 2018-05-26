@@ -1,6 +1,7 @@
 ﻿using System;
+using Bash;
 
-namespace Bash.Printing
+namespace Program
 {
     public class ConsoleUserInterface : IPrinter, IReader
     {

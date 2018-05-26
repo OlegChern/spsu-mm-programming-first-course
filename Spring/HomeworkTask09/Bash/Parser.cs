@@ -1,11 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Bash.Commands;
 
 namespace Bash
 {
     static class Parser
     {
+        #region main
+        /// <summary>
+        /// Parses string to commands list
+        /// </summary>
+        /// <param name="str">string to parse</param>
+        /// <returns>list of commands to execute</returns>
         public static List<ICommand> Parse(string str)
         {
             List<ICommand> commands = new List<ICommand>();
@@ -65,74 +70,6 @@ namespace Bash
             return commands;
         }
 
-        private static void RemoveEmptyBeginning(ref string str)
-        {
-            int removeCount = 0;
-
-            while (str[removeCount] == ' ')
-            {
-                removeCount++;
-            }
-
-            if (removeCount > 0)
-            {
-                str = str.Remove(0, removeCount);
-            }
-        }
-
-        private static void ProcessUsing(string part, ref string argument)
-        {
-            if (part[0] == '$')
-            {
-                // remove '$'
-                string newPart = part.Remove(0, 1);
-
-                if (!newPart.Contains("="))
-                {
-                    // use variable
-                    Bash.Instance.Variables.GetValue(newPart, out argument);
-                }
-            }
-        }
-
-        private static bool ProcessAssigning(string part, List<ICommand> commands)
-        {
-            if (part[0] == '$')
-            {
-                // remove '$'
-                string newPart = part.Remove(0, 1);
-
-                if (newPart.Contains("="))
-                {
-                    // if contains then add split by '='
-                    // and add to variables list
-                    return SplitAssigning(newPart, commands);
-                }
-            }
-
-            return false;
-        }
-
-        private static bool SplitAssigning(string str, List<ICommand> commands)
-        {
-            string[] splittedPart = str.Split('=');
-
-            // must be 2 parts: ..=..
-            if (splittedPart.Length == 2)
-            {
-                // if name is not empty
-                if (splittedPart[0].Length > 0)
-                {
-                    // add variable
-                    commands.Add(new Assign(splittedPart[0], splittedPart[1]));
-
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         /// <summary>
         /// Try to process command
         /// </summary>
@@ -179,6 +116,80 @@ namespace Bash
 
             return false;
         }
+        #endregion
+
+        #region using variables
+        private static void ProcessUsing(string part, ref string argument)
+        {
+            if (part[0] == '$')
+            {
+                // remove '$'
+                string newPart = part.Remove(0, 1);
+
+                if (!newPart.Contains("="))
+                {
+                    // use variable
+                    Bash.Instance.Variables.GetValue(newPart, out argument);
+                }
+            }
+        }
+        #endregion
+
+        #region assigning variable
+        private static bool ProcessAssigning(string part, List<ICommand> commands)
+        {
+            if (part[0] == '$')
+            {
+                // remove '$'
+                string newPart = part.Remove(0, 1);
+
+                if (newPart.Contains("="))
+                {
+                    // if contains then add split by '='
+                    // and add to variables list
+                    return SplitAssigning(newPart, commands);
+                }
+            }
+
+            return false;
+        }
+
+        private static bool SplitAssigning(string str, List<ICommand> commands)
+        {
+            string[] splittedPart = str.Split('=');
+
+            // must be 2 parts: ..=..
+            if (splittedPart.Length == 2)
+            {
+                // if name is not empty
+                if (splittedPart[0].Length > 0)
+                {
+                    // add variable
+                    commands.Add(new Assign(splittedPart[0], splittedPart[1]));
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        #endregion
+
+        #region string modificators
+        private static void RemoveEmptyBeginning(ref string str)
+        {
+            int removeCount = 0;
+
+            while (str[removeCount] == ' ')
+            {
+                removeCount++;
+            }
+
+            if (removeCount > 0)
+            {
+                str = str.Remove(0, removeCount);
+            }
+        }
 
         /// <summary>
         /// Concatenates string arrays
@@ -194,5 +205,6 @@ namespace Bash
 
             return result;
         }
+        #endregion
     }
 }

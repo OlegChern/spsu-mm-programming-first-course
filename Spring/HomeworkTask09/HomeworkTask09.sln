@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bash", "Bash\Bash.csproj", "{851E794D-B806-4F41-BD49-7C49703DD9CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Program", "Program\Program.csproj", "{EDF3AFE6-BFAD-41D4-8ABB-4A5A50CC7434}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{851E794D-B806-4F41-BD49-7C49703DD9CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{851E794D-B806-4F41-BD49-7C49703DD9CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{851E794D-B806-4F41-BD49-7C49703DD9CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDF3AFE6-BFAD-41D4-8ABB-4A5A50CC7434}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDF3AFE6-BFAD-41D4-8ABB-4A5A50CC7434}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDF3AFE6-BFAD-41D4-8ABB-4A5A50CC7434}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDF3AFE6-BFAD-41D4-8ABB-4A5A50CC7434}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

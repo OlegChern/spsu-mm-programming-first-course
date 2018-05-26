@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Bash.Printing;
 
 namespace Bash
 {
     public class Bash
     {
+        #region fields
         private bool isExecuting;
 
         private IPrinter printer;
@@ -14,7 +14,12 @@ namespace Bash
         private VariableContainer variables;
 
         private static Bash instance;
+        #endregion
 
+        #region properties
+        /// <summary>
+        /// Current instance
+        /// </summary>
         public static Bash Instance
         {
             get
@@ -28,6 +33,9 @@ namespace Bash
             }
         }
 
+        /// <summary>
+        /// Class for reading
+        /// </summary>
         public IReader Reader
         {
             get
@@ -40,6 +48,9 @@ namespace Bash
             }
         }
 
+        /// <summary>
+        /// Class for printing
+        /// </summary>
         public IPrinter Printer
         {
             get
@@ -59,31 +70,25 @@ namespace Bash
                 return variables;
             }
         }
+        #endregion
 
+        #region constructor
         private Bash()
         {
             isExecuting = false;
 
-            ConsoleUserInterface ui = new ConsoleUserInterface();
-            printer = ui;
-            reader = ui;
-
             context = new Context();
             variables = new VariableContainer();
         }
+        #endregion
 
-        private Bash(IPrinter printer, IReader reader)
-        {
-            isExecuting = false;
-
-            this.printer = printer;
-            this.reader = reader;
-
-            context = new Context();
-            variables = new VariableContainer();
-        }
-
-        public void Start()
+        #region main
+        /// <summary>
+        /// Start using Bash
+        /// </summary>
+        /// <param name="printer">class for printing</param>
+        /// <param name="reader">class for reading</param>
+        public void Start(IPrinter printer, IReader reader)
         {
             printer.Print("Bash started.");
             ShowHelp();
@@ -111,11 +116,16 @@ namespace Bash
             }
         }
 
+        /// <summary>
+        /// Stop using Bash
+        /// </summary>
         public void Stop()
         {
             isExecuting = false;
         }
+        #endregion
 
+        #region additional
         private void ShowHelp()
         {
             printer.Print("Commands:");
@@ -129,5 +139,6 @@ namespace Bash
             printer.Print("  $ - assigning and using of local variables");
             printer.Print("  | - commmands pipelining");
         }
+        #endregion
     }
 }
