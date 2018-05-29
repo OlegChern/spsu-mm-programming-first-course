@@ -24,6 +24,16 @@ namespace Task_9
 
         public void Start()
         {
+            Console.WriteLine("You can use:\n" +
+                              "echo - display the argument (s)\n" +
+                              "exit - exit the interpreter\n" +
+                              "pwd - display the current working directory\n" +
+                              "cat [FILENAME] - show the contents of a file on the screen\n" +
+                              "wc [FILENAME] - show on the screen the number of lines, words and bytes in the file\n\n" +
+                              "If your command is not recognized, an attempt will be made with cmd\n\n" +
+                              "also you can use:\n" +
+                              "operator $ - assignment and use of local session variables\n" +
+                              "operator | - pipelining commands. The result of executing one command becomes an input for the other\n");
             do
             {
                 Thread.Sleep(150);
