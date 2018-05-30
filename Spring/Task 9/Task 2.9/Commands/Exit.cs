@@ -8,9 +8,9 @@ namespace Bash
 {
     public class Exit : Command
     {
-        public Exit()
+        public Exit(List<string> args)
         {
-            Arguments = new List<string>();
+            Arguments = args;
         }
 
         public override void Execute()

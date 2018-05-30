@@ -108,12 +108,12 @@ namespace Bash
                         }
                     case "exit":
                         {
-                            commands.Add(new Exit());
+                            commands.Add(new Exit(args));
                             break;
                         }
                     case "pwd":
                         {
-                            commands.Add(new Pwd());
+                            commands.Add(new Pwd(args));
                             break;
                         }
                     case "wc":

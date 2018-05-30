@@ -9,13 +9,27 @@ namespace Bash
 {
     public class Pwd : Command
     {
+        public Pwd(List<string> args)
+        {
+            Arguments = args;
+        }
+
         private List<string> GetStrings()
         {
-            var list = new List<string>();
-            list.Add(Directory.GetCurrentDirectory());
-            var files = Directory.GetFiles(list[0]);
-            list = list.Concat(files).ToList();
-            return list;
+
+
+            if (Arguments.Count != 0)
+            {
+                throw new Exception("Ошибка: У данной команды не должно быть аргументов ...");
+            }
+            else
+            {
+                var list = new List<string>();
+                list.Add(Directory.GetCurrentDirectory());
+                var files = Directory.GetFiles(list[0]);
+                list = list.Concat(files).ToList();
+                return list;
+            }
         }
         public override void Execute()
         {

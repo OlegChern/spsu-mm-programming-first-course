@@ -25,6 +25,10 @@ namespace Bash
             {
                 Bash.BashObject.Variables.Add(new Variable(Name, Arguments[0]));
             }
+            else
+            {
+                throw new Exception($"Ошибка: Переменной {Name} уже присвоено значение ...");
+            }
         }
 
         public override List<string> ExecutePipe()
