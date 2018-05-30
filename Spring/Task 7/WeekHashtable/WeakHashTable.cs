@@ -36,7 +36,7 @@ namespace WeakHashtable
             }
         }
 
-        private void ExpansionTable()
+        private void Rebalance()
         {
             TableSize *= 2;
             var newHashTable = new List<Element<T>>[TableSize];
