@@ -9,7 +9,7 @@ namespace Bash
 {
     public class Cat : Command
     {
-        public Cat(List<string> args)
+        public Cat(List<string> args, Bash interpretator) : base(interpretator)
         {
             Arguments = args;
         }
@@ -45,7 +45,14 @@ namespace Bash
 
         public override List<string> ExecutePipe()
         {
-            return GetString(Arguments).ToList();
+            if (Arguments.Count == 1)
+            {
+                return Arguments;
+            }
+            else
+            {
+                throw new Exception("Ошибка: Неверно указан аргумент ...");
+            }
         }
     }
 }

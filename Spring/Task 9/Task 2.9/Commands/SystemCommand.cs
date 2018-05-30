@@ -11,7 +11,7 @@ namespace Bash
     {
         public string Name { get; }
 
-        public SystemCommand(string name, List<string> args)
+        public SystemCommand(string name, List<string> args, Bash interpretator) : base(interpretator)
         {
             Arguments = args;
             Name = name;
@@ -22,6 +22,7 @@ namespace Bash
             try
             {
                 var procInfo = new ProcessStartInfo(Name);
+                procInfo.UseShellExecute = false;
 
                 if (Arguments.Count != 0)
                 {

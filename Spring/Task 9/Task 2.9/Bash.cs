@@ -10,23 +10,13 @@ namespace Bash
     {
         public List<Variable> Variables { get; set; }
 
+        public IExecutable ExecutableField { get; }
+
         public bool IsRunning { get; set; }
 
-        private static Bash bashObject;
-        public static Bash BashObject
+        public Bash(IExecutable executableField)
         {
-            get
-            {
-                if (bashObject == null)
-                {
-                    bashObject = new Bash();
-                }
-                return bashObject;
-            }
-        }
-
-        public Bash()
-        {
+            ExecutableField = executableField;
             Variables = new List<Variable>();
             IsRunning = false;
         }
@@ -39,8 +29,8 @@ namespace Bash
             {
                 try
                 {
-                    var str = Console.ReadLine();
-                    List<Command> commands = Parser.SplitString(str);
+                    var str = ExecutableField.GetStringCommands();
+                    List<Command> commands = Parser.SplitString(str, this);
                     if (commands.Count == 0)
                     {
                         continue;
@@ -63,6 +53,11 @@ namespace Bash
                     Console.WriteLine(ex.Message);
                 }
             }
+        }
+
+        public void Stop()
+        {
+            IsRunning = false;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Bash
 {
     public class Exit : Command
     {
-        public Exit(List<string> args)
+        public Exit(List<string> args, Bash interpretator) : base(interpretator)
         {
             Arguments = args;
         }
@@ -17,7 +17,7 @@ namespace Bash
         {
             if (Arguments.Count == 0)
             {
-                Bash.BashObject.IsRunning = false;
+                Interpretator.Stop();
             }
             else
             {

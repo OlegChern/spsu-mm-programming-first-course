@@ -9,7 +9,7 @@ namespace Bash
 {
     public class Wc : Command
     {
-        public Wc(List<string> args)
+        public Wc(List<string> args, Bash interpretator) : base(interpretator)
         {
             Arguments = args;
         }

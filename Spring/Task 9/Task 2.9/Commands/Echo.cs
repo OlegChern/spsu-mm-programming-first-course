@@ -8,7 +8,7 @@ namespace Bash
 {
     public class Echo : Command
     {
-        public Echo(List<string> args)
+        public Echo(List<string> args, Bash interpretator) : base(interpretator)
         {
             Arguments = args;
         }

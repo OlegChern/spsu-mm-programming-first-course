@@ -51,6 +51,8 @@
     <Compile Include="Commands\SystemCommand.cs" />
     <Compile Include="Commands\Wc.cs" />
     <Compile Include="Command.cs" />
+    <Compile Include="ConsoleExecute.cs" />
+    <Compile Include="IExecutable.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Parser.cs" />

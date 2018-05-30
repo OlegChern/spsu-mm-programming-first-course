@@ -9,7 +9,7 @@ namespace Bash
     public class Assign : Command
     {
         public string Name { get; }
-        public Assign(string name, List<string> args)
+        public Assign(string name, List<string> args, Bash interpretator) : base(interpretator)
         {
             Name = name;
             Arguments = args;
@@ -21,9 +21,9 @@ namespace Bash
             {
                 throw new Exception("Ошибка: Не удалось присвоить данное значение ...");
             }
-            if (!Bash.BashObject.Variables.Select((z) => z.Name).Contains(Name))
+            if (!Interpretator.Variables.Select((z) => z.Name).Contains(Name))
             {
-                Bash.BashObject.Variables.Add(new Variable(Name, Arguments[0]));
+                Interpretator.Variables.Add(new Variable(Name, Arguments[0]));
             }
             else
             {

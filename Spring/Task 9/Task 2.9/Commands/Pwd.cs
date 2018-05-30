@@ -9,7 +9,7 @@ namespace Bash
 {
     public class Pwd : Command
     {
-        public Pwd(List<string> args)
+        public Pwd(List<string> args, Bash interpretator) : base(interpretator)
         {
             Arguments = args;
         }

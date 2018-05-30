@@ -10,7 +10,9 @@ namespace Bash
     {
         static void Main(string[] args)
         {
-            Bash.BashObject.Start();
+            var console = new ConsoleExecute();
+            var bash = new Bash(console);
+            bash.Start();
         }
     }
 }
