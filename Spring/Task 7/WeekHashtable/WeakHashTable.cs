@@ -78,7 +78,7 @@ namespace WeakHashtable
 
             while (HashTable[Hash(key)].Count > MaxSizeRow)
             {
-                ExpansionTable();
+                Rebalance();
             }
 
             await Task.Delay(TimeStorage);
