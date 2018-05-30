@@ -36,7 +36,7 @@ namespace WeakHashtable
             }
         }
 
-        private void Rebalanced()
+        private void ExpansionTable()
         {
             TableSize *= 2;
             var newHashTable = new List<Element<T>>[TableSize];
@@ -78,7 +78,7 @@ namespace WeakHashtable
 
             while (HashTable[Hash(key)].Count > MaxSizeRow)
             {
-                Rebalanced();
+                ExpansionTable();
             }
 
             await Task.Delay(TimeStorage);
