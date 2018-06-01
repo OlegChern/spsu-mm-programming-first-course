@@ -8,10 +8,14 @@ public class Commentator {
     }
     
     public void comment(String player, String action) {
-        pw.println(player + " " + action);
+        if (pw != null) {
+            pw.println(player + " " + action);
+        }
     }
     
     public void comment(String message) {
-        pw.println(message);
+        if (pw != null) {
+            pw.println(message);
+        }
     }
 }

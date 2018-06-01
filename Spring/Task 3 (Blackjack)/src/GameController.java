@@ -1,4 +1,3 @@
-import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -12,12 +11,18 @@ public class GameController {
     public static final int DEFAULT_DECKS_COUNT = 8;
     private ShuffleMachine shuffleMachine;
     
-    public static final int MINIMUM_BET = 5;
+    public static final int DEFAULT_MINIMUM_BET = 5;
+    private int minimumBet;
+    
+    public static final Commentator DEFAULT_COMMENTATOR = null;
+    private Commentator commentator;
     
     public GameController() {
         players = new HashMap<>();
         duration = INFINITE_GAME;
         shuffleMachine = new ShuffleMachine(DEFAULT_DECKS_COUNT);
+        minimumBet = DEFAULT_MINIMUM_BET;
+        commentator = DEFAULT_COMMENTATOR;
     }
     
     public void registerPlayer(Player player, String name, double money) throws RegistrationFailedException {
@@ -51,15 +56,24 @@ public class GameController {
         shuffleMachine = new ShuffleMachine(decksCount);
     }
     
+    public void setMinimumBet(int minimumBet) {
+        if (minimumBet < 0) {
+            throw new IllegalArgumentException("minimumBet must not be negative, given value: " + minimumBet);
+        }
+        this.minimumBet = minimumBet;
+    }
+    
+    public void setCommentator(Commentator commentator) {
+        this.commentator = commentator;
+    }
+    
     public void play() {
         if (players.isEmpty()) {
             throw new IllegalStateException("No players in game");
         }
         
-        Commentator commentator = new Commentator(new PrintWriter(System.out, true));
-        
         for (int i = 0; i < duration; i = (duration == INFINITE_GAME ? i : i + 1)) {
-            playMatch(commentator);
+            playMatch();
         }
         
         commentator.comment("\nFinal results:");
@@ -69,18 +83,18 @@ public class GameController {
         });
     }
     
-    private void playMatch(Commentator commentator) {
+    private void playMatch() {
         
         // players make bets and get cards
         Map<String, PlayerState> states = new HashMap<>();
         players.forEach((name, gambler) -> {
-            if (gambler.money >= MINIMUM_BET) {
-                double bet = gambler.player.makeBet(gambler.money, MINIMUM_BET);
-                if (bet > gambler.money) {
+            if (gambler.money >= minimumBet) {
+                double bet = gambler.player.makeBet(gambler.money, minimumBet);
+                if (bet > minimumBet) {
                     commentator.comment(name, "FOULED: made bet bigger than money he (she) has, he (she) misses match");
                     return;
                 }
-                if (bet < MINIMUM_BET) {
+                if (bet < minimumBet) {
                     commentator.comment(name, "FOULED: made bet smaller than minimum one, he (she) misses match");
                     return;
                 }

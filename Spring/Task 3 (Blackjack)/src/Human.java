@@ -1,28 +1,37 @@
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Scanner;
 
 public class Human implements Player {
     
-    private Scanner scanner = new Scanner(System.in);
+    private Scanner scanner;
+    private PrintWriter printWriter;
+    
+    public Human(InputStream inputStream, OutputStream outputStream) {
+        scanner = new Scanner(inputStream);
+        printWriter = new PrintWriter(outputStream);
+    }
     
     @Override
     public double makeBet(double playerMoney, double minimumBet) {
-        System.out.println("You have " + playerMoney + ", minimum one is " + minimumBet + ". Input your bet: ");
+        printWriter.println("You have " + playerMoney + ", minimum one is " + minimumBet + ". Input your bet: ");
         while (true) {
             try {
                 return Double.parseDouble(scanner.next());
             } catch (NumberFormatException e) {
-                System.out.println("Incorrect input, try again: ");
+                printWriter.println("Incorrect input, try again: ");
             }
         }
     }
     
     @Override
     public Action act(Hand hand, GameState gameState) {
-        System.out.println("Your hand: " + hand);
-        System.out.println("Dealer's card: " + gameState.getDealerOpenCard());
+        printWriter.println("Your hand: " + hand);
+        printWriter.println("Dealer's card: " + gameState.getDealerOpenCard());
         
         while (true) {
-            System.out.println("Input action [hit|stand|double|split]: ");
+            printWriter.println("Input action [hit|stand|double|split]: ");
             String input = scanner.next().toLowerCase();
             
             switch (input) {
@@ -35,7 +44,7 @@ public class Human implements Player {
                 case "split":
                     return Action.SPLIT;
                 default:
-                    System.out.println("Incorrect input, try again");
+                    printWriter.println("Incorrect input, try again");
             }
         }
     }
