@@ -90,6 +90,9 @@ namespace Bash
         /// <param name="reader">class for reading</param>
         public void Start(IPrinter printer, IReader reader)
         {
+            this.printer = printer;
+            this.reader = reader;
+
             printer.Print("Bash started.");
             ShowHelp();
 
