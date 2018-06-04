@@ -14,8 +14,8 @@ const int gauss_matrix3x3[3][3] = {{1, 2, 1},
 
 void filterGauss(int width, int height, struct RGBTRIPLE **rgb_arr, struct RGBTRIPLE **new_arr, int option)
 {
-    for (int i = 1; i < height - option; i++)
-        for (int j = 1; j < width - option; j++)
+    for (int i = option / 2; i < height - option; i++)
+        for (int j = option / 2; j < width - option; j++)
         {
             applyGaussToPixels(rgb_arr, new_arr, j, i, option);
         }
@@ -41,7 +41,7 @@ void applyGaussToPixels(struct RGBTRIPLE **arr, struct RGBTRIPLE **new_arr, int 
     {
         for (int i = 0; i < option * option; i++)
         {
-            struct RGBTRIPLE *temp_rgb = &arr[idy - 1 + i / option][idx - 1 + i % option];
+            struct RGBTRIPLE *temp_rgb = &arr[idy - 2 + i / option][idx - 2 + i % option];
 
             sum_b += temp_rgb->rgbBlue * gauss_matrix5x5[i / option][i % option];
             sum_g += temp_rgb->rgbGreen * gauss_matrix5x5[i / option][i % option];
