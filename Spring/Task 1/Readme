@@ -1,0 +1,14 @@
+To use the program type: 
+<input file path> <output file path> <filter name> [additional parameter]
+
+Available filters:
+grey 
+median
+gauss
+sobel
+
+Additional parameter is required if you want to apply gauss filter or sobel filter.
+If you choose gauss you have to put either 3 (if it is 3x3 gauss filter) or 5 (the case of 5x5 filter).
+In case you want to apply the sobel filter type x , y or xy
+
+Example: /home/username/Documents/bird.bmp /home/username/Documents/result.bmp sobel xy
