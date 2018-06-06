@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Commands;
 
 namespace Task_9
 {
@@ -22,6 +23,13 @@ namespace Task_9
             Type = type;
             VariableName = variableName;
             VariableValue = variableValue;
+        }
+
+        public Instruction(InstructionType type, string cmdCommand)
+        {
+            Type = type;
+            Commands = new List<Command> {new CmdCommand(cmdCommand)};
+
         }
     }
 }

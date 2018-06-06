@@ -3,6 +3,7 @@
     enum InstructionType
     {
         VariableDef,
-        Command
+        Command,
+        CmdCommand
     } 
 }

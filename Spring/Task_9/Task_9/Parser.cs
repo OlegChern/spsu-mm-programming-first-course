@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using Commands;
 
 namespace Task_9
 {
@@ -27,7 +29,11 @@ namespace Task_9
             }
             catch (CommandException)
             {
-                return new Instruction(InstructionType.Command, new List<Command> { new Command(CommandType.CmdCommand,new List<string>{inStr}) });
+                return new Instruction(InstructionType.CmdCommand,
+                    new List<Command>
+                    {
+                        new CmdCommand(inStr)
+                    });
             }
         }
 
@@ -78,25 +84,17 @@ namespace Task_9
             ((name[0] <= 'Z' && name[0] >= 'A') || (name[0] <= 'z' && name[0] >= 'a') || (name[0] == '_')) &&
             (name.All(c => !".,/';[](){}*&^%$#@!~`+=-\\|/<>!№:? ".Contains(c)));
 
+
         private static Instruction GetCommandInstructions(string inStr)
         {
             List<Command> resultCommands = new List<Command>();
             string[] commandsArr = inStr.Split(new[] {" | "}, StringSplitOptions.RemoveEmptyEntries);
 
-            try
-            {
-                resultCommands.Add(GetCommand(commandsArr[0]));
-            }
-            catch (CommandException e)
-            {
-                throw e;
-            }
-
-            for (int i = 1; i < commandsArr.Length; ++i)
+            for (int i = 0; i < commandsArr.Length; ++i)
             {
                 try
                 {
-                    resultCommands.Add(new Command(GetCommandType(commandsArr[i]),new List<string>()));
+                    resultCommands.Add(CreateCommand(commandsArr[i],i));
                 }
                 catch (CommandException e)
                 {
@@ -104,100 +102,77 @@ namespace Task_9
                 }
             }
 
+            for (int i = 1; i < resultCommands.Count; ++i)
+            {
+                resultCommands[i].Arguments.Add(Path.GetTempPath() + "\\tmpResult" + (i - 1) + ".txt");
+            }
+
             return new Instruction(InstructionType.Command,resultCommands);
         }
-
-        private static Command GetCommand(string command)
+        
+        private static Command CreateCommand(string command, int numberOfCommand)
         {
             string[] wordsArr = command.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-            try
+            string name = wordsArr[0].ToLower();
+            List<string> args = new List<string>();
+            for (int i = 1; i < wordsArr.Length; ++i)
             {
-                CommandType commandType = GetCommandType(wordsArr[0]);
-                List<string> commandArgs = new List<string>();
-                for (int i = 1; i < wordsArr.Length ; ++i)
-                {
-                    commandArgs.Add(wordsArr[i]);
-                }
-                Command result = new Command(commandType, commandArgs);
-                IsCorrectArgs(result);
-                return result;
+                args.Add(wordsArr[i]);
             }
-            catch (CommandException e)
-            {
-                throw e;
-            }
-        }
 
-
-        private static bool IsCorrectArgs(Command command)
-        {
-            switch (command.Type)
-            {
-                case CommandType.Pwd:
-                {
-                    if (command.Arguments.Count > 0)
-                    {
-                        throw new CommandException("Incorrect pwd command args");
-                    }
-
-                    return true;
-                }
-                case CommandType.Wc:
-                {
-                    if (command.Arguments.Count != 1)
-                    {
-                        throw new CommandException("Incorrect wc command args");
-                    }
-
-                    return true;
-                }
-                case CommandType.Cat:
-                {
-                    if (command.Arguments.Count != 1)
-                    {
-                        throw new CommandException("Incorrect cat command args");
-                    }
-
-                    return true;
-                }
-                case CommandType.Echo:
-                {
-                    return true;
-                }
-            }
-            throw new CommandException("Incorrect command's args");
-        }
-
-
-
-        private static CommandType GetCommandType(string name)
-        {
-            name = name.ToLower();
             switch (name)
             {
                 case "echo":
                 {
-                    return CommandType.Echo;
+                    Command result = new Echo(args, Path.GetTempPath()+"\\tmpResult"+numberOfCommand+".txt",numberOfCommand == 0);
+                    if (result.IsCorrectArgs())
+                    {
+                        return result;
+                    }
+                    break;
                 }
                 case "cat":
 
                 {
-                    return CommandType.Cat;
-                }
+                    Command result = new Cat(args, Path.GetTempPath() + "\\tmpResult" + numberOfCommand + ".txt", numberOfCommand == 0);
+                    if (result.IsCorrectArgs())
+                    {
+                        return result;
+                    }
+                    break;
+                    }
                 case "pwd":
                 {
-                    return CommandType.Pwd;
-                }
+                    Command result = new Pwd(args, Path.GetTempPath() + "\\tmpResult" + numberOfCommand + ".txt", numberOfCommand == 0);
+                    if (result.IsCorrectArgs())
+                    {
+                        return result;
+                    }
+                    break;
+                    }
                 case "wc":
+                {
+                    Command result = new Wc(args, Path.GetTempPath() + "\\tmpResult" + numberOfCommand + ".txt",
+                        numberOfCommand == 0);
+                    if (result.IsCorrectArgs())
+                    {
+                        return result;
+                    }
 
-                {
-                    return CommandType.Wc;
+                    break;
                 }
-                default:
+                case "exit":
                 {
-                    throw new CommandException("Incorrect command name");
+                    Command result = new Exit(args);
+                    if (result.IsCorrectArgs())
+                    {
+                        return result;
+                    }
+
+                    break;
                 }
             }
+            throw new CommandException("Incorrect command name");
         }
 
 

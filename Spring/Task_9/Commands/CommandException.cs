@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Task_9
+namespace Commands
 {
-    class CommandException : Exception
+    public class CommandException : Exception
     {
         public override string Message { get; }
 

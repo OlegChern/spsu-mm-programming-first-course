@@ -4,22 +4,20 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Threading;
+using System.Threading.Tasks;
+using Commands;
 
 namespace Task_9
 {
-    class Interpreter : IDisposable
+    class Interpreter
     {
         private bool IsExit { get; set; }
         private Dictionary<string, object> Variables { get; }
-        private string TmpDirPath { get; }
 
         public Interpreter()
         {
             IsExit = false;
             Variables = new Dictionary<string, object>();
-            TmpDirPath = Directory.GetCurrentDirectory() + "\\Task9tmp";
-            Directory.CreateDirectory(TmpDirPath);
         }
 
         public void Start()
@@ -34,40 +32,34 @@ namespace Task_9
                               "also you can use:\n" +
                               "operator $ - assignment and use of local session variables\n" +
                               "operator | - pipelining commands. The result of executing one command becomes an input for the other\n");
-            do
+
+            while (!IsExit)
             {
-                Thread.Sleep(150);
                 Console.Write("{0}>", Dns.GetHostName());
                 string inputStr = Console.ReadLine();
-                if (inputStr == "exit")
+
+                try
                 {
-                    IsExit = true;
+                    ExecuteInstructions(Parser.Parse(inputStr));
                 }
-                else
+
+                catch (VariableDefException e)
                 {
-                    try
-                    {
-                        ExecuteInstructions(Parser.Parse(inputStr));
-                    }
-
-
-                    catch (VariableDefException e)
-                    {
-                        Console.WriteLine(e.Message);
-                    }
-
-                    catch (InvalidOperationException e)
-                    {
-                    }
-                    catch (Exception e)
-                    {
-                        Console.Write(e.Message);
-                    }
+                    Console.WriteLine(e.Message);
                 }
-            } while (!IsExit);
+
+                catch (InvalidOperationException)
+                {
+                }
+                catch (Exception e)
+                {
+                    Console.Write(e.Message);
+                }
+
+            }
         }
 
-        private void ExecuteInstructions(Instruction instructions)
+        private async void ExecuteInstructions(Instruction instructions)
         {
             switch (instructions.Type)
             {
@@ -76,33 +68,58 @@ namespace Task_9
                     Variables.Add(instructions.VariableName, instructions.VariableValue);
                     break;
                 }
+                case InstructionType.CmdCommand:
+                {
+                    await CmdCommandExecute(instructions.Commands[0].Arguments[0]);
+                    break;
+                }
+
                 case InstructionType.Command:
                 {
-                    for (int i = 0; i < instructions.Commands.Count - 1; ++i)
+                    bool isCorrect = true;
+                    foreach (var command in instructions.Commands)
                     {
-                        string tmpPath = ExecuteCommand(instructions.Commands[i], i);
-                        instructions.Commands[i + 1].Arguments.Add(tmpPath);
+                        for (int i = 0; i < command.Arguments.Count; ++i)
+                        {
+                            string tmpVarName = command.Arguments[i].Remove(0, 1);
+                            if (Variables.ContainsKey(tmpVarName))
+                            {
+                                command.Arguments[i] = (string) Variables[tmpVarName];
+                            }
+                        }
                     }
 
-
-                    if (instructions.Commands.Last().Type == CommandType.CmdCommand)
+                    try
                     {
-                        ExecuteCommand(instructions.Commands.Last(), instructions.Commands.Count - 1);
+                        foreach (var command in instructions.Commands)
+                        {
+                            command.Execute();
+                        }
                     }
-                    else
+                    catch (CommandException e)
                     {
-                        string lastTmpPath =
-                            ExecuteCommand(instructions.Commands.Last(), instructions.Commands.Count - 1);
+                        if (e.Message == "Exit")
+                        {
+                            IsExit = true;
+                        }
+                        else
+                        {
+                            isCorrect = false;
+                            Console.WriteLine(e.Message);
+                        }
+                    }
 
-                        using (var reader = File.OpenText(lastTmpPath))
+                    if (!IsExit && isCorrect)
+                    {
+                        using (var reader = File.OpenText(instructions.Commands.Last().TargetPath))
                         {
                             Console.WriteLine(reader.ReadToEnd());
                         }
                     }
 
-                    foreach (var filePath in Directory.EnumerateFiles(TmpDirPath))
+                    for (int i = 0; i < instructions.Commands.Count; ++i)
                     {
-                        File.Delete(filePath);
+                        File.Delete(Path.GetTempPath() + "\\tmpResult" + i + ".txt");
                     }
 
                     break;
@@ -110,96 +127,25 @@ namespace Task_9
             }
         }
 
-        private string ExecuteCommand(Command command, int numberOfCommand)
+        private Task CmdCommandExecute(string arg)
         {
-            switch (command.Type)
+            var process = new Process
             {
-                case CommandType.Pwd:
+                StartInfo = new ProcessStartInfo
                 {
-                    string currentDirectory = Directory.GetCurrentDirectory();
-                    string tmpPwdFile = TmpDirPath + "\\tmpCommandResult" + numberOfCommand + ".txt";
-                    using (var writer = File.CreateText(tmpPwdFile))
-                    {
-                        writer.WriteLine(currentDirectory);
-                        foreach (var fileName in Directory.EnumerateFileSystemEntries(currentDirectory))
-                        {
-                            writer.WriteLine(fileName);
-                        }
+                    FileName = "cmd.exe",
+                    RedirectStandardInput = true,
+                    UseShellExecute = false,
+                    Arguments = "/C " + arg
 
-                        return tmpPwdFile;
-                    }
+
                 }
+            };
+            process.Start();
 
+            while (!process.HasExited) ;
 
-                case CommandType.Echo:
-                {
-                    string tmpEchoFile = TmpDirPath + "\\tmpCommandResult" + numberOfCommand + ".txt";
-                    using (var writer = File.CreateText(tmpEchoFile))
-                    {
-                        foreach (var arg in command.Arguments)
-                        {
-                            if (arg[0] == '$' && Variables.ContainsKey(arg.Remove(0, 1)))
-                            {
-                                writer.WriteLine(Variables[arg.Remove(0, 1)]);
-                            }
-                            else
-                            {
-                                writer.WriteLine(arg);
-                            }
-                        }
-                    }
-
-                    return tmpEchoFile;
-                }
-
-                case CommandType.Cat:
-                {
-                    string tmpCatFile = TmpDirPath + "\\tmpCommandResult" + numberOfCommand + ".txt";
-                    File.Copy(command.Arguments[0], tmpCatFile);
-                    return tmpCatFile;
-                }
-
-                case CommandType.Wc:
-                {
-                    string tmpWcFile = TmpDirPath + "\\tmpCommandResult" + numberOfCommand + ".txt";
-                    int linesAmount = File.ReadAllLines(command.Arguments[0]).Length;
-                    int wordsAmount = File.ReadAllText(command.Arguments[0]).Length;
-                    int bytesAmount = File.ReadAllBytes(command.Arguments[0]).Length;
-                    using (var writer = File.CreateText(tmpWcFile))
-                    {
-                        writer.WriteLine("In {0} {1} lines", command.Arguments[0], linesAmount);
-                        writer.WriteLine("In {0} {1} words", command.Arguments[0], wordsAmount);
-                        writer.WriteLine("In {0} {1} bytes", command.Arguments[0], bytesAmount);
-                    }
-
-                    return tmpWcFile;
-                }
-
-                case CommandType.CmdCommand:
-                {
-                    var process = new Process
-                    {
-                        StartInfo = new ProcessStartInfo
-                        {
-                            FileName = "cmd.exe",
-                            RedirectStandardInput = true,
-                            UseShellExecute = false,
-                            Arguments = "/C " + command.Arguments[0]
-                        }
-                    };
-                    process.Start();
-                    return "";
-                }
-                default:
-                {
-                    throw new CommandException("Incorrect command work");
-                }
-            }
-        }
-
-        public void Dispose()
-        {
-            Directory.Delete(TmpDirPath);
+            return Task.CompletedTask;
         }
     }
 }
