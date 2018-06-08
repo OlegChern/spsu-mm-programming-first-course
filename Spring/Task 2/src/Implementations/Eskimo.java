@@ -1,4 +1,6 @@
-package IceCreamLib;
+package Implementations;
+
+import IceCreamLib.IceCream;
 
 public class Eskimo extends IceCream {
 

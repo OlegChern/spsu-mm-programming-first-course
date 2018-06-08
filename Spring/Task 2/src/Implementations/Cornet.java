@@ -1,4 +1,6 @@
-package IceCreamLib;
+package Implementations;
+
+import IceCreamLib.IceCream;
 
 public class Cornet extends IceCream {
 
