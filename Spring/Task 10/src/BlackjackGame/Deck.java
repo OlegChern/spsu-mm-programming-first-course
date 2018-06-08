@@ -11,7 +11,7 @@ public class Deck {
     private ArrayList<Card> cards;
     private Integer currentSize;
 
-    Deck() {
+    public Deck() {
 
         cards = new ArrayList<>(defaultDeckNumber);
         currentSize = defaultDeckNumber * sizeofDeck;

@@ -2,7 +2,7 @@ package BlackjackGame;
 
 public class Dealer extends Player {
 
-    Dealer() {
+    public Dealer() {
         super();
     }
 

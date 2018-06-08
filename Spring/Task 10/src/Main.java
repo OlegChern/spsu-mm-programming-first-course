@@ -10,6 +10,7 @@ public class Main {
 
         pico.addComponent(NormalBot.class);
         pico.addComponent(AdvancedBot.class);
+
         pico.addComponent(Dealer.class);
         pico.addComponent(Deck.class);
         pico.addComponent(BlackjackTable.class);

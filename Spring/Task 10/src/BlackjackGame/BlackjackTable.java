@@ -17,9 +17,9 @@ public class BlackjackTable implements Observer {
     private boolean dealerInPlay;
 
 
-    public BlackjackTable() {
+    public BlackjackTable(Dealer dealer, Deck deck) {
 
-        this.dealer = new Dealer();
+        this.dealer = dealer;
         this.dealer.addObserver(this);
 
         this.players = new ArrayList<>();
@@ -27,7 +27,7 @@ public class BlackjackTable implements Observer {
         this.playersFinished = new ArrayList<>();
         this.statistics = new HashMap<>();
 
-        this.currentDeck = new Deck();
+        this.currentDeck = deck;
         this.dealerInPlay = false;
 
     }
