@@ -10,8 +10,8 @@ namespace Commands
         public Cat(List<string> arguments, string targetPath, bool isFirst)
         {
             TargetPath = targetPath;
-            Arguments = arguments;
             IsFirstCommand = isFirst;
+            Arguments = IsFirstCommand ? arguments : new List<string>();
         }
 
         public override void Execute()

@@ -59,7 +59,7 @@ namespace Task_9
             }
         }
 
-        private async void ExecuteInstructions(Instruction instructions)
+        private void ExecuteInstructions(Instruction instructions)
         {
             switch (instructions.Type)
             {
@@ -70,8 +70,19 @@ namespace Task_9
                 }
                 case InstructionType.CmdCommand:
                 {
-                    await CmdCommandExecute(instructions.Commands[0].Arguments[0]);
-                    break;
+                    var process = new Process
+                    {
+                        StartInfo = new ProcessStartInfo
+                        {
+                            FileName = "cmd.exe",
+                            RedirectStandardInput = true,
+                            UseShellExecute = false,
+                            Arguments = "/C " + instructions.Commands[0].Arguments[0]
+                        }
+                    };
+                    process.Start();
+                    process.WaitForExit();
+                        break;
                 }
 
                 case InstructionType.Command:
@@ -125,27 +136,6 @@ namespace Task_9
                     break;
                 }
             }
-        }
-
-        private Task CmdCommandExecute(string arg)
-        {
-            var process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "cmd.exe",
-                    RedirectStandardInput = true,
-                    UseShellExecute = false,
-                    Arguments = "/C " + arg
-
-
-                }
-            };
-            process.Start();
-
-            while (!process.HasExited) ;
-
-            return Task.CompletedTask;
         }
     }
 }
