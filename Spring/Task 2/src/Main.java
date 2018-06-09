@@ -1,4 +1,7 @@
 import IceCreamLib.*;
+import Implementations.Cornet;
+import Implementations.Eskimo;
+import Implementations.IcePop;
 
 import java.util.ArrayList;
 import java.util.List;
