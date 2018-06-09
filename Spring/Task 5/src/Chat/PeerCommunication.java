@@ -82,6 +82,16 @@ public class PeerCommunication {
         return result.toString();
     }
 
+    private boolean checkIfAlreadyConnected(String serverAddress, String serverPort) {
+        for (Connection currentConnection: peers) {
+            if (currentConnection.serverAddress.contains(serverAddress) &&
+                    currentConnection.serverPort.equals(serverPort)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void establishFirstConnection(String[] address, String username, String serverAddress, int serverPort) throws IOException, ConnectionException, InvalidInputFormatException {
         if (address.length < 2) {
             throw new InvalidInputFormatException("You have forgotten to enter the address you want to connect!");
@@ -95,6 +105,10 @@ public class PeerCommunication {
 
                 if (serverAddress.contains(connection[0]) && connection[1].equals(Integer.toString(serverPort))) {
                     throw new ConnectionException("It is forbidden to connect to yourself!");
+                }
+
+                if (checkIfAlreadyConnected(connection[0], connection[1])) {
+                    throw new ConnectionException("Connection is already established!");
                 }
 
                 Socket peer = new Socket(connection[0], Integer.parseInt(connection[1]));
