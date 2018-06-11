@@ -112,6 +112,9 @@ namespace HashTable
                 else
                 {
                     rootElement = null;
+                    chainSize--;
+
+                    return;
                 }
             }
 

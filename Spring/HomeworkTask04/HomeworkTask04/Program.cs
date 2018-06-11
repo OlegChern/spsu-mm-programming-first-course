@@ -12,7 +12,7 @@ namespace HomeworkTask04
 			Console.WriteLine("Hash table test.");
 			Console.WriteLine("Collision resolution: separate chaining with list head cells.");
 
-			HashTable<int> table = new HashTable<int>(4);
+			HashTable<int> table = new HashTable<int>(4,2);
 
 			Console.WriteLine("\nAdding elements...");
 			// adding test
@@ -25,8 +25,18 @@ namespace HomeworkTask04
 			table.Add("ZXCV", 1256);
 			table.Add("ASDFDS", 1258);
 			table.Add("ASDFWD", 1258);
+            table.Add("WADX", 1248);
+            table.Add("WADX", 1248);
+            table.Add("WADX", 1248);
+            table.Add("WADX", 1248);
+            table.Add("WADX", 1248);
+            table.Add("WADX", 1248);
+            table.Add("WADX", 1248);
+            table.Add("WADX", 1248);
+            table.Add("WADX", 1248);
+            table.Add("WADX", 1248);
 
-			table.Print();
+            table.Print();
 
 			// rebalancing test
 			Console.WriteLine("\nAdding and rebalancing elements...");

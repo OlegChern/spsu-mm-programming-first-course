@@ -173,8 +173,11 @@ namespace HashTable
 					// recalculate hash with new table size
 					int hash = Hash(sourceChain[j].Key);
 
-					// add element to new chain with recalculated hash key
-					temp[hash].Add(sourceChain[j]);
+                    // create new element without pointer to the next one
+                    HashTableElement<T> elem = new HashTableElement<T>(sourceChain[j].Key, sourceChain[j].Value);
+
+                    // add element to new chain with recalculated hash key
+                    temp[hash].Add(elem);
 				}
 			}
 
