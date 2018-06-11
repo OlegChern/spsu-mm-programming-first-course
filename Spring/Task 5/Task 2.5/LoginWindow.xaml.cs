@@ -29,9 +29,11 @@ namespace Chat
 
         private void Login_Click(object sender, RoutedEventArgs e)
         {
-            ChatWindow chat = new ChatWindow();
-            chat.MyName = NameClient.Text;
-            chat.Show();
+            var port = new Port
+            {
+                MyName = NameClient.Text
+            };
+            port.Show();
             Close();
         }       
 

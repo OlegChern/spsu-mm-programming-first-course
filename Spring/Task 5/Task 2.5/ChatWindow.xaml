@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Chat"
         mc:Ignorable="d"
-        Title="Chat" Height="320" Width="350" ResizeMode="NoResize">
+        Title="Chat" Height="320" Width="450" ResizeMode="NoResize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30*"/>
@@ -23,17 +23,18 @@
                  TextAlignment="Left" Grid.ColumnSpan="2" />
         <Button Name="Send" Grid.Column="2" Grid.Row="3" Margin="3"
                 Content="Отправить" Click="Send_Click"/>
-        <ScrollViewer Grid.Row="2" Margin="3"
-                      Grid.ColumnSpan="3">
+        <ScrollViewer Grid.Row="2" Margin="3" Grid.Column="1"
+                      Grid.ColumnSpan="2">
             <TextBlock Name="ChatText" Background="WhiteSmoke" TextWrapping="Wrap"/>
         </ScrollViewer>
-        <Button Name="Host" Content="Стать хостом" Grid.Column="0"
-                Grid.Row="1" Margin="3" Click="Host_Click"/>
-        <Button Name="Connect" Content="Подключиться" Grid.Column="1" Margin="3" Click="Connect_Click" Grid.Row="1"/>
-        <Button Name="Disconnect" Content="Отключиться" Grid.Column="2" Margin="3" Click="Disconnect_Click" Grid.Row="1"/>
+        <Button Name="Connect" Content="Подключиться" Grid.Column="1" Margin="3" Click="Connect_Click"/>
+        <Button Name="Disconnect" Content="Отключиться" Grid.Column="2" Margin="3" Click="Disconnect_Click"/>
         <Button Name="Exit" Content="Выход" Grid.Column="0" Grid.Row="0" Margin="3" Click="Exit_Click" />
-        <TextBlock Name="Address" Grid.Column="1" Grid.ColumnSpan="2"
-                   Grid.Row="0" Margin="3" TextAlignment="Center"
+        <TextBlock Name="Address" Grid.ColumnSpan="3"
+                   Grid.Row="1" Margin="3" TextAlignment="Center"
+                   Background="LightGray"/>
+        <TextBlock Name="ListAddress" Grid.Column="0"
+                   Grid.Row="2" Margin="3" TextAlignment="Justify"
                    Background="LightGray"/>
 
     </Grid>

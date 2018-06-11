@@ -32,18 +32,9 @@ namespace Chat
             if ((IPAddress.TryParse(ServerIP.Text, out var ip)) && (UInt16.TryParse(ServerPort.Text, out var port)))
             {
                 var chat = (ChatWindow)Owner;
-                chat.User = new Client(chat.Name, port, ip, chat);
-                if (chat.User.IsConnect)
-                {
-                    chat.Host.IsEnabled = false;
-                    chat.Connect.IsEnabled = false;
-                    chat.Disconnect.IsEnabled = true;
-                    chat.Address.Text = "-----";
-                }
-                else
-                {
-                    chat.User = null;
-                }
+
+                chat.User.Connect(new IPEndPoint(ip, port));
+
                 Close();
             }
             else

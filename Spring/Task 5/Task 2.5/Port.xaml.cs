@@ -19,6 +19,8 @@ namespace Chat
     /// </summary>
     public partial class Port : Window
     {
+        public string MyName { get; set; }
+
         public Port()
         {
             InitializeComponent();
@@ -30,20 +32,9 @@ namespace Chat
         {
             if (UInt16.TryParse(ServerPort.Text, out var port))
             {
-                var chat = (ChatWindow)Owner;
-                chat.User = new Server(chat.Name, port, chat);
-                if (chat.User.IsConnect)
-                {
-                    chat.Host.IsEnabled = false;
-                    chat.Connect.IsEnabled = false;
-                    chat.Disconnect.IsEnabled = true;
-                    chat.Address.Text += port.ToString();
-                }
-                else
-                {
-                    chat.User = null;
-                }
+                var chat = new ChatWindow(port, MyName);
                 Close();
+                chat.Show();
             }
             else
             {

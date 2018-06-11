@@ -22,18 +22,22 @@ namespace Chat
     /// </summary>
     public partial class ChatWindow : Window
     {
-        public User User { get; set; }
+        public ChatClient User { get; set; }
+
+        public int Port { get; set; }
 
         public IPAddress IP { get; set; }
 
         public string MyName { get; set; }
 
-        public ChatWindow()
+        public ChatWindow(int port, string name)
         {
             InitializeComponent();
+            Port = port;
+            MyName = name;
             Send.IsEnabled = false;
             Disconnect.IsEnabled = false;
-            MessageText.TextChanged += (sender, args) => Send.IsEnabled = ((MessageText.Text.Length == 0) || (User == null )) ? false : true;
+            MessageText.TextChanged += (sender, args) => Send.IsEnabled = (MessageText.Text.Length == 0) ? false : true;
             var addresses = Dns.GetHostAddresses(Dns.GetHostName());
             foreach (var e in addresses)
             {
@@ -42,7 +46,11 @@ namespace Chat
                     IP = e;
                 }
             }
-            Address.Text = "Адрес: " + IP + " : ";
+
+            User = new ChatClient(MyName, Port, this);
+
+            Address.Text = "Адрес: " + IP + " : " + Port;
+            ChangeListAdress();
         }
 
         public void PrintMessageAsync(string str)
@@ -67,15 +75,6 @@ namespace Chat
             MessageText.Text = null;
         }
 
-        private void Host_Click(object sender, RoutedEventArgs e)
-        {
-            var enterPort = new Port()
-            {
-                Owner = this
-            };
-            enterPort.Show();
-        }
-
         private void Connect_Click(object sender, RoutedEventArgs e)
         {
             var enterIP = new IP()
@@ -87,34 +86,59 @@ namespace Chat
 
         public void Disconnect_Click(object sender, RoutedEventArgs e)
         {
-            DisconnectChat();
+            User.Disconnect();
+            Disconnect.IsEnabled = false;
+            Connect.IsEnabled = true;
         }
 
-        public void DisconnectAsync()
+        public void ChangeListAdressAsync()
         {
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                User.Disconnect();
-                User = null;
-                Host.IsEnabled = true;
-                Connect.IsEnabled = true;
+                ListAddress.Text = "Адреса пользователей:\n";
+                foreach (var e in User.Points)
+                {
+                    ListAddress.Text += e.ToString() + "\n";
+                }
+            }));
+        }
+
+        public void ChangeListAdress()
+        {
+            new Action(ChangeListAdressAsync).BeginInvoke(null, null);
+        }
+
+        public void ConnectChatAsync()
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                Disconnect.IsEnabled = true;
+                Connect.IsEnabled = false;
+            }));
+        }
+
+        public void ConnectChat()
+        {
+            new Action(ConnectChatAsync).BeginInvoke(null, null);
+        }
+
+        public void DisconnectChatAsync()
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
                 Disconnect.IsEnabled = false;
-                Address.Text = "Адрес: " + IP + " : ";
-                ChatText.Text = null;
+                Connect.IsEnabled = true;
             }));
         }
 
         public void DisconnectChat()
         {
-            new Action(DisconnectAsync).BeginInvoke(null, null);
+            new Action(DisconnectChatAsync).BeginInvoke(null, null);
         }
 
         private void Exit_Click(object sender, RoutedEventArgs e)
         {
-            if (User != null)            
-            {
-                DisconnectChat();
-            }
+            User.Exit();
             Close();
         }
     }
