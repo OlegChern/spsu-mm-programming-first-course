@@ -1,6 +1,7 @@
-package icecream;
+package IceCreamImplementations;
 
 import com.sun.istack.internal.Nullable;
+import IceCreamAbstract.IceCream;
 
 public class MilkyIceCream extends IceCream {
     protected Ingredient flavor;

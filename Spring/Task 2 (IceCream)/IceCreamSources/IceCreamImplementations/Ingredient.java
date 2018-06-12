@@ -1,4 +1,4 @@
-package icecream;
+package IceCreamImplementations;
 
 public class Ingredient {
 

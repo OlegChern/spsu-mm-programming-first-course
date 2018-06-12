@@ -1,4 +1,6 @@
-package icecream;
+package IceCreamImplementations;
+
+import IceCreamAbstract.IceCream;
 
 public class FruitIce extends IceCream {
 

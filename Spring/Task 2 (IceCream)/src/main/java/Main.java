@@ -1,4 +1,5 @@
-import icecream.*;
+import IceCreamImplementations.*;
+import IceCreamAbstract.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,7 @@ public class Main {
                 "Happy IceCream Inc.",
                 new Ingredient("orange", 200))
         );
-
+    
         iceCreamsList.add(new MilkyIceCream(
                 "Creme Brulee in white chocolate",
                 "Milky Nightmare Corp.",
@@ -21,7 +22,7 @@ public class Main {
                 new Ingredient("white chocolate", 30),
                 null)
         );
-
+    
         iceCreamsList.add(new IceCreamCone(
                 "Cherry ice cream in waffle cup under milk chocolate and cherry syrup",
                 "Awesome sweets (c)",

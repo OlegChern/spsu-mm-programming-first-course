@@ -1,4 +1,4 @@
-package icecream;
+package IceCreamImplementations;
 
 import com.sun.istack.internal.Nullable;
 
