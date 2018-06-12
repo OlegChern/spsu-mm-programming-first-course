@@ -7,7 +7,7 @@ public class Main {
     private static final int START_SUM = 1000;
     private static final int MINIMUM_BET = 5;
     
-    private static final Commentator COMMENTATOR = new Commentator(new PrintWriter(System.out));
+    private static final Commentator COMMENTATOR = new Commentator(new PrintWriter(System.out, true));
     
     public static void main(String[] args) {
         

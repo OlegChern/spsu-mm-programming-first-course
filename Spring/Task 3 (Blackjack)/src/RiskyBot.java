@@ -1,7 +1,7 @@
 public class RiskyBot implements Player {
     @Override
     public double makeBet(double playerMoney, double minimumBet) {
-        return Math.max(playerMoney / 5, minimumBet);
+        return Math.max(playerMoney / 10, minimumBet);
     }
     
     @Override
@@ -14,7 +14,7 @@ public class RiskyBot implements Player {
             return Action.DOUBLE;
         }
     
-        if (hand.getScore() < 16) {
+        if (hand.getScore() < 15) {
             return Action.HIT;
         }
     

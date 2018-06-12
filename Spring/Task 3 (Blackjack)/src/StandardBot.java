@@ -18,7 +18,7 @@ public class StandardBot implements Player {
             return Action.DOUBLE;
         }
         
-        if (hand.getScore() < 16) {
+        if (hand.getScore() < 15) {
             return Action.HIT;
         }
         

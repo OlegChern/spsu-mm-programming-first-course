@@ -90,7 +90,7 @@ public class GameController {
         players.forEach((name, gambler) -> {
             if (gambler.money >= minimumBet) {
                 double bet = gambler.player.makeBet(gambler.money, minimumBet);
-                if (bet > minimumBet) {
+                if (bet > gambler.money) {
                     commentator.comment(name, "FOULED: made bet bigger than money he (she) has, he (she) misses match");
                     return;
                 }
