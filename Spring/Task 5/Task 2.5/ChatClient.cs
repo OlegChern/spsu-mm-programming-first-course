@@ -37,9 +37,11 @@ namespace Chat
 
         public List<Socket> ConnectedSockets { get; private set; }
 
+        public bool CanConnect { get; private set; }
 
         public ChatClient(string name, int port, ChatWindow chat)
         {
+            CanConnect = true;
             MyPort = port;
             Name = name;
             Chat = chat;
@@ -62,8 +64,9 @@ namespace Chat
             {
                 var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 socket.Connect(point);
-                ConnectedSockets.Add(socket);
                 Points.Add(point);
+                CanConnect = true;
+                ConnectedSockets.Add(socket);
                 ExchangeDataClient(socket);
                 var recInfo = new ReceiveInfo(socket);
                 socket.BeginReceive(recInfo.Buff, 0, recInfo.Buff.Length, SocketFlags.None, new AsyncCallback(Receive), recInfo);
@@ -77,7 +80,15 @@ namespace Chat
                 {
                     var pointClient = NewPoints[NewPoints.Count - 1];
                     NewPoints.Remove(pointClient);
-                    Connect(pointClient);
+                    while (!CanConnect)
+                    {
+                        Thread.Sleep(200);
+                    }
+                    if (!Points.Contains(pointClient))
+                    {
+                            CanConnect = false;
+                            Connect(pointClient);
+                    }
                 }
             }
             catch (Exception ex)
@@ -93,7 +104,7 @@ namespace Chat
                 var netStream = new NetworkStream(socket, true);
                 var formatter = new BinaryFormatter();
                 var points = (List<IPEndPoint>)formatter.Deserialize(netStream);
-                formatter.Serialize(netStream, IPEndPoint);
+                formatter.Serialize(netStream, Points);
                 foreach (var e in points)
                 {
                     if ((!Points.Contains(e)) && (!NewPoints.Contains(e)))
@@ -140,6 +151,20 @@ namespace Chat
                     }
                     IsConnect = true;
                     SocketServer.BeginAccept(new AsyncCallback(NewClient), null);
+                    if (NewPoints.Count != 0)
+                    {
+                        var pointClient = NewPoints[NewPoints.Count - 1];
+                        NewPoints.Remove(pointClient);
+                        while (!CanConnect)
+                        {
+                            Thread.Sleep(200);
+                        }
+                        if (!Points.Contains(pointClient))
+                        {
+                            CanConnect = false;
+                            Connect(pointClient);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -155,11 +180,14 @@ namespace Chat
                 var netStream = new NetworkStream(socket, true);
                 var formatter = new BinaryFormatter();
                 formatter.Serialize(netStream, Points);
-                var point = (IPEndPoint)formatter.Deserialize(netStream);
-                if (!Points.Contains(point))
+                var points = (List<IPEndPoint>)formatter.Deserialize(netStream);
+                foreach (var e in points)
                 {
-                    Chat.PrintMessage("Подключился пользователь " + point.ToString() + "\n");
-                    Connect(point);
+                    if (!Points.Contains(e))
+                    {
+                        NewPoints.Add(e);
+                        Chat.PrintMessage("Подключился пользователь " + e.ToString() + "\n");
+                    }
                 }
             }
             catch (Exception ex)

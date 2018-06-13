@@ -113,7 +113,6 @@ namespace Chat
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 Disconnect.IsEnabled = true;
-                Connect.IsEnabled = false;
             }));
         }
 
