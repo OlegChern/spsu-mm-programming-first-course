@@ -3,5 +3,5 @@ Available commands:
 2) /exit
 3) /disconnect
 4) /help
-5) /users
+5) /users/n
 If you are connected to network just enter smth to send it to the network!
