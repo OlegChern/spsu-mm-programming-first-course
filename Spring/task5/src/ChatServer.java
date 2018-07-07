@@ -16,7 +16,7 @@ public class ChatServer extends Thread {
         this.clientInterface = clientInterface;
         String IP = server.getInetAddress().toString();
         port = server.getLocalPort();
-        clientInterface.println("You are now available for connections\nYour IP: " + IP + " : " + port);
+        clientInterface.println("You are now available for connections\nYour IP and port: " + IP.split("/")[0] + ":" + port);
     }
 
     public int getPort() {
