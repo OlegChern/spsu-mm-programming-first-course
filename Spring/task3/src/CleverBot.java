@@ -1,6 +1,7 @@
 public class CleverBot extends Player {
     private int oldCash;
     private int count;
+    public static final int CLEVER_BOT_BET = 10;
 
     public CleverBot(int cash) {
         this.cash = cash;
@@ -8,17 +9,13 @@ public class CleverBot extends Player {
         count = 1;
     }
 
-    public int[] makeBet() {
-        int[] bet = new int[3];
-        bet[0] = Game.BET_ON_COLOUR;
-        bet[1] = Game.RED_BET;
+    public Bet makeBet() {
         if (oldCash > cash) {
             count *= 2;
         } else {
             count = 1;
         }
-        bet[2] = Game.CLEVER_BOT_BET * count;
         oldCash = cash;
-        return bet;
+        return new Bet(Bet.BET_ON_COLOUR, Bet.RED_BET, CLEVER_BOT_BET * count);
     }
 }

@@ -13,5 +13,5 @@ public abstract class Player {
         cash -= sum;
     }
 
-    public abstract int[] makeBet();
+    public abstract Bet makeBet();
 }
