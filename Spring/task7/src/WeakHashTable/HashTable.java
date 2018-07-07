@@ -38,8 +38,8 @@ public class HashTable<K, V> extends AbstractMap<K, V> implements Map<K, V> {
 
     }
 
-    public HashTable(int capacity, int loadFactor) {
-        if (capacity < 0 && (powerOfTwo(capacity) == false))
+    private HashTable(int capacity, int loadFactor) {
+        if (capacity < 0 && (!powerOfTwo(capacity)))
             throw new IllegalArgumentException("Illegal Initial Capacity: " + capacity +" should be the power of 2 and positive value");
         if (loadFactor <= 0)
             throw new IllegalArgumentException("Illegal Load factor: " + loadFactor);
