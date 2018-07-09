@@ -1,6 +1,5 @@
 package sample;
 
-
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,22 +16,20 @@ import javafx.stage.Stage;
 import javafx.scene.input.MouseEvent;
 import mathlib.*;
 import mathlib.ChartMaker;
-
 import static mathlib.FuncEllipse.FuncEllipseName;
 import static mathlib.FuncParabollicRight.FuncParabollicRightName;
 
 public class Main extends Application {
 
-
-    private String choosenFunc;
+    private String chosenFunc;
     private LineChart linechart;
     private boolean flag;
 
-    public void setChoosenFunc(String choosenFunc) {
-        this.choosenFunc = choosenFunc;
+    private void setChoosenFunc(String choosenFunc) {
+        this.chosenFunc = choosenFunc;
     }
 
-    public void setDefaultLineChart() {
+    private void setDefaultLineChart() {
         Borders borders = FuncMath.getDefaultResolution();
         NumberAxis xAxis = new NumberAxis(borders.getXmin(), borders.getXmax(), FuncMath.getDefaultStep()) ;
         xAxis.setLabel("X") ;
@@ -45,11 +42,6 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         flag = false;
         setDefaultLineChart();
-
-
-
-
-
         Button button = new Button("Draw");
         Button buttonExit = new Button("Exit");
         Button buttonScale = new Button("Scale");
@@ -67,9 +59,8 @@ public class Main extends Application {
         textX.setVisible(false);
         textY.setVisible(false);
         textSc.setVisible(false);
-
         ComboBox comboBox = new ComboBox();
-        comboBox.getItems() .add(FuncParabollicRightName);
+        comboBox.getItems().add(FuncParabollicRightName);
         comboBox.getItems().add(FuncEllipseName);
         comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue)->{
             if (newValue == FuncParabollicRightName) {
@@ -100,7 +91,7 @@ public class Main extends Application {
         gridPane .add(scalingSc, 4, 1);
 
 
-        EventHandler<MouseEvent> eventHandler = new EventHandler<>() {
+        EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent e) {
                 gridPane .add(linechart, 0, 0);
@@ -115,14 +106,14 @@ public class Main extends Application {
             }
         };
 
-        EventHandler<MouseEvent> eventHandlerExit = new EventHandler<>() {
+        EventHandler<MouseEvent> eventHandlerExit = new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 System.exit(0);
             }
         };
 
-        EventHandler<MouseEvent> eventHandlerScale = new EventHandler<>() {
+        EventHandler<MouseEvent> eventHandlerScale = new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 if (flag) {
@@ -132,10 +123,10 @@ public class Main extends Application {
                     flag = true;
                     gridPane.getChildren().remove(linechart);
                 }
-                if (choosenFunc.equals(FuncParabollicRightName)) {
+                if (chosenFunc.equals(FuncParabollicRightName)) {
                     mathForFuncParabollicRight math = new mathForFuncParabollicRight();
                     linechart = ChartMaker.BuiltChart(math, Double.parseDouble(textX.getText()), Double.parseDouble(textY.getText()), Double.parseDouble(textSc.getText()));
-                } else if (choosenFunc.equals(FuncEllipseName)) {
+                } else if (chosenFunc.equals(FuncEllipseName)) {
                     mathForFuncEllipse math = new mathForFuncEllipse();
                     linechart = ChartMaker.BuiltChart(math, Double.parseDouble(textX.getText()), Double.parseDouble(textY.getText()), Double.parseDouble(textSc.getText()));
                 }
@@ -152,8 +143,6 @@ public class Main extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
-
     public static void main(String[] args) {
         launch(args);
     }
