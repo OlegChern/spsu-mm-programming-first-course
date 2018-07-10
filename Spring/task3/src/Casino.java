@@ -1,10 +1,8 @@
 public class Casino {
-    public static final int COLOUR_WIN_COEF = 2;
-    public static final int DOZEN_WIN_COEF = 3;
-    public static final int SIZE_WIN_COEF = 2;
     public static final int ONE_NUMBER_WIN_COEF = 36;
     public static final int AMOUNT_OF_NUMBERS = 37;
-    public static final int[] NULL_NUMBERS = new int[]{0}; //if you want to add 00, just change AMOUNT_OF_NUMBERS and classify 00 as the next number after old AMOUNT_OF_NUMBERS and add it to this array
+    //if you want to add 00, just change AMOUNT_OF_NUMBERS and classify 00 as the next number after old AMOUNT_OF_NUMBERS and add it to this array
+    public static final int[] NULL_NUMBERS = new int[]{0};
     private Player[] players;
     private Bet[] bets;
     private int spinResult;
@@ -47,22 +45,22 @@ public class Casino {
         if (notNull(spinResult)) {
             for (int i = 0; i < bets.length; i++) {
                 switch (bets[i].getTypeOfBet()) {
-                    case Bet.BET_ON_COLOUR:
-                        if ((bets[i].getBetChoice() == Bet.RED_BET && isRed(spinResult)) || (bets[i].getBetChoice() == Bet.BLACK_BET && isBlack(spinResult))) {
-                            pay(players[i], bets[i].getSumOfBet() * COLOUR_WIN_COEF);
+                    case ON_COLOUR:
+                        if ((bets[i].getBetChoice() == Colour.RED.getValue() && isRed(spinResult)) || (bets[i].getBetChoice() == Colour.BLACK.getValue() && isBlack(spinResult))) {
+                            pay(players[i], bets[i].getSumOfBet() * WinCoefficient.COLOUR.getValue());
                         }
                         break;
-                    case Bet.BET_ON_DOZEN:
-                        if ((bets[i].getBetChoice() == Bet.FIRST_DOZEN_BET && spinResult <= 12) || (bets[i].getBetChoice() == Bet.SECOND_DOZEN_BET && spinResult > 12 && spinResult <= 24) || (bets[i].getBetChoice() == Bet.THIRD_DOZEN_BET && spinResult > 24)) {
-                            pay(players[i], bets[i].getSumOfBet() * DOZEN_WIN_COEF);
+                    case ON_DOZEN:
+                        if ((bets[i].getBetChoice() == Dozen.FIRST_DOZEN.getValue() && spinResult <= 12) || (bets[i].getBetChoice() == Dozen.SECOND_DOZEN.getValue() && spinResult > 12 && spinResult <= 24) || (bets[i].getBetChoice() == Dozen.THIRD_DOZEN.getValue() && spinResult > 24)) {
+                            pay(players[i], bets[i].getSumOfBet() * WinCoefficient.DOZEN.getValue());
                         }
                         break;
-                    case Bet.BET_ON_SIZE:
-                        if ((bets[i].getBetChoice() == Bet.LITTLE_NUMBER_BET && spinResult <= 18) || (bets[i].getBetChoice() == Bet.BIG_NUMBER_BET && spinResult > 18)) {
-                            pay(players[i], bets[i].getSumOfBet() * SIZE_WIN_COEF);
+                    case ON_SIZE:
+                        if ((bets[i].getBetChoice() == Number.LITTLE_NUMBER.getValue() && spinResult <= 18) || (bets[i].getBetChoice() == Number.BIG_NUMBER.getValue() && spinResult > 18)) {
+                            pay(players[i], bets[i].getSumOfBet() * WinCoefficient.SIZE.getValue());
                         }
                         break;
-                    case Bet.BET_ON_NUMBER:
+                    case ON_NUMBER:
                         if (bets[i].getBetChoice() == spinResult) {
                             pay(players[i], bets[i].getSumOfBet() * ONE_NUMBER_WIN_COEF);
                         }

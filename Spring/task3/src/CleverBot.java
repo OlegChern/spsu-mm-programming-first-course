@@ -16,6 +16,6 @@ public class CleverBot extends Player {
             count = 1;
         }
         oldCash = cash;
-        return new Bet(Bet.BET_ON_COLOUR, Bet.RED_BET, CLEVER_BOT_BET * count);
+        return new Bet(BetType.ON_COLOUR, Colour.RED.getValue(), CLEVER_BOT_BET * count);
     }
 }

@@ -9,6 +9,6 @@ public class SillyBot extends Player {
 
     public Bet makeBet() {
         Random random = new Random();
-        return new Bet(Bet.BET_ON_NUMBER, random.nextInt(Casino.AMOUNT_OF_NUMBERS), SILLY_BOT_BET);
+        return new Bet(BetType.ON_NUMBER, random.nextInt(Casino.AMOUNT_OF_NUMBERS), SILLY_BOT_BET);
     }
 }
