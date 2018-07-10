@@ -8,6 +8,4 @@ public class MathForFuncEllipse extends FuncMath{
         Xcur = Xmax;
         borders = new Borders(MAX_X, MIN_X, MAX_Y, MIN_Y);
     }
-
-
 }

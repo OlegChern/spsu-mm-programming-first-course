@@ -94,20 +94,16 @@ public class Chat {
     }
 
     public void disconnect() {
-        server.interrupt();
-        network.interrupt();
+        server.Pause();
+        network.Pause();
         sendMSG("\0disconnect");
         network.disconnect();
         clientInterface.println("Disconnected from network! To become online connect to someone!");
     }
 
     public void connectTo(String IP, int port) {
-        if (server.isInterrupted()) {
-            server.start();
-        }
-        if (network.isInterrupted()) {
-            network.start();
-        }
+        server.Continue();
+        network.Continue();
         if (network.checkAddress(IP, port)) {
             clientInterface.println("Connection is still alive!!!");
             return;
@@ -119,9 +115,11 @@ public class Chat {
         ClientController clientController;
         try {
             network.Pause();
-            clientController = network.add(tmp);
+            clientController = network.add(tmp, true);
+            //System.out.println(clientController.getUsername());
             if (clientController == null) {
                 clientInterface.println("Connection failed!");
+                network.Continue();
                 return;
             }
             users = clientController.takeUsersList();
@@ -135,7 +133,7 @@ public class Chat {
                 if (network.checkAddress(address[0], Integer.parseInt(address[1]))) {
                     continue;
                 }
-                extrauser = network.add(chatClient.connectTo(address[0], Integer.parseInt(address[1])));
+                extrauser = network.add(chatClient.connectTo(address[0], Integer.parseInt(address[1])), false);
                 if (extrauser == null) {
                     continue;
                 }
@@ -147,5 +145,4 @@ public class Chat {
             clientInterface.errorMSG(e);
         }
     }
-
 }

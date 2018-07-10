@@ -34,7 +34,7 @@ public class NetworkController extends Thread {
         }
     }
 
-    public ClientController add(Socket client) {
+    public ClientController add(Socket client, boolean flag) {
         try {
             ClientController clientController = new ClientController(client, username, serverPort);
             sendContactList(clientController);
@@ -42,6 +42,10 @@ public class NetworkController extends Thread {
                 clients.add(clientController);
                 clientInterface.println("SYSTEM: New user with username '" + clientController.getUsername() + "' connected!");
                 return clientController;
+            } else if (flag) {
+                clientInterface.println("This user is in your userlist!!!");
+                return null;
+
             }
         } catch (IOException e) {
             clientInterface.errorMSG(e);
@@ -63,10 +67,12 @@ public class NetworkController extends Thread {
 
     public void Continue() {
         pauseFlag = false;
+        //System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
     }
 
     public void Pause() {
         pauseFlag = true;
+        //System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
 
     public boolean check(String username) {
