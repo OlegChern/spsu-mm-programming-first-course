@@ -1,5 +1,5 @@
 package mathlib;
 
-public interface function {
+public interface Function {
     double getValue(double X, boolean positivness, double step);
 }

@@ -2,7 +2,9 @@ package swing;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.*;
+
 import mathlib.*;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -17,6 +19,7 @@ public class Main {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 JFrame frame = new JFrame("Charts");
+
                 frame.setSize(800, 600);
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setVisible(true);
@@ -37,6 +40,7 @@ public class Main {
                 textFieldY.setToolTipText("Enter Y");
                 String[] items = {"", FuncParabollicRight.FuncParabollicRightName, FuncEllipse.FuncEllipseName};
                 JComboBox comboBox = new JComboBox(items);
+
                 panel.add(comboBox);
                 panel.add(textFieldX);
                 panel.add(textFieldY);
@@ -44,6 +48,7 @@ public class Main {
                 panel.add(scaleButton);
                 panel.add(drawButton);
                 panel.add(exitButton);
+
                 scaleButton.setVisible(false);
                 textFieldScale.setVisible(false);
                 textFieldX.setVisible(false);
@@ -56,7 +61,7 @@ public class Main {
                         JFreeChart chart;
                         switch (item) {
                             case FuncParabollicRight.FuncParabollicRightName:
-                                chart = ChartMaker.buildChart(new mathForFuncParabollicRight(), FuncParabollicRight.FuncParabollicRightName, FuncMath.getDefaultPointX(), FuncMath.getDefaultPointY(), FuncMath.getDefaultScroll());
+                                chart = ChartMaker.buildChart(new MathForFuncParabollicRight(), FuncParabollicRight.FuncParabollicRightName, FuncMath.getDefaultPointX(), FuncMath.getDefaultPointY(), FuncMath.getDefaultScroll());
                                 panel.remove(panel.getComponents().length - 1);
                                 cp = new ChartPanel(chart);
                                 panel.add(cp);
@@ -65,7 +70,7 @@ public class Main {
                                 scaleButton.setEnabled(true);
                                 break;
                             case FuncEllipse.FuncEllipseName:
-                                chart = ChartMaker.buildChart(new mathForFuncEllipse(), FuncEllipse.FuncEllipseName, FuncMath.getDefaultPointX(), FuncMath.getDefaultPointY(), FuncMath.getDefaultScroll());
+                                chart = ChartMaker.buildChart(new MathForFuncEllipse(), FuncEllipse.FuncEllipseName, FuncMath.getDefaultPointX(), FuncMath.getDefaultPointY(), FuncMath.getDefaultScroll());
                                 panel.remove(panel.getComponents().length - 1);
                                 cp = new ChartPanel(chart);
                                 panel.add(cp);
@@ -110,7 +115,7 @@ public class Main {
                         JFreeChart chart;
                         switch (FuncName) {
                             case FuncParabollicRight.FuncParabollicRightName:
-                                chart = ChartMaker.buildChart(new mathForFuncParabollicRight(), FuncParabollicRight.FuncParabollicRightName, Double.parseDouble(textFieldX.getText()), Double.parseDouble(textFieldY.getText()), Double.parseDouble(textFieldScale.getText()));
+                                chart = ChartMaker.buildChart(new MathForFuncParabollicRight(), FuncParabollicRight.FuncParabollicRightName, Double.parseDouble(textFieldX.getText()), Double.parseDouble(textFieldY.getText()), Double.parseDouble(textFieldScale.getText()));
                                 panel.remove(panel.getComponents().length - 1);
                                 cp = new ChartPanel(chart);
                                 panel.add(cp);
@@ -118,7 +123,7 @@ public class Main {
                                 cp.setVisible(true);
                                 break;
                             case FuncEllipse.FuncEllipseName:
-                                chart = ChartMaker.buildChart(new mathForFuncEllipse(), FuncEllipse.FuncEllipseName, Double.parseDouble(textFieldX.getText()), Double.parseDouble(textFieldY.getText()), Double.parseDouble(textFieldScale.getText()));
+                                chart = ChartMaker.buildChart(new MathForFuncEllipse(), FuncEllipse.FuncEllipseName, Double.parseDouble(textFieldX.getText()), Double.parseDouble(textFieldY.getText()), Double.parseDouble(textFieldScale.getText()));
                                 panel.remove(panel.getComponents().length - 1);
                                 cp = new ChartPanel(chart);
                                 panel.add(cp);
@@ -139,6 +144,5 @@ public class Main {
                 frame.getContentPane().add(panel);
             }
         });
-
     }
 }

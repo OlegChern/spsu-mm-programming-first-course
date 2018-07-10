@@ -1,8 +1,8 @@
 package mathlib;
 
-public class mathForFuncParabollicRight extends FuncMath{
+public class MathForFuncParabollicRight extends FuncMath{
 
-    public mathForFuncParabollicRight() {
+    public MathForFuncParabollicRight() {
         this.func = new FuncParabollicRight();
         step = DEFAULT_STEP;
         Xmax = MAX_X;

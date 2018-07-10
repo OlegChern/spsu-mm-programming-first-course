@@ -3,7 +3,7 @@ package mathlib;
 import java.util.Vector;
 
 public abstract class FuncMath {
-    protected function func;
+    protected Function func;
     protected double Xcur;
     protected double Xmax;
     protected double step;

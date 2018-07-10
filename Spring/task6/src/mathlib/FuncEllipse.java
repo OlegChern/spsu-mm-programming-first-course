@@ -1,6 +1,6 @@
 package mathlib;
 
-public class FuncEllipse implements function {
+public class FuncEllipse implements Function {
 
     public static final String FuncEllipseName = "x^2 +y^2/2 = 1";
 

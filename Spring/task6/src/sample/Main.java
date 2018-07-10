@@ -1,5 +1,6 @@
 package sample;
 
+
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -15,21 +16,23 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.scene.input.MouseEvent;
 import mathlib.*;
-import mathlib.ChartMaker;
+
 import static mathlib.FuncEllipse.FuncEllipseName;
 import static mathlib.FuncParabollicRight.FuncParabollicRightName;
 
 public class Main extends Application {
 
+
     private String chosenFunc;
     private LineChart linechart;
     private boolean flag;
+    private boolean graphCreated;
 
-    private void setChoosenFunc(String choosenFunc) {
+    public void setChoosenFunc(String choosenFunc) {
         this.chosenFunc = choosenFunc;
     }
 
-    private void setDefaultLineChart() {
+    public void setDefaultLineChart() {
         Borders borders = FuncMath.getDefaultResolution();
         NumberAxis xAxis = new NumberAxis(borders.getXmin(), borders.getXmax(), FuncMath.getDefaultStep()) ;
         xAxis.setLabel("X") ;
@@ -41,6 +44,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         flag = false;
+        graphCreated = false;
         setDefaultLineChart();
         Button button = new Button("Draw");
         Button buttonExit = new Button("Exit");
@@ -60,15 +64,17 @@ public class Main extends Application {
         textY.setVisible(false);
         textSc.setVisible(false);
         ComboBox comboBox = new ComboBox();
-        comboBox.getItems().add(FuncParabollicRightName);
+        comboBox.getItems() .add(FuncParabollicRightName);
         comboBox.getItems().add(FuncEllipseName);
         comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue)->{
             if (newValue == FuncParabollicRightName) {
-                linechart = ChartMaker.BuiltChart(new mathForFuncParabollicRight(), FuncMath.getDefaultPointX(), FuncMath.getDefaultPointY(), FuncMath.getDefaultScroll());
+                button.setDisable(false);
+                linechart = ChartMaker.BuiltChart(new MathForFuncParabollicRight(), FuncMath.getDefaultPointX(), FuncMath.getDefaultPointY(), FuncMath.getDefaultScroll());
                 setChoosenFunc(FuncParabollicRightName);
             }
             if (newValue == FuncEllipseName) {
-                linechart = ChartMaker.BuiltChart(new mathForFuncEllipse(), FuncMath.getDefaultPointX(), FuncMath.getDefaultPointY(), FuncMath.getDefaultScroll());
+                button.setDisable(false);
+                linechart = ChartMaker.BuiltChart(new MathForFuncEllipse(), FuncMath.getDefaultPointX(), FuncMath.getDefaultPointY(), FuncMath.getDefaultScroll());
                 setChoosenFunc(FuncEllipseName);
             }
         });
@@ -79,22 +85,30 @@ public class Main extends Application {
         gridPane.setVgap(5);
         gridPane.setHgap(5);
         gridPane.setAlignment(Pos.CENTER) ;
-        gridPane .add(comboBox, 0, 1);
-        gridPane .add(button, 1, 1);
-        gridPane .add(buttonExit, 1, 4);
-        gridPane .add(buttonScale, 2, 3);
-        gridPane .add(textX, 2, 2);
-        gridPane .add(textY, 3, 2);
-        gridPane .add(textSc, 4, 2);
-        gridPane .add(scalingX, 2, 1);
-        gridPane .add(scalingY, 3, 1);
-        gridPane .add(scalingSc, 4, 1);
+        gridPane .add(comboBox, 0, 1, 2, 1);
+        gridPane .add(button, 2, 1);
+        gridPane .add(buttonExit, 2, 4);
+        gridPane .add(buttonScale, 0, 4, 2, 1);
+        gridPane .add(textX, 1, 3);
+        gridPane .add(textY, 2, 3);
+        gridPane .add(textSc, 3, 3);
+        gridPane .add(scalingX, 1, 2);
+        gridPane .add(scalingY, 2, 2);
+        gridPane .add(scalingSc, 3, 2);
 
 
         EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent e) {
-                gridPane .add(linechart, 0, 0);
+                if (graphCreated) {
+                    if (flag) {
+                        gridPane.getChildren().remove(10);
+                    } else {
+                        flag = true;
+                        gridPane.getChildren().remove(linechart);
+                    }
+                }
+                gridPane .add(linechart, 0, 0, 4, 1);
                 buttonExit.setVisible(true);
                 buttonScale.setVisible(true);
                 scalingX.setVisible(true);
@@ -103,6 +117,8 @@ public class Main extends Application {
                 textX.setVisible(true);
                 textY.setVisible(true);
                 textSc.setVisible(true);
+                button.setDisable(true);
+                graphCreated = true;
             }
         };
 
@@ -116,33 +132,34 @@ public class Main extends Application {
         EventHandler<MouseEvent> eventHandlerScale = new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if (flag) {
-                    gridPane.getChildren().remove(10);
+                if (!textX.getText().equals("") && !textY.getText().equals("") && !textSc.getText().equals("")) {
+                    if (flag) {
+                        gridPane.getChildren().remove(10);
+                    } else {
+                        flag = true;
+                        gridPane.getChildren().remove(linechart);
+                    }
+                    if (chosenFunc.equals(FuncParabollicRightName)) {
+                        MathForFuncParabollicRight math = new MathForFuncParabollicRight();
+                        linechart = ChartMaker.BuiltChart(math, Double.parseDouble(textX.getText()), Double.parseDouble(textY.getText()), Double.parseDouble(textSc.getText()));
+                    } else if (chosenFunc.equals(FuncEllipseName)) {
+                        MathForFuncEllipse math = new MathForFuncEllipse();
+                        linechart = ChartMaker.BuiltChart(math, Double.parseDouble(textX.getText()), Double.parseDouble(textY.getText()), Double.parseDouble(textSc.getText()));
+                    }
+                    gridPane.add(linechart, 0, 0, 4, 1);
                 }
-                else {
-                    flag = true;
-                    gridPane.getChildren().remove(linechart);
-                }
-                if (chosenFunc.equals(FuncParabollicRightName)) {
-                    mathForFuncParabollicRight math = new mathForFuncParabollicRight();
-                    linechart = ChartMaker.BuiltChart(math, Double.parseDouble(textX.getText()), Double.parseDouble(textY.getText()), Double.parseDouble(textSc.getText()));
-                } else if (chosenFunc.equals(FuncEllipseName)) {
-                    mathForFuncEllipse math = new mathForFuncEllipse();
-                    linechart = ChartMaker.BuiltChart(math, Double.parseDouble(textX.getText()), Double.parseDouble(textY.getText()), Double.parseDouble(textSc.getText()));
-                }
-                gridPane.add(linechart, 0, 0);
             }
         };
 
         button .addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler);
         buttonExit.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandlerExit);
         buttonScale.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandlerScale);
-
         Scene scene = new Scene(gridPane ,1200, 600);
         primaryStage.setTitle("Graphics");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+
     public static void main(String[] args) {
         launch(args);
     }

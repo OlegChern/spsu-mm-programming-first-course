@@ -1,7 +1,7 @@
 package mathlib;
 
 
-public class FuncParabollicRight implements function{
+public class FuncParabollicRight implements Function{
 
     public static final String FuncParabollicRightName = "x^2-y^3=0";
 

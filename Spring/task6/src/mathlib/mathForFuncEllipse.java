@@ -1,7 +1,7 @@
 package mathlib;
 
-public class mathForFuncEllipse extends FuncMath{
-    public mathForFuncEllipse() {
+public class MathForFuncEllipse extends FuncMath{
+    public MathForFuncEllipse() {
         this.func = new FuncEllipse();
         step = DEFAULT_STEP;
         Xmax = MAX_X;
