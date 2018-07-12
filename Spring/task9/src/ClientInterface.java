@@ -29,4 +29,8 @@ public class ClientInterface {
     public void print(char i) {
         System.out.print(i);
     }
+
+    public void print(String i) {
+        System.out.print(i);
+    }
 }

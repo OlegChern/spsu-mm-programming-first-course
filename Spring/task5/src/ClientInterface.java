@@ -41,6 +41,4 @@ public class ClientInterface {
     public void printExitMSG() {
         System.out.println("Goodbye");
     }
-
-
 }
