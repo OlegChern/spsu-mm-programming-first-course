@@ -1,6 +1,5 @@
 package sample;
 
-
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -23,13 +22,11 @@ import static mathlib.FuncParabollicRight.FuncParabollicRightName;
 public class Main extends Application {
 
 
-    private String chosenFunc;
+    private String choosenFunc;
     private LineChart linechart;
-    private boolean flag;
-    private boolean graphCreated;
 
     public void setChoosenFunc(String choosenFunc) {
-        this.chosenFunc = choosenFunc;
+        this.choosenFunc = choosenFunc;
     }
 
     public void setDefaultLineChart() {
@@ -43,8 +40,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        flag = false;
-        graphCreated = false;
         setDefaultLineChart();
         Button button = new Button("Draw");
         Button buttonExit = new Button("Exit");
@@ -55,14 +50,15 @@ public class Main extends Application {
         TextField textX = new TextField();
         TextField textY = new TextField();
         TextField textSc = new TextField();
-        buttonExit.setVisible(false);
-        buttonScale.setVisible(false);
-        scalingX.setVisible(false);
-        scalingY.setVisible(false);
-        scalingSc.setVisible(false);
-        textX.setVisible(false);
-        textY.setVisible(false);
-        textSc.setVisible(false);
+        buttonExit.setDisable(true);
+        buttonScale.setDisable(true);
+        scalingX.setDisable(true);
+        scalingY.setDisable(true);
+        scalingSc.setDisable(true);
+        textX.setDisable(true);
+        textY.setDisable(true);
+        textSc.setDisable(true);
+
         ComboBox comboBox = new ComboBox();
         comboBox.getItems() .add(FuncParabollicRightName);
         comboBox.getItems().add(FuncEllipseName);
@@ -85,40 +81,37 @@ public class Main extends Application {
         gridPane.setVgap(5);
         gridPane.setHgap(5);
         gridPane.setAlignment(Pos.CENTER) ;
-        gridPane .add(comboBox, 0, 1, 2, 1);
-        gridPane .add(button, 2, 1);
-        gridPane .add(buttonExit, 2, 4);
-        gridPane .add(buttonScale, 0, 4, 2, 1);
-        gridPane .add(textX, 1, 3);
-        gridPane .add(textY, 2, 3);
-        gridPane .add(textSc, 3, 3);
-        gridPane .add(scalingX, 1, 2);
-        gridPane .add(scalingY, 2, 2);
-        gridPane .add(scalingSc, 3, 2);
+        gridPane.add(comboBox, 0, 1, 2, 1);
+        gridPane.add(button, 2, 1);
+        gridPane.add(buttonExit, 2, 4);
+        gridPane.add(buttonScale, 0, 4, 2, 1);
+        gridPane.add(textX, 1, 3);
+        gridPane.add(textY, 2, 3);
+        gridPane.add(textSc, 3, 3);
+        gridPane.add(scalingX, 1, 2);
+        gridPane.add(scalingY, 2, 2);
+        gridPane.add(scalingSc, 3, 2);
+        linechart.setMinSize(600, 600);
+        linechart.setMaxSize(600, 600);
+        gridPane .add(linechart, 0, 0, 4, 1);
 
 
         EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent e) {
-                if (graphCreated) {
-                    if (flag) {
-                        gridPane.getChildren().remove(10);
-                    } else {
-                        flag = true;
-                        gridPane.getChildren().remove(linechart);
-                    }
-                }
+                gridPane.getChildren().remove(10);
+                linechart.setMinSize(600, 600);
+                linechart.setMaxSize(600, 600);
                 gridPane .add(linechart, 0, 0, 4, 1);
-                buttonExit.setVisible(true);
-                buttonScale.setVisible(true);
-                scalingX.setVisible(true);
-                scalingY.setVisible(true);
-                scalingSc.setVisible(true);
-                textX.setVisible(true);
-                textY.setVisible(true);
-                textSc.setVisible(true);
+                buttonExit.setDisable(false);
+                buttonScale.setDisable(false);
+                scalingX.setDisable(false);
+                scalingY.setDisable(false);
+                scalingSc.setDisable(false);
+                textX.setDisable(false);
+                textY.setDisable(false);
+                textSc.setDisable(false);
                 button.setDisable(true);
-                graphCreated = true;
             }
         };
 
@@ -133,19 +126,16 @@ public class Main extends Application {
             @Override
             public void handle(MouseEvent event) {
                 if (!textX.getText().equals("") && !textY.getText().equals("") && !textSc.getText().equals("")) {
-                    if (flag) {
-                        gridPane.getChildren().remove(10);
-                    } else {
-                        flag = true;
-                        gridPane.getChildren().remove(linechart);
-                    }
-                    if (chosenFunc.equals(FuncParabollicRightName)) {
+                    gridPane.getChildren().remove(10);
+                    if (choosenFunc.equals(FuncParabollicRightName)) {
                         MathForFuncParabollicRight math = new MathForFuncParabollicRight();
                         linechart = ChartMaker.BuiltChart(math, Double.parseDouble(textX.getText()), Double.parseDouble(textY.getText()), Double.parseDouble(textSc.getText()));
-                    } else if (chosenFunc.equals(FuncEllipseName)) {
+                    } else if (choosenFunc.equals(FuncEllipseName)) {
                         MathForFuncEllipse math = new MathForFuncEllipse();
                         linechart = ChartMaker.BuiltChart(math, Double.parseDouble(textX.getText()), Double.parseDouble(textY.getText()), Double.parseDouble(textSc.getText()));
                     }
+                    linechart.setMinSize(600, 600);
+                    linechart.setMaxSize(600, 600);
                     gridPane.add(linechart, 0, 0, 4, 1);
                 }
             }
@@ -154,9 +144,11 @@ public class Main extends Application {
         button .addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler);
         buttonExit.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandlerExit);
         buttonScale.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandlerScale);
-        Scene scene = new Scene(gridPane ,1200, 600);
+
+        Scene scene = new Scene(gridPane ,700, 800);
         primaryStage.setTitle("Graphics");
         primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 

@@ -61,7 +61,7 @@
       <file leaf-file-name="FuncSeries.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/mathlib/FuncSeries.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="27">
+            <state relative-caret-position="108">
               <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
             </state>
           </provider>
@@ -71,7 +71,7 @@
         <entry file="file://$PROJECT_DIR$/src/mathlib/Function.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="108">
-              <caret line="4" column="1" lean-forward="true" selection-start-line="4" selection-start-column="1" selection-end-line="4" selection-end-column="1" />
+              <caret line="4" column="1" selection-start-line="4" selection-start-column="1" selection-end-line="4" selection-end-column="1" />
             </state>
           </provider>
         </entry>
@@ -85,19 +85,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FuncMath.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/mathlib/FuncMath.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="108">
-              <caret line="4" column="22" selection-start-line="4" selection-start-column="22" selection-end-line="4" selection-end-column="22" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="ChartMaker.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/swing/ChartMaker.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
+            <state relative-caret-position="1161">
               <caret line="43" column="5" selection-start-line="43" selection-start-column="5" selection-end-line="43" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -106,7 +97,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MathForFuncParabollicRight.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="MathForFuncParabollicRight.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/mathlib/MathForFuncParabollicRight.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="297">
@@ -116,12 +107,32 @@
         </entry>
       </file>
       <file leaf-file-name="Main.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/swing/Main.java">
+        <entry file="file://$PROJECT_DIR$/src/sample/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="27">
-              <caret line="41" column="37" selection-start-line="41" selection-start-column="37" selection-end-line="41" selection-end-column="37" />
+            <state relative-caret-position="3348">
+              <caret line="124" column="81" selection-start-line="124" selection-start-column="81" selection-end-line="124" selection-end-column="81" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#781#782#0" expanded="true" />
+                <element signature="e#827#828#0" expanded="true" />
+                <element signature="e#4701#4702#0" expanded="true" />
+                <element signature="e#4747#4748#0" expanded="true" />
+                <element signature="e#6458#6459#0" expanded="true" />
+                <element signature="e#6486#6487#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Main.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/swing/Main.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="729">
+              <caret line="27" column="59" selection-start-line="27" selection-start-column="59" selection-end-line="27" selection-end-column="59" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#4565#4566#0" expanded="true" />
+                <element signature="e#4627#4628#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -130,7 +141,7 @@
       <file leaf-file-name="Borders.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/mathlib/Borders.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="27">
+            <state relative-caret-position="54">
               <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
             </state>
           </provider>
@@ -139,7 +150,7 @@
       <file leaf-file-name="Point.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/mathlib/Point.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="27">
+            <state relative-caret-position="54">
               <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
             </state>
           </provider>
@@ -149,7 +160,7 @@
         <entry file="file://$PROJECT_DIR$/src/mathlib/MathForFuncEllipse.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="270">
-              <caret line="10" column="1" lean-forward="true" selection-start-line="10" selection-start-column="1" selection-end-line="10" selection-end-column="1" />
+              <caret line="10" column="1" selection-start-line="10" selection-start-column="1" selection-end-line="10" selection-end-column="1" />
             </state>
           </provider>
         </entry>
@@ -179,14 +190,14 @@
         <option value="$PROJECT_DIR$/src/swing/ChartMaker.java" />
         <option value="$PROJECT_DIR$/src/mathlib/mathForFuncParabollicRight.java" />
         <option value="$PROJECT_DIR$/src/mathlib/ChartMaker.java" />
-        <option value="$PROJECT_DIR$/src/sample/Main.java" />
         <option value="$PROJECT_DIR$/src/mathlib/FuncMath.java" />
         <option value="$PROJECT_DIR$/src/mathlib/FuncParabollicRight.java" />
         <option value="$PROJECT_DIR$/src/mathlib/FuncEllipse.java" />
-        <option value="$PROJECT_DIR$/src/swing/Main.java" />
         <option value="$PROJECT_DIR$/src/mathlib/Function.java" />
         <option value="$PROJECT_DIR$/src/mathlib/MathForFuncEllipse.java" />
         <option value="$PROJECT_DIR$/src/mathlib/MathForFuncParabollicRight.java" />
+        <option value="$PROJECT_DIR$/src/sample/Main.java" />
+        <option value="$PROJECT_DIR$/src/swing/Main.java" />
       </list>
     </option>
   </component>
@@ -205,7 +216,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="AndroidView" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -218,11 +229,23 @@
               <item name="task6" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="task6" type="b2602c69:ProjectViewProjectNode" />
+              <item name="task6" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="sample" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="task6" type="b2602c69:ProjectViewProjectNode" />
+              <item name="task6" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="swing" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
+      <pane id="AndroidView" />
       <pane id="Scope" />
     </panes>
   </component>
@@ -236,7 +259,7 @@
     <property name="OverrideImplement.combined" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="dynamic.classpath" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/swtgraphics2d.jar!/" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -260,7 +283,7 @@
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
     </configuration>
     <configuration name="Main" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="sample.Main" />
+      <option name="MAIN_CLASS_NAME" value="swing.Main" />
       <module name="task6" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <extension name="coverage">
@@ -359,6 +382,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="5" width="1386" height="723" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -368,18 +392,18 @@
       <window_info anchor="right" id="Capture Analysis" order="4" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="right" id="Maven Projects" order="3" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.27058825" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.27058825" />
       <window_info anchor="bottom" id="Terminal" order="8" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Designer" order="2" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.6703755" visible="true" weight="0.27615383" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.6703755" visible="true" weight="0.29" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info id="UI Designer" order="2" />
       <window_info anchor="right" id="Theme Preview" order="4" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="right" id="JetGradle" order="3" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -448,6 +472,8 @@
           <caret line="49" column="45" selection-start-line="49" selection-start-column="45" selection-end-line="49" selection-end-column="45" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#4565#4566#0" expanded="true" />
+            <element signature="e#4627#4628#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -598,13 +624,6 @@
     <entry file="file://$PROJECT_DIR$/../spsu-mm-programming-first-course/Spring/task6/src/mathlib/mathForFuncParabollicRight.java" />
     <entry file="file://$PROJECT_DIR$/../spsu-mm-programming-first-course/Spring/task6/src/mathlib/Point.java" />
     <entry file="file://$PROJECT_DIR$/src/sample/ChartMaker.java" />
-    <entry file="file://$PROJECT_DIR$/src/sample/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4104">
-          <caret line="152" lean-forward="true" selection-start-line="152" selection-end-line="152" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/mathlib/ChartMaker.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="159">
@@ -633,26 +652,16 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/swing/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="27">
-          <caret line="41" column="37" selection-start-line="41" selection-start-column="37" selection-end-line="41" selection-end-column="37" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/mathlib/Borders.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="27">
+        <state relative-caret-position="54">
           <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/mathlib/FuncSeries.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="27">
+        <state relative-caret-position="108">
           <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
         </state>
       </provider>
@@ -660,13 +669,13 @@
     <entry file="file://$PROJECT_DIR$/src/mathlib/Function.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="108">
-          <caret line="4" column="1" lean-forward="true" selection-start-line="4" selection-start-column="1" selection-end-line="4" selection-end-column="1" />
+          <caret line="4" column="1" selection-start-line="4" selection-start-column="1" selection-end-line="4" selection-end-column="1" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/mathlib/Point.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="27">
+        <state relative-caret-position="54">
           <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
         </state>
       </provider>
@@ -674,20 +683,14 @@
     <entry file="file://$PROJECT_DIR$/src/mathlib/MathForFuncEllipse.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
-          <caret line="10" column="1" lean-forward="true" selection-start-line="10" selection-start-column="1" selection-end-line="10" selection-end-column="1" />
+          <caret line="10" column="1" selection-start-line="10" selection-start-column="1" selection-end-line="10" selection-end-column="1" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/swing/MathForFuncParabollicRight.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret selection-end-line="3" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/swing/MathForFuncParabollicRight.java" />
     <entry file="file://$PROJECT_DIR$/src/swing/ChartMaker.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
+        <state relative-caret-position="1161">
           <caret line="43" column="5" selection-start-line="43" selection-start-column="5" selection-end-line="43" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -699,6 +702,34 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="297">
           <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/sample/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3348">
+          <caret line="124" column="81" selection-start-line="124" selection-start-column="81" selection-end-line="124" selection-end-column="81" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#781#782#0" expanded="true" />
+            <element signature="e#827#828#0" expanded="true" />
+            <element signature="e#4701#4702#0" expanded="true" />
+            <element signature="e#4747#4748#0" expanded="true" />
+            <element signature="e#6458#6459#0" expanded="true" />
+            <element signature="e#6486#6487#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/swing/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="729">
+          <caret line="27" column="59" selection-start-line="27" selection-start-column="59" selection-end-line="27" selection-end-column="59" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#4565#4566#0" expanded="true" />
+            <element signature="e#4627#4628#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

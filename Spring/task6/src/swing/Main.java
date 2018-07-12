@@ -28,6 +28,7 @@ public class Main {
                 JButton scaleButton = new JButton("Scale");
                 JFreeChart chart = ChartMaker.buildDefaultChart();
                 cp = new ChartPanel(chart);
+
                 JPanel panel = new JPanel();
                 JTextField textFieldX = new JTextField();
                 textFieldX.setColumns(10);
@@ -53,7 +54,6 @@ public class Main {
                 textFieldScale.setVisible(false);
                 textFieldX.setVisible(false);
                 textFieldY.setVisible(false);
-
                 ActionListener actionListenerComboBox = new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         JComboBox box = (JComboBox)e.getSource();
@@ -142,6 +142,7 @@ public class Main {
                 panel.add(cp);
                 cp.setVisible(false);
                 frame.getContentPane().add(panel);
+                frame.setResizable(false);
             }
         });
     }
