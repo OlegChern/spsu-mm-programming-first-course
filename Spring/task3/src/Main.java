@@ -23,7 +23,8 @@ public class Main {
         }
         Casino casino = new Casino();
         Roulette roulette = new Roulette();
-        Game game = new Game(casino, roulette );
+        BetWorker betWorker = new BetWorker();
+        Game game = new Game(casino, roulette, betWorker);
         game.setPlayers(players);
         for (int i = 0; i < 40; i++) {
             game.Round();

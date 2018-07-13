@@ -2,10 +2,12 @@ public class Game {
     private Player[] players;
     private Casino casino;
     private Roulette roulette;
+    private BetWorker betWorker;
 
-    public Game(Casino casino, Roulette roulette) {
+    public Game(Casino casino, Roulette roulette, BetWorker betWorker) {
         this.casino = casino;
         this.roulette = roulette;
+        this.betWorker = betWorker;
     }
 
     public void setPlayers(Player[] players) {
@@ -13,8 +15,9 @@ public class Game {
     }
 
     public void Round() {
-        casino.setPlayers(players);
-        casino.setBets();
+        betWorker.setPlayers(players);
+        betWorker.setBets();
+        casino.setBetWorker(betWorker);
         casino.setSpinResult(roulette.spin());
         casino.payBets();
     }

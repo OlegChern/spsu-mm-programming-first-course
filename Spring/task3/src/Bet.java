@@ -18,7 +18,5 @@ public class Bet {
         return typeOfBet;
     }
 
-    public int getSumOfBet() {
-        return sumOfBet;
-    }
+    public int getSumOfBet() { return sumOfBet; }
 }
