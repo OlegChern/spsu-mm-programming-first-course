@@ -1,24 +1,21 @@
 #pragma once
 #include "LinkedList.h"
 /// <summary>
-/// хэш таблица
+/// ГµГЅГё ГІГ ГЎГ«ГЁГ¶Г 
 /// </summary>
 template <typename T>
 class HashTable
 {
 private:
 
-#pragma region Поля
+#pragma region ГЏГ®Г«Гї
+
 	/// <summary>
-	/// было ли первое добавление в таблицу
-	/// </summary>
-	bool firstAdd = true;
-	/// <summary>
-	/// уникальный id
+	/// ГіГ­ГЁГЄГ Г«ГјГ­Г»Г© id
 	/// </summary>
 	int id;
 	/// <summary>
-	/// хэш функция
+	/// ГµГЅГё ГґГіГ­ГЄГ¶ГЁГї
 	/// </summary>
 	/// <param name="value"></param>
 	/// <returns></returns>
@@ -31,7 +28,7 @@ private:
 
 public:
 
-#pragma region Конструкторы/Деструкторы
+#pragma region ГЉГ®Г­Г±ГІГ°ГіГЄГІГ®Г°Г»/Г„ГҐГ±ГІГ°ГіГЄГІГ®Г°Г»
 
 	HashTable(int count) {
 		id = 0;
@@ -43,7 +40,7 @@ public:
 	}
 #pragma endregion
 
-#pragma region Методы
+#pragma region ГЊГҐГІГ®Г¤Г»
 
 	void Add(T value) {
 		int hash = HashFunction(value);
