@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2002
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Task10.IoC", "Task10.IoC\Task10.IoC.csproj", "{9BCD8B73-1318-462E-9D58-9E7D8E26165D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blackjack", "Blackjack\Blackjack.csproj", "{3C353E8F-5757-4DDF-9C2C-4EA066FD0CBB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9BCD8B73-1318-462E-9D58-9E7D8E26165D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BCD8B73-1318-462E-9D58-9E7D8E26165D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BCD8B73-1318-462E-9D58-9E7D8E26165D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BCD8B73-1318-462E-9D58-9E7D8E26165D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C353E8F-5757-4DDF-9C2C-4EA066FD0CBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C353E8F-5757-4DDF-9C2C-4EA066FD0CBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C353E8F-5757-4DDF-9C2C-4EA066FD0CBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C353E8F-5757-4DDF-9C2C-4EA066FD0CBB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C564C5F8-9017-44AE-BDEE-E94C568E6774}
+	EndGlobalSection
+EndGlobal
