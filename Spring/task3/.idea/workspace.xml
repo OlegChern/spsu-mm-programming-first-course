@@ -29,7 +29,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Casino.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Casino.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Casino.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-1091">
@@ -71,15 +71,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SillyBot.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/SillyBot.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="54">
-              <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="Roulette.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Roulette.java">
           <provider selected="true" editor-type-id="text-editor">
@@ -94,6 +85,15 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="54">
               <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BetType.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/BetType.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="108">
+              <caret line="4" column="14" selection-start-line="4" selection-start-column="14" selection-end-line="4" selection-end-column="14" />
             </state>
           </provider>
         </entry>
@@ -139,7 +139,6 @@
         <option value="$PROJECT_DIR$/src/SillyBot.java" />
         <option value="$PROJECT_DIR$/src/WinCoefficient.java" />
         <option value="$PROJECT_DIR$/src/Bet.java" />
-        <option value="$PROJECT_DIR$/src/BetType.java" />
         <option value="$PROJECT_DIR$/src/BetWorker.java" />
         <option value="$PROJECT_DIR$/src/Colour.java" />
         <option value="$PROJECT_DIR$/src/Dozen.java" />
@@ -147,6 +146,7 @@
         <option value="$PROJECT_DIR$/src/Game.java" />
         <option value="$PROJECT_DIR$/src/Casino.java" />
         <option value="$PROJECT_DIR$/src/Main.java" />
+        <option value="$PROJECT_DIR$/src/BetType.java" />
       </list>
     </option>
   </component>
@@ -268,7 +268,8 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="7" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -607,13 +608,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/BetType.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="12" selection-start-column="12" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/WinCoefficient.java">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -706,6 +700,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1091">
           <caret column="13" selection-start-column="13" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/BetType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="108">
+          <caret line="4" column="14" selection-start-line="4" selection-start-column="14" selection-end-line="4" selection-end-column="14" />
         </state>
       </provider>
     </entry>
