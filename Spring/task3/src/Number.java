@@ -8,9 +8,12 @@ public enum Number {
         this.value = value;
     }
 
-
     public int getValue() {
         return value;
     }
 
+    public static boolean betCheck(Bet bet, int spinResult) {
+        return ((bet.getBetChoice() == Number.LITTLE_NUMBER.getValue() && spinResult <= 18) || (bet.getBetChoice() == Number.BIG_NUMBER.getValue() && spinResult > 18));
+
+    }
 }

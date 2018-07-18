@@ -3,11 +3,27 @@ public class Casino {
     public static final int AMOUNT_OF_NUMBERS = 37;
     //if you want to add 00, just change AMOUNT_OF_NUMBERS and classify 00 as the next number after old AMOUNT_OF_NUMBERS and add it to this array
     public static final int[] NULL_NUMBERS = new int[]{0};
+    private Player[] players;
+    private Bet[] bets;
     private int spinResult;
     private BetWorker betWorker;
 
+    public void setPlayers(Player[] players) {
+        this.players = players;
+    }
+
     public void setBetWorker(BetWorker betWorker) {
         this.betWorker = betWorker;
+    }
+
+
+    public void setBets() {
+        bets = new Bet[players.length];
+        for (int i = 0; i < players.length; i++) {
+            Bet bet = players[i].makeBet();
+            bets[i] = bet;
+            players[i].payCash(bet.getSumOfBet());
+        }
     }
 
     public void setSpinResult(int spinResult) {
@@ -23,40 +39,43 @@ public class Casino {
         return true;
     }
 
-    public boolean isRed(int spinResult) {
-        return (spinResult % 2 != 0);
-    }
-
-    public boolean isBlack(int spinResult) {
-        return (spinResult % 2 == 0);
-    }
-
     public void payBets() {
+        int winCoef;
         if (notNull(spinResult)) {
             for (int i = 0; i < betWorker.getNumOfPlayers(); i++) {
-                switch (betWorker.getTypeOfBet(i)) {
-                    case ON_COLOUR:
-                        if ((betWorker.getBetChoice(i) == Colour.RED.getValue() && isRed(spinResult)) || (betWorker.getBetChoice(i) == Colour.BLACK.getValue() && isBlack(spinResult))) {
-                            betWorker.pay(i, WinCoefficient.COLOUR.getValue());
-                        }
-                        break;
-                    case ON_DOZEN:
-                        if ((betWorker.getBetChoice(i) == Dozen.FIRST_DOZEN.getValue() && spinResult <= 12) || (betWorker.getBetChoice(i) == Dozen.SECOND_DOZEN.getValue() && spinResult > 12 && spinResult <= 24) || (betWorker.getBetChoice(i) == Dozen.THIRD_DOZEN.getValue() && spinResult > 24)) {
-                            betWorker.pay(i, WinCoefficient.DOZEN.getValue());
-                        }
-                        break;
-                    case ON_SIZE:
-                        if ((betWorker.getBetChoice(i) == Number.LITTLE_NUMBER.getValue() && spinResult <= 18) || (betWorker.getBetChoice(i) == Number.BIG_NUMBER.getValue() && spinResult > 18)) {
-                            betWorker.pay(i, WinCoefficient.SIZE.getValue());
-                        }
-                        break;
-                    case ON_NUMBER:
-                        if (betWorker.getBetChoice(i) == spinResult) {
-                            betWorker.pay(i, ONE_NUMBER_WIN_COEF);
-                        }
-                        break;
-                }
+                winCoef = getWinCoef(betWorker.getBet(i), spinResult);
+                betWorker.pay(i, winCoef);
             }
         }
+    }
+
+    public int getWinCoef (Bet bet, int spinResult) {
+        switch (bet.getTypeOfBet()) {
+            case ON_COLOUR:
+                if (Colour.betCheck(bet, spinResult)) {
+                    return WinCoefficient.COLOUR.getValue();
+                }
+                break;
+            case ON_DOZEN:
+                if (Dozen.betCheck(bet, spinResult)) {
+                    return WinCoefficient.DOZEN.getValue();
+                }
+                break;
+            case ON_SIZE:
+                if (Number.betCheck(bet, spinResult)) {
+                    return WinCoefficient.SIZE.getValue();
+                }
+                break;
+            case ON_NUMBER:
+                if (checkNumberBet(bet, spinResult)) {
+                    return ONE_NUMBER_WIN_COEF;
+                }
+                break;
+        }
+        return 0;
+    }
+
+    public boolean checkNumberBet (Bet bet, int spinResult) {
+        return (bet.getBetChoice() == spinResult);
     }
 }

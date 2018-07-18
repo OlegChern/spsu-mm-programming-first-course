@@ -1,4 +1,5 @@
 public class BetWorker {
+
     private Player[] players;
     private Bet[] bets;
 
@@ -22,6 +23,10 @@ public class BetWorker {
         return bets[numOfPlayer].getTypeOfBet();
     }
 
+    public Bet getBet(int numOfPlayer) {
+        return bets[numOfPlayer];
+    }
+
     public void setBets() {
         bets = new Bet[players.length];
         for (int i = 0; i < players.length; i++) {
@@ -35,5 +40,4 @@ public class BetWorker {
         int sum = bets[numOfPlayer].getSumOfBet() * coef;
         players[numOfPlayer].addCash(sum);
     }
-
 }
