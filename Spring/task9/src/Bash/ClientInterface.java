@@ -1,3 +1,5 @@
+package Bash;
+
 import java.util.Scanner;
 
 public class ClientInterface {
@@ -34,3 +36,4 @@ public class ClientInterface {
         System.out.print(i);
     }
 }
+

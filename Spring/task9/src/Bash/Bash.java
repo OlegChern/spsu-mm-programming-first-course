@@ -1,18 +1,33 @@
+package Bash;
+
+import Commands.*;
+
 import java.util.HashMap;
 
 public class Bash {
 
     private ClientInterface clientInterface;
     private String directoryName;
-    private HashMap <String, String> variables;
-    private Commands commands;
+    private HashMap<String, String> variables;
+    private Cat cat;
+    private Echo echo;
+    private Exit exit;
+    private Pwd pwd;
+    private RunWithOS runWithOS;
+    private Wc wc;
 
     public Bash() {
         clientInterface = new ClientInterface();
         this.variables = new HashMap<>();
         setDirectoryName();
-        commands = new Commands(clientInterface, directoryName, this);
+        echo = new Echo(clientInterface, directoryName, this);
+        exit = new Exit(clientInterface, directoryName, this);
+        pwd = new Pwd(clientInterface, directoryName, this);
+        runWithOS = new RunWithOS(clientInterface, directoryName, this);
+        wc = new Wc(clientInterface, directoryName, this);
+        cat = new Cat(clientInterface, directoryName, this);
     }
+
 
     public void setDirectoryName() {
         clientInterface.println("Enter path where you want to work with bash:");
@@ -40,9 +55,7 @@ public class Bash {
     }
 
     public void ClassifyAndDo(String command, String[] otherCommands) {
-        //System.out.println(command);
         String[] parsedCommand = command.split(" ");
-        //System.out.println(parsedCommand[0]);
         int i = 0;
         if (parsedCommand.length > 0) {
             for (int j = 0; j < parsedCommand.length; j++) {
@@ -56,52 +69,48 @@ public class Bash {
                     parsedCommand[j] = variables.get(parsedCommand[j].substring(1));
                 }
             }
-            //System.out.println(parsedCommand[i]);
             String[] tmp = new String[parsedCommand.length - i - 1];
             System.arraycopy(parsedCommand, i + 1, tmp, 0, parsedCommand.length - i - 1);
             switch (parsedCommand[i].charAt(0)) {
                 case 'e':
                     if (parsedCommand[i].equals("exit")) {
-                        commands.exit();
+                        exit.run(tmp, otherCommands);
                     } else if (parsedCommand[i].equals("echo") && parsedCommand.length - i > 1) {
-                        //System.out.println( parsedCommand.length - i);
-                        //System.out.println(parsedCommand.length - i - 1);
-                        commands.echo(tmp, otherCommands);
+                        echo.run(tmp, otherCommands);
                     } else {
-                        commands.runWithOS(parsedCommand, otherCommands);
+                        runWithOS.run(parsedCommand, otherCommands);
                     }
                     break;
                 case 'p':
                     if (parsedCommand[i].equals("pwd")) {
-                        commands.pwd(otherCommands);
+                        pwd.run(tmp, otherCommands);
                     } else {
-                        commands.runWithOS(parsedCommand, otherCommands);
+                        runWithOS.run(parsedCommand, otherCommands);
                     }
                     break;
                 case 'c':
                     if (parsedCommand[i].equals("cat") && parsedCommand.length > 1) {
-                        commands.cat(tmp, otherCommands);
+                        cat.run(tmp, otherCommands);
                     } else {
-                        commands.runWithOS(parsedCommand, otherCommands);
+                        runWithOS.run(parsedCommand, otherCommands);
                     }
                     break;
                 case 'w':
                     if (parsedCommand[i].equals("wc") && parsedCommand.length > 1) {
-                        commands.wc(tmp, otherCommands);
+                        wc.run(tmp, otherCommands);
                     } else {
-                        commands.runWithOS(parsedCommand, otherCommands);
+                        runWithOS.run(parsedCommand, otherCommands);
                     }
                     break;
                 case '$':
-                    //System.out.println(parsedCommand[i].split("=")[0]);
                     if (parsedCommand[i].split("=").length == 2) {
                         variables.put(parsedCommand[i].split("=")[0].substring(1), parsedCommand[i].split("=")[1]);
                     } else {
-                        commands.runWithOS(parsedCommand, otherCommands);
+                        runWithOS.run(parsedCommand, otherCommands);
                     }
                     break;
                 default:
-                    commands.runWithOS(parsedCommand, otherCommands);
+                    runWithOS.run(parsedCommand, otherCommands);
                     break;
             }
         }
