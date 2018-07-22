@@ -13,6 +13,7 @@ public:
 		combatMass = _combatMass;
 		cost = _cost;
 	}
+	
 	APC();
 	~APC();
 };
