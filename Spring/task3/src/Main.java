@@ -23,11 +23,10 @@ public class Main {
         }
         Casino casino = new Casino();
         Roulette roulette = new Roulette();
-        BetWorker betWorker = new BetWorker();
-        Game game = new Game(casino, roulette, betWorker);
+        Game game = new Game(casino, roulette);
         game.setPlayers(players);
         for (int i = 0; i < 40; i++) {
-            game.Round();
+            game.round();
         }
         for (int i = 0; i < count; i++) {
             System.out.println("Player number " + (i + 1) + " now has " + players[i].showCash() + " dollars");

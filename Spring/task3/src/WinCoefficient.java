@@ -9,7 +9,6 @@ public enum WinCoefficient {
         this.value = value;
     }
 
-
     public int getValue() {
         return value;
     }
