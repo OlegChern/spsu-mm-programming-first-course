@@ -7,7 +7,7 @@ class cat : public command
 	char line[1000];
 public:
 	LocalValue * values;
-	// ôàéë äîëæåí íàõîäèòüñÿ â ðàáî÷åì êàòàëîãå
+	// Ñ„Ð°Ð¹Ð» Ð´Ð¾Ð»Ð¶ÐµÐ½ Ð½Ð°Ñ…Ð¾Ð´Ð¸Ñ‚ÑŒÑÑ Ð² Ñ€Ð°Ð±Ð¾Ñ‡ÐµÐ¼ ÐºÐ°Ñ‚Ð°Ð»Ð¾Ð³Ðµ
 	void execude() {
 		string dollarCmd = values->getValue(value);
 		if (dollarCmd != "")
