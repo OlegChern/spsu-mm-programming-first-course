@@ -81,7 +81,7 @@ public:
 		vector <string> splitString = split(s);
 		vector <pair<int, string> > res;
 
-		// cлучай когда | первая или последняя
+		
 		if (numCommand(splitString[0]) == 6 || numCommand(splitString[(int)splitString.size() - 1]) == 6)
 		{
 			res.push_back({ 6, "error" });
@@ -115,7 +115,7 @@ public:
 		return res;
 	}
 
-	// разделить строку	
+	// СЂР°Р·РґРµР»РёС‚СЊ СЃС‚СЂРѕРєСѓ	
 	vector <string> split(string s)
 	{
 		vector <string> res;
@@ -138,7 +138,7 @@ public:
 		return res;
 	}
 
-	// номер команды
+	// РЅРѕРјРµСЂ РєРѕРјР°РЅРґС‹
 	int numCommand(string s)
 	{
 		if (s[0] == '$')
