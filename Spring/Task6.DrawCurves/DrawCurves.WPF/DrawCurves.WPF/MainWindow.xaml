@@ -1,0 +1,28 @@
+﻿<Window x:Class="DrawCurves.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DrawCurves.WPF"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="500" Width="700" MaxHeight="500" MaxWidth="700" ResizeMode="NoResize">
+    <Grid>
+        <ComboBox x:Name="curvesComboBox" HorizontalAlignment="Left" Margin="29,45,0,0" VerticalAlignment="Top" Width="120">
+            <ComboBox.ItemTemplate>
+                <DataTemplate DataType="Curves:ACurve">
+                    <TextBlock Text="{Binding Equation}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Label x:Name="curvesLabel" Content="Curves:" HorizontalAlignment="Left" Margin="29,14,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="14"/>
+        <Label x:Name="scaleLabel" Content="Scale:" HorizontalAlignment="Left" Margin="30,75,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="14" Width="51" Height="29" RenderTransformOrigin="0.92,-1.998"/>
+        <Label x:Name="scaleChangeLabel" Content="1" HorizontalAlignment="Left" Margin="88,109,0,0" VerticalAlignment="Top" Height="60" Width="61" FontSize="20" FontWeight="Bold" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" BorderBrush="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" BorderThickness="2" RenderTransformOrigin="3.975,0.703"/>
+        <Button x:Name="decButton1" Click="buttonScale_Click" HorizontalAlignment="Left" Margin="30,109,0,0" VerticalAlignment="Top" Width="50" Height="25" Content="- 0.1"/>
+        <Button x:Name="decButton2" Click="buttonScale_Click" Content="-1" HorizontalAlignment="Left" Margin="29,144,0,0" VerticalAlignment="Top" Width="50" Height="25" FontSize="10" IsDefault="True"/>
+        <Button x:Name="incButton1" Click="buttonScale_Click" Content="+ 0.1" HorizontalAlignment="Left" Margin="157,109,0,0" VerticalAlignment="Top" Width="50" Height="25"/>
+        <Button x:Name="incButton2" Click="buttonScale_Click" Content="+ 1" HorizontalAlignment="Left" Margin="159,144,0,0" VerticalAlignment="Top" Width="50" Height="25"/>
+        <Button x:Name="drawCurveButton" Click="buttonDraw_Click" Content="draw curve" HorizontalAlignment="Left" Margin="33,183,0,0" VerticalAlignment="Top" Width="176" Height="23" FontSize="14"/>
+        <Canvas x:Name="canvas" Height="453" Margin="9,10,10,0" VerticalAlignment="Top" Width="675"/>
+
+    </Grid>
+</Window>
