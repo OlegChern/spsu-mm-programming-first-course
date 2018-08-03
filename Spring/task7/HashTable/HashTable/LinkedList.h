@@ -2,13 +2,13 @@
 #include "Node.h"
 
 /// <summary>
-/// двусвязный список
+/// РґРІСѓСЃРІСЏР·РЅС‹Р№ СЃРїРёСЃРѕРє
 /// </summary>
 template <typename T1, typename T2>
 class LinkedList
 {
 
-#pragma region Поля
+#pragma region РџРѕР»СЏ
 	Node<T1, T2>* head;
 	Node<T1, T2>* tail;
 	Node<T1, T2>* nullNode;
@@ -16,7 +16,7 @@ class LinkedList
 
 public:
 
-#pragma region Конструкторы/Деструкторы
+#pragma region РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂС‹/Р”РµСЃС‚СЂСѓРєС‚РѕСЂС‹
 	LinkedList()
 	{
 		nullNode = new Node<T1, T2>();
@@ -29,7 +29,7 @@ public:
 	}
 #pragma endregion
 
-#pragma region Методы
+#pragma region РњРµС‚РѕРґС‹
 	void setHead(Node<T1, T2>* ptr)
 	{
 		head = ptr;
