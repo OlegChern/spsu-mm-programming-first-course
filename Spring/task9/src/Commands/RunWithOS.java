@@ -17,7 +17,6 @@ public class RunWithOS extends Command {
         String result = "";
         try {
             parsedCommand[0] = "cd " + directoryName + " & " + parsedCommand[0];
-            parsedCommand[0] = "cd " + directoryName + " & " + parsedCommand[0];
             process = Runtime.getRuntime().exec(new String[]{"cmd.exe", "/c", String.join(" ", parsedCommand)});
             int i;
             while ((i = process.getInputStream().read()) != -1) {

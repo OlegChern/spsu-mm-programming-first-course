@@ -2,6 +2,8 @@ package Bash;
 
 import Commands.*;
 
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Bash {
@@ -9,32 +11,39 @@ public class Bash {
     private ClientInterface clientInterface;
     private String directoryName;
     private HashMap<String, String> variables;
-    private Cat cat;
-    private Echo echo;
-    private Exit exit;
-    private Pwd pwd;
+    private HashMap<CommandType, Command> commandsHashmap;
+    private ArrayList<CommandType> commandsNames;
     private RunWithOS runWithOS;
-    private Wc wc;
 
-    public Bash() {
+    public Bash(ArrayList<CommandType> commandsNames) {
         clientInterface = new ClientInterface();
+        this.commandsNames = commandsNames;
         this.variables = new HashMap<>();
         setDirectoryName();
-        echo = new Echo(clientInterface, directoryName, this);
-        exit = new Exit(clientInterface, directoryName, this);
-        pwd = new Pwd(clientInterface, directoryName, this);
-        runWithOS = new RunWithOS(clientInterface, directoryName, this);
-        wc = new Wc(clientInterface, directoryName, this);
-        cat = new Cat(clientInterface, directoryName, this);
+        commandFactory(clientInterface, directoryName, this);
     }
 
+    private void commandFactory(ClientInterface clientInterface, String directoryName, Bash bash) {
+        commandsHashmap = new HashMap<>();
+        runWithOS = new RunWithOS(clientInterface, directoryName, this);
+        commandsNames.forEach(name -> {
+            try {
+                Class<?> clazz = Class.forName("Commands." + name);
+                Constructor<?> constructor = clazz.getConstructor(ClientInterface.class, String.class, Bash.class);
+                Object instance = constructor.newInstance(clientInterface, directoryName, this);
+                commandsHashmap.put(name, (Command) instance);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
 
     public void setDirectoryName() {
         clientInterface.println("Enter path where you want to work with bash:");
         this.directoryName = clientInterface.getCommand();
     }
 
-    public void run() {
+    public void start() {
         clientInterface.printWelcomeMSG();
         while (true) {
             String command = clientInterface.getCommand();
@@ -44,7 +53,6 @@ public class Bash {
 
     public void runCommand(String command) {
         String[] commands = command.split("\\|");
-        String tmp;
         if (commands.length == 1) {
             ClassifyAndDo(commands[0], null);
         } else {
@@ -74,30 +82,30 @@ public class Bash {
             switch (parsedCommand[i].charAt(0)) {
                 case 'e':
                     if (parsedCommand[i].equals("exit")) {
-                        exit.run(tmp, otherCommands);
+                        commandsHashmap.get(CommandType.Exit).run(tmp, otherCommands);
                     } else if (parsedCommand[i].equals("echo") && parsedCommand.length - i > 1) {
-                        echo.run(tmp, otherCommands);
+                        commandsHashmap.get(CommandType.Echo).run(tmp, otherCommands);
                     } else {
                         runWithOS.run(parsedCommand, otherCommands);
                     }
                     break;
                 case 'p':
                     if (parsedCommand[i].equals("pwd")) {
-                        pwd.run(tmp, otherCommands);
+                        commandsHashmap.get(CommandType.Pwd).run(tmp, otherCommands);
                     } else {
                         runWithOS.run(parsedCommand, otherCommands);
                     }
                     break;
                 case 'c':
                     if (parsedCommand[i].equals("cat") && parsedCommand.length > 1) {
-                        cat.run(tmp, otherCommands);
+                        commandsHashmap.get(CommandType.Cat).run(tmp, otherCommands);
                     } else {
                         runWithOS.run(parsedCommand, otherCommands);
                     }
                     break;
                 case 'w':
                     if (parsedCommand[i].equals("wc") && parsedCommand.length > 1) {
-                        wc.run(tmp, otherCommands);
+                        commandsHashmap.get(CommandType.Wc).run(tmp, otherCommands);
                     } else {
                         runWithOS.run(parsedCommand, otherCommands);
                     }
