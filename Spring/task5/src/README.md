@@ -12,4 +12,5 @@ Available commands:
 
 If you are connected to network just enter smth to send it to the network!
 
-JDK version: 10.0.1
+JDK version: 10.0.2
+IDEA: Intellij IDEA 2018.2 x64
