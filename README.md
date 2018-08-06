@@ -1,5 +1,8 @@
 Language: Java
 
-JDK: jdk1.8.0_161
+JDK version: 10.0.2
 
-IDE: IntelliJ Idea 2018.1
+Standart: Java SE 10
+
+IDE: IntelliJ Idea 2018.2
+
