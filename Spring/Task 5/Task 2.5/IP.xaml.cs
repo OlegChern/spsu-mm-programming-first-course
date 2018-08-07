@@ -31,11 +31,20 @@ namespace Chat
         {
             if ((IPAddress.TryParse(ServerIP.Text, out var ip)) && (UInt16.TryParse(ServerPort.Text, out var port)))
             {
+                var point = new IPEndPoint(ip, port);
+
                 var chat = (ChatWindow)Owner;
 
-                chat.User.Connect(new IPEndPoint(ip, port));
+                if ((!chat.User.Points.Contains(point)) && (!chat.User.NewPoints.Contains(point)))
+                {
+                    chat.User.Connect(point);
 
-                Close();
+                    Close();
+                }
+                else
+                {
+                    chat.PrintException("Вы уже подключены к данному пользователю");
+                }
             }
             else
             {
