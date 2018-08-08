@@ -13,6 +13,10 @@ public class Cat extends Command {
     @Override
     public void run(String[] args, String[] commands) {
         String line, result;
+        if (args.length == 0) {
+            String[] tmp = {"cat"};
+            bash.getRunWithOS().run(tmp, commands);
+        }
         for (int i = 0; i < args.length; i++) {
             try {
                 File f;

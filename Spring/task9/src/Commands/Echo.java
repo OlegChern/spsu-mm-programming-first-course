@@ -12,6 +12,10 @@ public class Echo extends Command {
     @Override
     public void run(String[] args, String[] commands) {
         String result = "";
+        if (args.length == 0) {
+            String[] tmp = {"echo"};
+            bash.getRunWithOS().run(tmp, commands);
+        }
         for (String arg : args) {
             result += arg + " ";
         }

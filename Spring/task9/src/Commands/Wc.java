@@ -13,6 +13,10 @@ public class Wc extends Command {
     @Override
     public void run(String[] args, String[] commands) {
         String line, result;
+        if (args.length == 0) {
+            String[] tmp = {"wc"};
+            bash.getRunWithOS().run(tmp, commands);
+        }
         for (int i = 0; i < args.length; i++) {
             int lines = 0, words = 0;
             try {

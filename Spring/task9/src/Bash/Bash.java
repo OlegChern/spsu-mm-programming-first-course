@@ -3,39 +3,41 @@ package Bash;
 import Commands.*;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Vector;
 
 public class Bash {
 
     private ClientInterface clientInterface;
     private String directoryName;
     private HashMap<String, String> variables;
-    private HashMap<CommandType, Command> commandsHashmap;
-    private ArrayList<CommandType> commandsNames;
+    private HashMap<String, Command> commandsHashmap;
+    private Vector<String> commandsNames;
     private RunWithOS runWithOS;
 
-    public Bash(ArrayList<CommandType> commandsNames) {
+
+    public Bash(Vector<String> commandsNames) {
         clientInterface = new ClientInterface();
         this.commandsNames = commandsNames;
         this.variables = new HashMap<>();
         setDirectoryName();
-        commandFactory(clientInterface, directoryName, this);
+        commandsHashmap = commandFactory(clientInterface, directoryName, this);
     }
 
-    private void commandFactory(ClientInterface clientInterface, String directoryName, Bash bash) {
-        commandsHashmap = new HashMap<>();
+    private HashMap<String, Command> commandFactory(ClientInterface clientInterface, String directoryName, Bash bash) {
+        HashMap<String, Command> commandHashMap = new HashMap<>();
         runWithOS = new RunWithOS(clientInterface, directoryName, this);
-        commandsNames.forEach(name -> {
+        for (String name : commandsNames) {
             try {
                 Class<?> clazz = Class.forName("Commands." + name);
                 Constructor<?> constructor = clazz.getConstructor(ClientInterface.class, String.class, Bash.class);
                 Object instance = constructor.newInstance(clientInterface, directoryName, this);
-                commandsHashmap.put(name, (Command) instance);
+                commandHashMap.put(name, (Command) instance);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }
+        return commandHashMap;
     }
 
     public void setDirectoryName() {
@@ -49,6 +51,10 @@ public class Bash {
             String command = clientInterface.getCommand();
             runCommand(command);
         }
+    }
+
+    public RunWithOS getRunWithOS() {
+        return runWithOS;
     }
 
     public void runCommand(String command) {
@@ -79,47 +85,16 @@ public class Bash {
             }
             String[] tmp = new String[parsedCommand.length - i - 1];
             System.arraycopy(parsedCommand, i + 1, tmp, 0, parsedCommand.length - i - 1);
-            switch (parsedCommand[i].charAt(0)) {
-                case 'e':
-                    if (parsedCommand[i].equals("exit")) {
-                        commandsHashmap.get(CommandType.Exit).run(tmp, otherCommands);
-                    } else if (parsedCommand[i].equals("echo") && parsedCommand.length - i > 1) {
-                        commandsHashmap.get(CommandType.Echo).run(tmp, otherCommands);
-                    } else {
-                        runWithOS.run(parsedCommand, otherCommands);
-                    }
-                    break;
-                case 'p':
-                    if (parsedCommand[i].equals("pwd")) {
-                        commandsHashmap.get(CommandType.Pwd).run(tmp, otherCommands);
-                    } else {
-                        runWithOS.run(parsedCommand, otherCommands);
-                    }
-                    break;
-                case 'c':
-                    if (parsedCommand[i].equals("cat") && parsedCommand.length > 1) {
-                        commandsHashmap.get(CommandType.Cat).run(tmp, otherCommands);
-                    } else {
-                        runWithOS.run(parsedCommand, otherCommands);
-                    }
-                    break;
-                case 'w':
-                    if (parsedCommand[i].equals("wc") && parsedCommand.length > 1) {
-                        commandsHashmap.get(CommandType.Wc).run(tmp, otherCommands);
-                    } else {
-                        runWithOS.run(parsedCommand, otherCommands);
-                    }
-                    break;
-                case '$':
-                    if (parsedCommand[i].split("=").length == 2) {
-                        variables.put(parsedCommand[i].split("=")[0].substring(1), parsedCommand[i].split("=")[1]);
-                    } else {
-                        runWithOS.run(parsedCommand, otherCommands);
-                    }
-                    break;
-                default:
-                    runWithOS.run(parsedCommand, otherCommands);
-                    break;
+            for (String name : commandsNames) {
+                if (parsedCommand[i].equals(name.toLowerCase())) {
+                    commandsHashmap.get(name).run(tmp, otherCommands);
+                    return;
+                }
+            }
+            if (parsedCommand[i].charAt(0) == '$' && parsedCommand[i].split("=").length == 2) {
+                variables.put(parsedCommand[i].split("=")[0].substring(1), parsedCommand[i].split("=")[1]);
+            } else {
+                runWithOS.run(parsedCommand, otherCommands);
             }
         }
     }
