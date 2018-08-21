@@ -1,13 +1,17 @@
 import TestInterface.Loadable;
 
+import java.io.File;
 import java.io.IOException;
-
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.jar.JarFile;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
-    
+
     public static void main(String[] args) throws IOException {
 
         if (args.length < 1) {
@@ -15,31 +19,42 @@ public class Main {
             return;
         }
 
-        String filePath = args[0];
-        JarFile archive = new JarFile(filePath);
+        String path = args[0];
+        Path baseDir = Paths.get(path);
 
-        URL[] url = new URL[]{new URL("jar:file:" + filePath + "!/")};
+        if (!baseDir.toFile().isDirectory()) {
+            throw new IOException("Path is specified to a file, not a directory");
+        }
+
+        URL[] url = {baseDir.toUri().toURL()};
         URLClassLoader loader = URLClassLoader.newInstance(url);
 
-        archive.stream()
-                .filter(entry -> !entry.isDirectory() && entry.getName().endsWith(".class"))
-                .map(entry -> {
-                    Class<?> temp = null;
+        List<Loadable> testList = new ArrayList<>();
+
+        Files.walkFileTree(baseDir, new SimpleFileVisitor<Path>() {
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) {
+                if (!file.toFile().isDirectory() && file.toString().endsWith(".class")) {
                     try {
-                        String name = entry.getName().substring(0, entry.getName().length() - ".class".length()).replace("/", ".");
-                        temp = loader.loadClass(name);
-                    } catch (ClassNotFoundException ex) {
-                        System.err.println(ex.getMessage());
+                        String name = file.toString().substring(baseDir.toString().length() + 1, file.toString().length() - 6).replace(File.separator, ".");
+                        Class<?> result = loader.loadClass(name);
+                        if (Loadable.class.isAssignableFrom(result)) {
+                            testList.add((Loadable) result.getDeclaredConstructor().newInstance());
+                        }
+                    } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
+                        e.printStackTrace();
+                        System.exit(1);
                     }
-                    return temp;
-                })
-                .filter(Loadable.class::isAssignableFrom)
-                .forEach(clss -> {
-                    try {
-                        ((Loadable) clss.newInstance()).load();
-                    } catch (InstantiationException | IllegalAccessException ex) {
-                        System.err.println(ex.getMessage());
-                    }
-                });
+                }
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+        for (Loadable test : testList) {
+            test.load();
+        }
+
     }
 }
+
