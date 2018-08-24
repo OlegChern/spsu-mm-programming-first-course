@@ -36,7 +36,7 @@ class Parser {
 
     private void searchForInit(ArrayList<String> lexemes) {
         List<String> toBeRemoved = new ArrayList<>();
-        Pattern pattern = Pattern.compile("(\\$)(\\w)(\\w?){30}(\\=)(\\w?){30}(\\.?)(\\w?){10}");
+        Pattern pattern = Pattern.compile("(\\$)(\\w)(\\w?){30}(\\=)(\\S?){100}");
 
         for (String currentLexeme : lexemes) {
             Matcher matcher = pattern.matcher(currentLexeme);
