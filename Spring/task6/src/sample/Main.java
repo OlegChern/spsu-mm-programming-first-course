@@ -1,5 +1,7 @@
 package sample;
 
+import java.util.Vector;
+import mathlib.*;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,7 +16,6 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.scene.input.MouseEvent;
-import mathlib.*;
 
 import static mathlib.FuncEllipse.FuncEllipseName;
 import static mathlib.FuncParabollicRight.FuncParabollicRightName;
@@ -22,11 +23,11 @@ import static mathlib.FuncParabollicRight.FuncParabollicRightName;
 public class Main extends Application {
 
 
-    private String choosenFunc;
+    private String chosenFunc;
     private LineChart linechart;
 
     public void setChoosenFunc(String choosenFunc) {
-        this.choosenFunc = choosenFunc;
+        this.chosenFunc = choosenFunc;
     }
 
     public void setDefaultLineChart() {
@@ -81,22 +82,22 @@ public class Main extends Application {
         gridPane.setVgap(5);
         gridPane.setHgap(5);
         gridPane.setAlignment(Pos.CENTER) ;
-        gridPane.add(comboBox, 0, 1, 2, 1);
-        gridPane.add(button, 2, 1);
-        gridPane.add(buttonExit, 2, 4);
-        gridPane.add(buttonScale, 0, 4, 2, 1);
-        gridPane.add(textX, 1, 3);
-        gridPane.add(textY, 2, 3);
-        gridPane.add(textSc, 3, 3);
-        gridPane.add(scalingX, 1, 2);
-        gridPane.add(scalingY, 2, 2);
-        gridPane.add(scalingSc, 3, 2);
+        gridPane .add(comboBox, 0, 1, 2, 1);
+        gridPane .add(button, 2, 1);
+        gridPane .add(buttonExit, 2, 4);
+        gridPane .add(buttonScale, 0, 4, 2, 1);
+        gridPane .add(textX, 1, 3);
+        gridPane .add(textY, 2, 3);
+        gridPane .add(textSc, 3, 3);
+        gridPane .add(scalingX, 1, 2);
+        gridPane .add(scalingY, 2, 2);
+        gridPane .add(scalingSc, 3, 2);
         linechart.setMinSize(600, 600);
         linechart.setMaxSize(600, 600);
         gridPane .add(linechart, 0, 0, 4, 1);
 
 
-        EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() {
+        EventHandler<MouseEvent> eventHandler = new EventHandler<>() {
             @Override
             public void handle(MouseEvent e) {
                 gridPane.getChildren().remove(10);
@@ -115,22 +116,22 @@ public class Main extends Application {
             }
         };
 
-        EventHandler<MouseEvent> eventHandlerExit = new EventHandler<MouseEvent>() {
+        EventHandler<MouseEvent> eventHandlerExit = new EventHandler<>() {
             @Override
             public void handle(MouseEvent event) {
                 System.exit(0);
             }
         };
 
-        EventHandler<MouseEvent> eventHandlerScale = new EventHandler<MouseEvent>() {
+        EventHandler<MouseEvent> eventHandlerScale = new EventHandler<>() {
             @Override
             public void handle(MouseEvent event) {
                 if (!textX.getText().equals("") && !textY.getText().equals("") && !textSc.getText().equals("")) {
                     gridPane.getChildren().remove(10);
-                    if (choosenFunc.equals(FuncParabollicRightName)) {
+                    if (chosenFunc.equals(FuncParabollicRightName)) {
                         MathForFuncParabollicRight math = new MathForFuncParabollicRight();
                         linechart = ChartMaker.BuiltChart(math, Double.parseDouble(textX.getText()), Double.parseDouble(textY.getText()), Double.parseDouble(textSc.getText()));
-                    } else if (choosenFunc.equals(FuncEllipseName)) {
+                    } else if (chosenFunc.equals(FuncEllipseName)) {
                         MathForFuncEllipse math = new MathForFuncEllipse();
                         linechart = ChartMaker.BuiltChart(math, Double.parseDouble(textX.getText()), Double.parseDouble(textY.getText()), Double.parseDouble(textSc.getText()));
                     }
@@ -152,7 +153,11 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+
     public static void main(String[] args) {
+        MathForFuncEllipse math = new MathForFuncEllipse();
+        Vector<FuncSeries> tmp = math.giveSeries(1, 0, 5);
+        Vector <Point> points = tmp.elementAt(1).getPoints();
         launch(args);
     }
 }

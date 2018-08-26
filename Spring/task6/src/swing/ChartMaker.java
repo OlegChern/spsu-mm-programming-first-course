@@ -24,7 +24,6 @@ public class ChartMaker {
             for (Point point : points) {
                 data[0][i] = point.getX();
                 data[1][i] = point.getY();
-                System.out.println(data[0][i] + " " + data[1][i]);
                 i++;
             }
             ds.addSeries(funcSeries.getSeriesName(), data);

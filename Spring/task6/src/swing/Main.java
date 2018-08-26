@@ -26,8 +26,11 @@ public class Main {
                 JButton drawButton = new JButton("Draw");
                 JButton exitButton = new JButton("Exit");
                 JButton scaleButton = new JButton("Scale");
+
+
                 JFreeChart chart = ChartMaker.buildDefaultChart();
                 cp = new ChartPanel(chart);
+
 
                 JPanel panel = new JPanel();
                 JTextField textFieldX = new JTextField();
@@ -54,10 +57,11 @@ public class Main {
                 textFieldScale.setVisible(false);
                 textFieldX.setVisible(false);
                 textFieldY.setVisible(false);
+
                 ActionListener actionListenerComboBox = new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        JComboBox box = (JComboBox)e.getSource();
-                        String item = (String)box.getSelectedItem();
+                        JComboBox box = (JComboBox) e.getSource();
+                        String item = (String) box.getSelectedItem();
                         JFreeChart chart;
                         switch (item) {
                             case FuncParabollicRight.FuncParabollicRightName:
@@ -145,5 +149,6 @@ public class Main {
                 frame.setResizable(false);
             }
         });
+
     }
 }
