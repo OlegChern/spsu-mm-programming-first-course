@@ -13,7 +13,7 @@ public abstract class FuncMath {
     protected static final double MIN_Y = -12;
     protected static final double MAX_X = 5;
     protected static final double MIN_X = -5;
-    protected static final double DEFAULT_STEP = 0.1;
+    protected static final double DEFAULT_STEP = 0.05;
     protected static final double DEFAULT_POINT_X = 0;
     protected static final double DEFAULT_POINT_Y = 0;
     protected static final double DEFAULT_SCROLL = 1;

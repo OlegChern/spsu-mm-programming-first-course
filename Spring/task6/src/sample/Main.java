@@ -77,7 +77,7 @@ public class Main extends Application {
         });
 
         GridPane gridPane = new GridPane();
-        gridPane.setMinSize(400, 200) ;
+        gridPane.setMinSize(450, 200) ;
         gridPane.setPadding(new Insets(10, 10, 10, 10) );
         gridPane.setVgap(5);
         gridPane.setHgap(5);
@@ -92,8 +92,8 @@ public class Main extends Application {
         gridPane .add(scalingX, 1, 2);
         gridPane .add(scalingY, 2, 2);
         gridPane .add(scalingSc, 3, 2);
-        linechart.setMinSize(600, 600);
-        linechart.setMaxSize(600, 600);
+        linechart.setMinSize(450, 450);
+        linechart.setMaxSize(450, 450);
         gridPane .add(linechart, 0, 0, 4, 1);
 
 
@@ -101,8 +101,8 @@ public class Main extends Application {
             @Override
             public void handle(MouseEvent e) {
                 gridPane.getChildren().remove(10);
-                linechart.setMinSize(600, 600);
-                linechart.setMaxSize(600, 600);
+                linechart.setMinSize(450, 450);
+                linechart.setMaxSize(450, 450);
                 gridPane .add(linechart, 0, 0, 4, 1);
                 buttonExit.setDisable(false);
                 buttonScale.setDisable(false);
@@ -135,8 +135,8 @@ public class Main extends Application {
                         MathForFuncEllipse math = new MathForFuncEllipse();
                         linechart = ChartMaker.BuiltChart(math, Double.parseDouble(textX.getText()), Double.parseDouble(textY.getText()), Double.parseDouble(textSc.getText()));
                     }
-                    linechart.setMinSize(600, 600);
-                    linechart.setMaxSize(600, 600);
+                    linechart.setMinSize(450, 450);
+                    linechart.setMaxSize(450, 450);
                     gridPane.add(linechart, 0, 0, 4, 1);
                 }
             }
@@ -146,7 +146,7 @@ public class Main extends Application {
         buttonExit.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandlerExit);
         buttonScale.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandlerScale);
 
-        Scene scene = new Scene(gridPane ,700, 800);
+        Scene scene = new Scene(gridPane ,475, 575);
         primaryStage.setTitle("Graphics");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);

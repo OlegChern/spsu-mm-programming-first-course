@@ -20,7 +20,7 @@ public class Main {
             public void run() {
                 JFrame frame = new JFrame("Charts");
 
-                frame.setSize(800, 600);
+                frame.setSize(695, 500);
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setVisible(true);
                 JButton drawButton = new JButton("Draw");
