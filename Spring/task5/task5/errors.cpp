@@ -13,7 +13,7 @@ void errors::ShowError()
 void errors::ShowError(SOCKET _socket)
 {
 	printf("Error bind %d\n", WSAGetLastError());
-	// закрываем сокет!
+	// Р·Р°РєСЂС‹РІР°РµРј СЃРѕРєРµС‚!
 	closesocket(_socket);
 	WSACleanup();
 }

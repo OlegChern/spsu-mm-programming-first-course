@@ -16,19 +16,19 @@ private:
 	static string convert(int a);
 
 	/// <summary>
-	/// Отделить ip и port
+	/// РћС‚РґРµР»РёС‚СЊ ip Рё port
 	/// </summary>
 	/// <returns></returns>
 	static pair<string, string> parser(string s);
 
 	/// <summary>
-	/// печатает сообщения  в консоли
+	/// РїРµС‡Р°С‚Р°РµС‚ СЃРѕРѕР±С‰РµРЅРёСЏ  РІ РєРѕРЅСЃРѕР»Рё
 	/// </summary>
 	/// <param name="message"></param>
 	static void logMessage(string message);
 
 	/// <summary>
-	/// Корректный выход
+	/// РљРѕСЂСЂРµРєС‚РЅС‹Р№ РІС‹С…РѕРґ
 	/// </summary>
 	static void exitCmd(SOCKET socket);
 
@@ -43,14 +43,14 @@ public:
 	static int lastPort;
 
 	/// <summary>
-	/// отправка сообщения
+	/// РѕС‚РїСЂР°РІРєР° СЃРѕРѕР±С‰РµРЅРёСЏ
 	/// </summary>
 	/// <param name="socket"></param>
 	/// <param name="message"></param>
 	static void sendMessage(SOCKET socket, string message);
 
 	/// <summary>
-	/// Создает сокет
+	/// РЎРѕР·РґР°РµС‚ СЃРѕРєРµС‚
 	/// </summary>
 	/// <returns></returns>
 	static SOCKET initSocket();
@@ -58,7 +58,7 @@ public:
 	static DWORD WINAPI getMessage(LPVOID clientSocket);
 
 	/// <summary>
-	/// обсуживает очередного подключившегося клиента независимо от остальных
+	/// РѕР±СЃСѓР¶РёРІР°РµС‚ РѕС‡РµСЂРµРґРЅРѕРіРѕ РїРѕРґРєР»СЋС‡РёРІС€РµРіРѕСЃСЏ РєР»РёРµРЅС‚Р° РЅРµР·Р°РІРёСЃРёРјРѕ РѕС‚ РѕСЃС‚Р°Р»СЊРЅС‹С…
 	/// </summary>
 	/// <param name="client_socket"></param>
 	/// <returns></returns>

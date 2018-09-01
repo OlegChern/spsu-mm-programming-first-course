@@ -13,7 +13,7 @@ private:
 	map <int, SOCKET>::iterator it;
 public:
 	/// <summary>
-	/// печатает сообщения  в консоли
+	/// РїРµС‡Р°С‚Р°РµС‚ СЃРѕРѕР±С‰РµРЅРёСЏ  РІ РєРѕРЅСЃРѕР»Рё
 	/// </summary>
 	/// <param name="message"></param>
 	void logMessage(string message);
@@ -21,9 +21,9 @@ public:
 	string convert(int a);
 
 	/// <summary>
-	/// Инициализация Библиотеки Сокетов
+	/// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Р‘РёР±Р»РёРѕС‚РµРєРё РЎРѕРєРµС‚РѕРІ
 	/// </summary>
-	/// <returns>true- если все ок</returns>
+	/// <returns>true- РµСЃР»Рё РІСЃРµ РѕРє</returns>
 	bool init(); 
 
 	void start();
