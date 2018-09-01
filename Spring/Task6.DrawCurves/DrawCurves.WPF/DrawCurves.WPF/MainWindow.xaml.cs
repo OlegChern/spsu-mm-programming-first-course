@@ -36,10 +36,10 @@ namespace DrawCurves.WPF
             x0 = (float)canvas.Width / 2;
             y0 = (float)canvas.Height / 2;
 
-            decButton1.Tag = -0.1f;
-            decButton2.Tag = -1f;
-            incButton1.Tag = 0.1f;
-            incButton2.Tag = 1f;
+            small_Decrease.Tag = -0.1f;
+            large_Decrease.Tag = -1f;
+            small_Increase.Tag = 0.1f;
+            large_Increase.Tag = 1f;
             scaleChangeLabel.Tag = 1f;
 
             List<ACurve> list = new List<ACurve>() { new Curves.Ellipse(1, 1, -width, width),

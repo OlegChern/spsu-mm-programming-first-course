@@ -32,10 +32,10 @@
             this.CurveLabel = new System.Windows.Forms.Label();
             this.ScaleLabel = new System.Windows.Forms.Label();
             this.ScaleChangeLabel = new System.Windows.Forms.Label();
-            this.Dec1 = new System.Windows.Forms.Button();
-            this.Inc1 = new System.Windows.Forms.Button();
-            this.Dec2 = new System.Windows.Forms.Button();
-            this.Inc2 = new System.Windows.Forms.Button();
+            this.Small_Decrease = new System.Windows.Forms.Button();
+            this.Small_Increase = new System.Windows.Forms.Button();
+            this.Large_Decrease = new System.Windows.Forms.Button();
+            this.Large_Increase = new System.Windows.Forms.Button();
             this.buildButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
@@ -82,53 +82,53 @@
             this.ScaleChangeLabel.Text = "1";
             this.ScaleChangeLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // Dec1
+            // Small_Decrease
             // 
-            this.Dec1.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.Dec1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.Dec1.Location = new System.Drawing.Point(12, 94);
-            this.Dec1.Name = "Dec1";
-            this.Dec1.Size = new System.Drawing.Size(48, 25);
-            this.Dec1.TabIndex = 4;
-            this.Dec1.Text = "- 0.1";
-            this.Dec1.UseVisualStyleBackColor = false;
-            this.Dec1.Click += new System.EventHandler(this.buttonIncDec_Click);
+            this.Small_Decrease.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.Small_Decrease.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.Small_Decrease.Location = new System.Drawing.Point(12, 94);
+            this.Small_Decrease.Name = "Small_Decrease";
+            this.Small_Decrease.Size = new System.Drawing.Size(48, 25);
+            this.Small_Decrease.TabIndex = 4;
+            this.Small_Decrease.Text = "- 0.1";
+            this.Small_Decrease.UseVisualStyleBackColor = false;
+            this.Small_Decrease.Click += new System.EventHandler(this.buttonIncDec_Click);
             // 
-            // Inc1
+            // Small_Increase
             // 
-            this.Inc1.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.Inc1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.Inc1.Location = new System.Drawing.Point(143, 94);
-            this.Inc1.Name = "Inc1";
-            this.Inc1.Size = new System.Drawing.Size(47, 25);
-            this.Inc1.TabIndex = 5;
-            this.Inc1.Text = "+ 0.1";
-            this.Inc1.UseVisualStyleBackColor = false;
-            this.Inc1.Click += new System.EventHandler(this.buttonIncDec_Click);
+            this.Small_Increase.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.Small_Increase.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.Small_Increase.Location = new System.Drawing.Point(143, 94);
+            this.Small_Increase.Name = "Small_Increase";
+            this.Small_Increase.Size = new System.Drawing.Size(47, 25);
+            this.Small_Increase.TabIndex = 5;
+            this.Small_Increase.Text = "+ 0.1";
+            this.Small_Increase.UseVisualStyleBackColor = false;
+            this.Small_Increase.Click += new System.EventHandler(this.buttonIncDec_Click);
             // 
-            // Dec2
+            // Large_Decrease
             // 
-            this.Dec2.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.Dec2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.Dec2.Location = new System.Drawing.Point(12, 125);
-            this.Dec2.Name = "Dec2";
-            this.Dec2.Size = new System.Drawing.Size(48, 25);
-            this.Dec2.TabIndex = 6;
-            this.Dec2.Text = "- 1";
-            this.Dec2.UseVisualStyleBackColor = false;
-            this.Dec2.Click += new System.EventHandler(this.buttonIncDec_Click);
+            this.Large_Decrease.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.Large_Decrease.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.Large_Decrease.Location = new System.Drawing.Point(12, 125);
+            this.Large_Decrease.Name = "Large_Decrease";
+            this.Large_Decrease.Size = new System.Drawing.Size(48, 25);
+            this.Large_Decrease.TabIndex = 6;
+            this.Large_Decrease.Text = "- 1";
+            this.Large_Decrease.UseVisualStyleBackColor = false;
+            this.Large_Decrease.Click += new System.EventHandler(this.buttonIncDec_Click);
             // 
-            // Inc2
+            // Large_Increase
             // 
-            this.Inc2.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.Inc2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.Inc2.Location = new System.Drawing.Point(143, 125);
-            this.Inc2.Name = "Inc2";
-            this.Inc2.Size = new System.Drawing.Size(48, 25);
-            this.Inc2.TabIndex = 7;
-            this.Inc2.Text = "+ 1";
-            this.Inc2.UseVisualStyleBackColor = false;
-            this.Inc2.Click += new System.EventHandler(this.buttonIncDec_Click);
+            this.Large_Increase.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.Large_Increase.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.Large_Increase.Location = new System.Drawing.Point(143, 125);
+            this.Large_Increase.Name = "Large_Increase";
+            this.Large_Increase.Size = new System.Drawing.Size(48, 25);
+            this.Large_Increase.TabIndex = 7;
+            this.Large_Increase.Text = "+ 1";
+            this.Large_Increase.UseVisualStyleBackColor = false;
+            this.Large_Increase.Click += new System.EventHandler(this.buttonIncDec_Click);
             // 
             // buildButton
             // 
@@ -149,10 +149,10 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(744, 421);
             this.Controls.Add(this.buildButton);
-            this.Controls.Add(this.Inc2);
-            this.Controls.Add(this.Dec2);
-            this.Controls.Add(this.Inc1);
-            this.Controls.Add(this.Dec1);
+            this.Controls.Add(this.Large_Increase);
+            this.Controls.Add(this.Large_Decrease);
+            this.Controls.Add(this.Small_Increase);
+            this.Controls.Add(this.Small_Decrease);
             this.Controls.Add(this.ScaleChangeLabel);
             this.Controls.Add(this.ScaleLabel);
             this.Controls.Add(this.CurveLabel);
@@ -173,10 +173,10 @@
         private System.Windows.Forms.Label CurveLabel;
         private System.Windows.Forms.Label ScaleLabel;
         private System.Windows.Forms.Label ScaleChangeLabel;
-        private System.Windows.Forms.Button Dec1;
-        private System.Windows.Forms.Button Inc1;
-        private System.Windows.Forms.Button Dec2;
-        private System.Windows.Forms.Button Inc2;
+        private System.Windows.Forms.Button Small_Decrease;
+        private System.Windows.Forms.Button Small_Increase;
+        private System.Windows.Forms.Button Large_Decrease;
+        private System.Windows.Forms.Button Large_Increase;
         private System.Windows.Forms.Button buildButton;
     }
 }

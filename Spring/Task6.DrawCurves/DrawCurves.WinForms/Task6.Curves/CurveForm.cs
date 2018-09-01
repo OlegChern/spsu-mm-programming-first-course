@@ -29,10 +29,10 @@ namespace Task6.Curves
             scale = 1f;
             pointsInSegment = (int)(width / 16 * scale);
 
-            Inc1.Tag = 0.1f;
-            Inc2.Tag = 1f;
-            Dec1.Tag = -0.1f;
-            Dec2.Tag = -1f;
+            Small_Increase.Tag = 0.1f;
+            Large_Increase.Tag = 1f;
+            Small_Decrease.Tag = -0.1f;
+            Large_Decrease.Tag = -1f;
             ScaleChangeLabel.Tag = 1f;
 
             comboBoxCurves.Items.AddRange(new ACurve[] { new Ellipse(1, 1, -width, width),
