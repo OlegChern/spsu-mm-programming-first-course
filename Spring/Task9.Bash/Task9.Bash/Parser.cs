@@ -84,7 +84,10 @@ namespace Task9.Bash
                     }
                 default:
                     {
-                        ProcessStart processStart = new ProcessStart(new List<string>() { inputString });
+                        List<string> arg = new List<string>();
+                        arg.Add(commandName);
+                        arg.AddRange(arguments);
+                        ProcessStart processStart = new ProcessStart(arg);
                         return processStart;
                     }
             }

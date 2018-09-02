@@ -32,7 +32,7 @@ namespace Task9.Bash
 
         public void Execute()
         {
-            throw new ExitException();
+            Environment.Exit(0);
         }
     }
 }

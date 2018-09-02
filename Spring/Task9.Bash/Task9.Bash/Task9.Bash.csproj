@@ -47,7 +47,6 @@
     <Compile Include="Cat.cs" />
     <Compile Include="Echo.cs" />
     <Compile Include="Exit.cs" />
-    <Compile Include="ExitException.cs" />
     <Compile Include="ICommand.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="ProcessStart.cs" />

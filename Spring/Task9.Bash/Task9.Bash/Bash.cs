@@ -38,9 +38,8 @@ namespace Task9.Bash
         public void Start()
         {
             PrintInfo();
-            bool stop = false;
 
-            while (!stop)
+            while (true)
             {
                 List<ICommand> commands = null;
                 try
@@ -62,10 +61,6 @@ namespace Task9.Bash
                     try
                     {
                         ExecuteCommands(commands);
-                    }
-                    catch (ExitException)
-                    {
-                        stop = true;
                     }
                     catch (Exception exception)
                     {

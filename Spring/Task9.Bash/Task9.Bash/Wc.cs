@@ -30,42 +30,46 @@ namespace Task9.Bash
 
         public void Execute()
         {
-            if (Arguments.Count != 1)
+            if (Arguments.Count == 0)
             {
                 throw new ArgumentException("Incorrect arguments in '" + Name + "'");
             }
 
-            int numberOfLines;
-            int numberOfWords;
-            int numberOfBytes;
-
-            try
+            foreach(var temp in Arguments)
             {
-                string[] lines = File.ReadAllLines(Arguments[0]);
-                numberOfLines = lines.Length;
+                int numberOfLines;
+                int numberOfWords;
+                int numberOfBytes;
 
-                numberOfWords = 0;
-                foreach (var temp in lines)
+                try
                 {
-                    string[] words = temp.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    numberOfWords += words.Length;
+                    string[] lines = File.ReadAllLines(temp);
+                    numberOfLines = lines.Length;
+
+                    numberOfWords = 0;
+                    foreach (var tmp in lines)
+                    {
+                        string[] words = tmp.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        numberOfWords += words.Length;
+                    }
+
+                    byte[] bytes = File.ReadAllBytes(Arguments[0]);
+                    numberOfBytes = bytes.Length;
+                }
+                catch
+                {
+                    throw new ArgumentException("Incorrect path to file");
                 }
 
-                byte[] bytes = File.ReadAllBytes(Arguments[0]);
-                numberOfBytes = bytes.Length;
-            }
-            catch
-            {
-                throw new ArgumentException("Incorrect path to file");
-            }
+                Console.WriteLine("Number of lines: {0}", numberOfLines);
+                Console.WriteLine("Number of words: {0}", numberOfWords);
+                Console.WriteLine("Number of bytes: {0}", numberOfBytes);
+                Console.WriteLine();
 
-            Console.WriteLine("Number of lines: {0}", numberOfLines);
-            Console.WriteLine("Number of words: {0}", numberOfWords);
-            Console.WriteLine("Number of bytes: {0}", numberOfBytes);
-
-            Output.Add(numberOfLines.ToString());
-            Output.Add(numberOfWords.ToString());
-            Output.Add(numberOfBytes.ToString());
+                Output.Add(numberOfLines.ToString());
+                Output.Add(numberOfWords.ToString());
+                Output.Add(numberOfBytes.ToString());
+            }        
         }
     }
 }

@@ -30,26 +30,29 @@ namespace Task9.Bash
 
         public void Execute()
         {
-            if (Arguments.Count != 1)
+            if (Arguments.Count == 0)
             {
                 throw new ArgumentException("Incorrect arguments in '" + Name + "'");
             }
 
-            string[] lines;
-            try
+            foreach(var tmp in Arguments)
             {
-                lines = File.ReadAllLines(Arguments[0]);
-            }
-            catch
-            {
-                throw new ArgumentException("Incorrect path to file");
-            }
-            foreach(var temp in lines)
-            {
-                Console.WriteLine(temp);
-            }
-            Console.WriteLine();
-            Output.AddRange(lines);
+                string[] lines;
+                try
+                {
+                    lines = File.ReadAllLines(tmp);
+                }
+                catch
+                {
+                    throw new ArgumentException("Incorrect path to file");
+                }
+                foreach (var temp in lines)
+                {
+                    Console.WriteLine(temp);
+                }
+                Console.WriteLine();
+                Output.AddRange(lines);
+            }        
         }
     }
 }

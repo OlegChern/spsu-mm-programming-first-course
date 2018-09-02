@@ -27,14 +27,27 @@ namespace Task9.Bash
         {
             try
             {
-                var process = new Process();
-                process.StartInfo = new ProcessStartInfo(Arguments[0]);
-                process.StartInfo.UseShellExecute = false;
-                process.Start();
+                var procInfo = new ProcessStartInfo(Name);
+                procInfo.UseShellExecute = false;
+
+                if (Arguments.Count > 1)
+                {
+                    var arg = Arguments[1];
+                    if (Arguments.Count > 2)
+                    {
+                        for (int i = 2; i < Arguments.Count; i++)
+                        {
+                            arg += " " + Arguments[i];
+                        }
+                    }
+                    procInfo.Arguments = arg;
+                    Console.WriteLine(arg);
+                }
+                Process.Start(procInfo);
             }
-            catch(Exception)
+            catch
             {
-                throw new ArgumentException("incorrect '" + Name + "'");
+                throw new Exception("Ошибка: Не удалось запустить данную команду ...");
             }
         }
     }
