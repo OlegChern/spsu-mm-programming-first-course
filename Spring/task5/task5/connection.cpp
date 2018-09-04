@@ -33,7 +33,7 @@ SOCKET connection::tryConnect(string ipClient, int portClient)
 	dest_addr.sin_family = AF_INET;
 	dest_addr.sin_port = htons(portClient);
 	HOSTENT *hst;
-	// преобразование IP адреса из символьного в сетевой формат
+	// РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ IP Р°РґСЂРµСЃР° РёР· СЃРёРјРІРѕР»СЊРЅРѕРіРѕ РІ СЃРµС‚РµРІРѕР№ С„РѕСЂРјР°С‚
 	if (inet_addr(ipClient.c_str()) != INADDR_NONE)
 		dest_addr.sin_addr.s_addr = inet_addr(ipClient.c_str());
 	else

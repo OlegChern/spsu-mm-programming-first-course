@@ -62,9 +62,9 @@ void chat::start()
 		logMessage(errors::incorrectAdress);
 		return;
 	}
-	// создание сокета
+	// СЃРѕР·РґР°РЅРёРµ СЃРѕРєРµС‚Р°
 	socketEx = connection::initSocket();
-	// связывание сокета с локальным адресом
+	// СЃРІСЏР·С‹РІР°РЅРёРµ СЃРѕРєРµС‚Р° СЃ Р»РѕРєР°Р»СЊРЅС‹Рј Р°РґСЂРµСЃРѕРј
 	sockaddr_in local_addr;
 	local_addr.sin_family = AF_INET;
 	local_addr.sin_port = htons(connection::port);
@@ -76,7 +76,7 @@ void chat::start()
 		return;
 	}
 
-	// ожидание подключений
+	// РѕР¶РёРґР°РЅРёРµ РїРѕРґРєР»СЋС‡РµРЅРёР№
 	if (listen(socketEx, 20))
 		errors::ShowError(socketEx);
 

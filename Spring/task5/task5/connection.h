@@ -11,13 +11,13 @@ public:
 	static string recieveClient(LPVOID client_socket);
 
 	/// <summary>
-	/// Создает сокет
+	/// РЎРѕР·РґР°РµС‚ СЃРѕРєРµС‚
 	/// </summary>
 	/// <returns></returns>
 	static SOCKET initSocket();
 
 	/// <summary>
-	/// отправка сообщения
+	/// РѕС‚РїСЂР°РІРєР° СЃРѕРѕР±С‰РµРЅРёСЏ
 	/// </summary>
 	/// <param name="socket"></param>
 	/// <param name="message"></param>
