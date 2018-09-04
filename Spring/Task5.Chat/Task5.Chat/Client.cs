@@ -14,61 +14,22 @@ namespace Task5.Chat
         private Socket socket;
         private Dictionary<IPEndPoint, string> connectedClients;
 
-        public Client()
+        public Client(string name, IPEndPoint iPEndPoint, Socket socket,  Dictionary<IPEndPoint, string> connectedClients)
         {
-            socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            connectedClients = new Dictionary<IPEndPoint, string>();
-            localIpEndPoint = null;
-
-            bool correctStart = false;
-            while (!correctStart)
-            {
-                try
-                {
-                    Start();
-                    correctStart = true;
-                }
-                catch (Exception exception)
-                {
-                    Console.WriteLine(exception.Message);
-                }
-            }
-        }
-
-        private void Start()
-        {
-            Console.Write("Input your port ");
-            int port = UserInterface.ReadPort();
-
-            try
-            {
-                foreach (IPAddress temp in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
-                {
-                    if (temp.AddressFamily == AddressFamily.InterNetwork)
-                    {
-                        localIpEndPoint = new IPEndPoint(temp, port);
-                        break;
-                    }
-                }
-                socket.Bind(localIpEndPoint);
-            }
-            catch
-            {
-                throw new Exception("This port is already in use");
-            }
-            Console.Write("Input your name ");
-            name = UserInterface.ReadName() + "(" + localIpEndPoint.ToString() + ")";
-
-            Console.WriteLine();
-            Console.WriteLine(name);
-            Console.WriteLine();
-            UserInterface.ShowInformation();
-            Console.WriteLine();
+            this.name = name;
+            this.localIpEndPoint = iPEndPoint;
+            this.socket = socket;
+            this.connectedClients = connectedClients;
         }
 
         public Dictionary<IPEndPoint, string> GetConnectedClients()
         {
             return connectedClients;
+        }
+
+        public string GetName()
+        {
+            return name;
         }
 
         private bool Connected(IPEndPoint iPEndPoint)
@@ -82,6 +43,11 @@ namespace Task5.Chat
             {
                 connectedClients.Add(client.Key, client.Value);
             }
+        }
+
+        public void DeleteConnectedClients(IPEndPoint iPEndPoint)
+        {
+            connectedClients.Remove(iPEndPoint);
         }
 
         private void SendIPsToConnectedClients(string stringIPs)
@@ -109,7 +75,7 @@ namespace Task5.Chat
             socket.SendTo(data, iPEndPoint);
         }
 
-        private void SendMessageToConnectedClients(string message)
+        public void SendMessageToConnectedClients(string message)
         {
             string newMessage = String.Concat('=', name, ": ", message);
             byte[] data = Encoding.Unicode.GetBytes(newMessage);
@@ -119,17 +85,22 @@ namespace Task5.Chat
             }
         }
 
-        private void Connect()
+        public void Connect()
         {
             Console.Write("Input IP:port ");
             bool correct = false;
             while (!correct)
             {
                 IPEndPoint iPEndPoint = UserInterface.ReadIpEndPoint();
-                if (iPEndPoint.Equals(localIpEndPoint) || Connected(iPEndPoint))
+                if (iPEndPoint.Equals(localIpEndPoint) )
                 {
-                    Console.WriteLine("incorrect input");
-                    continue;
+                    Console.WriteLine("it is your IP:port");
+                    return;
+                }
+                if (Connected(iPEndPoint))
+                {
+                    Console.WriteLine("you are already connected to this client");
+                    return;
                 }
                 string message;
                 if (connectedClients.Count == 0)
@@ -154,7 +125,7 @@ namespace Task5.Chat
             }
         }
 
-        private void Disconnect()
+        public void Disconnect()
         {
             if (connectedClients.Count > 0)
             {
@@ -168,59 +139,10 @@ namespace Task5.Chat
             }
         }
 
-        public void Chat()
+        public void SocketClose()
         {
-            StartWaitingMessage();
-
-            string input = "";
-            while (true)
-            {
-                try
-                {
-                    Action action = UserInterface.ReadAction(out input);
-                    switch (action)
-                    {
-                        case Action.Connect:
-                            {
-                                Connect();
-                                break;
-                            }
-                        case Action.Disconnect:
-                            {
-                                UserInterface.LeaveThisChat(this);
-                                Disconnect();
-                                break;
-                            }
-                        case Action.Clients:
-                            {
-                                UserInterface.ShowConnectedClients(this);
-                                break;
-                            }
-                        case Action.Message:
-                            {
-                                SendMessageToConnectedClients(input);
-                                UserInterface.Message(name, input);
-                                break;
-                            }
-                        case Action.Exit:
-                            {
-                                if (connectedClients.Count > 0)
-                                {
-                                    Disconnect();
-                                }
-                                socket.Shutdown(SocketShutdown.Both);
-                                socket.Close();
-                                Environment.Exit(0);
-                                break;
-                            }
-                    }
-                }
-                catch (Exception exception)
-                {
-                    Console.WriteLine(exception.Message);
-                    continue;
-                }
-            }
+            socket.Shutdown(SocketShutdown.Both);
+            socket.Close();
         }
 
         public void ReceiveMessage(string input, IPEndPoint sender)
@@ -237,7 +159,7 @@ namespace Task5.Chat
                             {
                                 IPEndPoint iPEndPoint = StringFunctions.StringToClient(message).Key;
                                 UserInterface.Disconnect(message);
-                                connectedClients.Remove(iPEndPoint);
+                                DeleteConnectedClients(iPEndPoint);
                                 break;
                             }
                         case '+':

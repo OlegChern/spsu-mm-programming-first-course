@@ -4,8 +4,8 @@
     {
         static void Main(string[] args)
         {
-            Client client = new Client();
-            client.Chat();
+            Client client = Connection.CreateClient();
+            Connection.Chat(client);
         }
     }
 }
