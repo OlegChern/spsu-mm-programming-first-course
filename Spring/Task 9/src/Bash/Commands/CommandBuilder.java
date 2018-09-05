@@ -3,27 +3,27 @@ package Bash.Commands;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Command {
+public class CommandBuilder {
 
     private List<String> args;
     private Executable executor;
 
-    public Command(List<String> parsedString) {
+    public CommandBuilder(List<String> parsedString) {
         switch (parsedString.get(0)) {
             case "echo": {
                 parsedString.remove(0);
                 args = parsedString;
-                executor = new Echo(this);
+                executor = new Echo(args);
                 break;
             }
             case "exit": {
                 args = new ArrayList<>();
-                executor = new Exit(this);
+                executor = new Exit(args);
                 break;
             }
             case "pwd": {
                 args = new ArrayList<>();
-                executor = new Pwd(this);
+                executor = new Pwd(args);
                 break;
             }
             case "cat": {
@@ -31,21 +31,17 @@ public class Command {
                 if (parsedString.size() > 1) {
                     args.add(parsedString.get(1));
                 }
-                executor = new Cat(this);
+                executor = new Cat(args);
                 break;
             }
             case "wc": {
-                args = new ArrayList<>();
-                args.add(parsedString.get(1));
-                if (parsedString.size() > 1) {
-                    args.add(parsedString.get(1));
-                }
-                executor = new Wc(this);
+                args = parsedString;
+                executor = new Wc(args);
                 break;
             }
             default: {
                 args = parsedString;
-                executor = new SystemCall(this);
+                executor = new SystemCall(args);
                 break;
             }
         }

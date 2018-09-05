@@ -6,8 +6,8 @@ public class Echo implements Executable {
 
     private List<String> args;
 
-    Echo(Command command) {
-        args = command.getArgs();
+    Echo(List<String> args) {
+        this.args = args;
     }
 
     @Override

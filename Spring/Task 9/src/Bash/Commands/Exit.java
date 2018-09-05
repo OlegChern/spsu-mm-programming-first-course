@@ -6,8 +6,8 @@ public class Exit implements Executable {
 
     private List<String> args;
 
-    Exit(Command command) {
-        args = command.getArgs();
+    Exit(List<String> args) {
+        this.args = args;
     }
 
     @Override

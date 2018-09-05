@@ -11,17 +11,15 @@ public class Cat implements Executable {
 
     private List<String> args;
 
-    Cat(Command command) throws NotEnoughArgumentsException {
-        args = command.getArgs();
+    Cat(List<String> args) throws NotEnoughArgumentsException {
+        if (args.isEmpty()) {
+            throw new NotEnoughArgumentsException("Please specify path to the file");
+        }
+        this.args = args;
     }
 
     @Override
     public String execute() throws FileNotFoundException {
-
-        if (args.isEmpty()) {
-            throw new NotEnoughArgumentsException("Please specify path to the file");
-        }
-
         File file = new File(args.get(0));
         Scanner scanner = new Scanner(new BufferedReader(new FileReader(file)));
         StringBuilder result = new StringBuilder("");

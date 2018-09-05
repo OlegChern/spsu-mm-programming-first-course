@@ -1,6 +1,6 @@
 package Bash;
 
-import Bash.Commands.Command;
+import Bash.Commands.CommandBuilder;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -14,9 +14,9 @@ class Parser {
         localVariables = new HashMap<>();
     }
 
-    List<Command> parse(String inputString) {
+    List<CommandBuilder> parse(String inputString) {
 
-        List<Command> commandQueue = new ArrayList<>();
+        List<CommandBuilder> commandQueue = new ArrayList<>();
 
         String[] commands = inputString.split("\\|");
 
@@ -28,7 +28,7 @@ class Parser {
             substituteLocalVariables(lexemes);
 
             if (!lexemes.isEmpty()) {
-                commandQueue.add(new Command(lexemes));
+                commandQueue.add(new CommandBuilder(lexemes));
             }
         }
         return commandQueue;

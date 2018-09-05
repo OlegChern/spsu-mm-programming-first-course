@@ -8,37 +8,41 @@ public class Wc implements Executable {
 
     private List<String> args;
 
-    Wc(Command command) throws NotEnoughArgumentsException {
-        args = command.getArgs();
+    Wc(List<String> args) {
+        this.args = args;
     }
 
     @Override
-    public String execute() throws FileNotFoundException {
-        if (args.isEmpty()) {
-            throw new NotEnoughArgumentsException("Please specify path to the file");
+    public String execute() throws NotEnoughArgumentsException {
+        Integer totalLines = 0;
+        Long totalWords = (long) 0;
+        Long totalSize = (long) 0;
+        boolean mark = false;
+        for (String currentArg : args) {
+            File file = new File(currentArg);
+            try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(file)))) {
+                StringBuilder fileStr = new StringBuilder("");
+                Integer linesNumber = 0;
+                while (scanner.hasNextLine()) {
+                    fileStr.append(scanner.nextLine());
+                    linesNumber++;
+                }
+                totalSize += file.length();
+                totalWords += (long) fileStr.toString().split(" ").length;
+                totalLines += linesNumber;
+                mark = true;
+            } catch (FileNotFoundException e) { }
         }
 
-        File file = new File(args.get(0));
-        Scanner scanner = new Scanner(new BufferedReader(new FileReader(file)));
-        StringBuilder fileStr = new StringBuilder("");
-
-        Integer linesNumber = 0;
-        Long wordsNumber;
-        Long fileSize;
-
-        while (scanner.hasNextLine()) {
-            fileStr.append(scanner.nextLine());
-            linesNumber++;
+        if (mark) {
+            return totalLines.toString() + " " + totalWords.toString() + " " + totalSize.toString();
+        } else {
+            throw new NotEnoughArgumentsException("Please specify path to the file!");
         }
-
-        fileSize = file.length();
-        wordsNumber = (long) fileStr.toString().split(" ").length;
-
-        return linesNumber.toString() + " " + wordsNumber.toString() + " " + fileSize.toString();
     }
 
     @Override
     public void addArg(String arg) {
-        args.add(arg);
+        args.addAll(List.of(arg.split("\\s")));
     }
 }

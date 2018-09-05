@@ -1,6 +1,6 @@
 package Bash;
 
-import Bash.Commands.Command;
+import Bash.Commands.CommandBuilder;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public class Bash {
         while (true) {
             try {
                 String inputCommand = UI.getLine();
-                List<Command> commandList = parser.parse(inputCommand);
+                List<CommandBuilder> commandList = parser.parse(inputCommand);
                 String result = interpretCommand(commandList);
                 UI.printResult(result);
             } catch (Exception ex) {
@@ -27,10 +27,10 @@ public class Bash {
         }
     }
 
-    private String interpretCommand(List<Command> commandList) throws Exception {
+    private String interpretCommand(List<CommandBuilder> commandList) throws Exception {
 
         String result = "";
-        for (Command currentCommand : commandList) {
+        for (CommandBuilder currentCommand : commandList) {
             if (!result.equals("")) {
                 currentCommand.addArg(result);
             }

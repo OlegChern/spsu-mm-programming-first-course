@@ -14,8 +14,8 @@ public class SystemCall implements Executable {
     private ProcessBuilder builder;
     private ProcessReader result;
 
-    SystemCall(Command command) {
-        args = command.getArgs();
+    SystemCall(List<String> args) {
+        this.args = args;
         isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
         builder = new ProcessBuilder();
         result = new ProcessReader();

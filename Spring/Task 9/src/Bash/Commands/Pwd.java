@@ -8,8 +8,8 @@ public class Pwd implements Executable {
 
     private List<String> args;
 
-    Pwd(Command command) {
-        args = command.getArgs();
+    Pwd(List<String> args) {
+        this.args = args;
     }
 
     @Override
