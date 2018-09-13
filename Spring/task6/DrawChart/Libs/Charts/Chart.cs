@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace Libs
@@ -9,17 +9,25 @@ namespace Libs
         /// <summary>
         /// имя графика
         /// </summary>
-        public string Name { set; get; }
+        string name;
         /// <summary>
         /// отражать по Х
         /// </summary>
-        public bool mirror;
+        bool mirror;
+        /// <summary>
+        /// имя графика
+        /// </summary>
+        public string Name { get => name; set => name = value; }
+        /// <summary>
+        /// отражать по Х
+        /// </summary>
+        public bool Mirror { get => mirror; set => mirror = value; }
         #endregion
 
         #region Methods
         public Chart()
         {
-            mirror = false;
+            Mirror = false;
         }
         /// <summary>
         /// 
@@ -28,12 +36,12 @@ namespace Libs
         public Chart(string name)
         {
             Name = name;
-            mirror = false;
+            Mirror = false;
         }
         public Chart(string name, bool mirror)
         {
             Name = name;
-            this.mirror = mirror;
+            this.Mirror = mirror;
         }
         /// <summary>
         /// масштабирует график
@@ -71,7 +79,7 @@ namespace Libs
         public List<Point> GetPoints(List<float> values, double scale)
         {
             List<Point> points = new List<Point>();
-            if (mirror)
+            if (Mirror)
             {
 
                 for (int i = 0; i < values.Count; i++)
