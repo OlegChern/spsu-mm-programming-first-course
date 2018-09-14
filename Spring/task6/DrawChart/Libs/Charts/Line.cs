@@ -30,13 +30,13 @@ namespace Libs.Charts
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="x1"></param>
-        /// <param name="y1"></param>
-        public Line(double x, double y, double x1, double y1)
+        /// <param name="x1">х первой точки</param>
+        /// <param name="y1">y первой точки</param>
+        /// <param name="x2">x второй точки</param>
+        /// <param name="y2">y второй точки</param>
+        public Line(double x1, double y1, double x2, double y2)
         {
-            Init(x, y, x1, y1);
+            Init(x1, y1, x2, y2);
         }
         /// <summary>
         /// 
