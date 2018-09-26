@@ -33,12 +33,12 @@ struct BitmapInfoHeader
 class BMP
 {
 private:
-	BitmapInfoHeader * bitmapInfoHeader;
-	BitmapFileHeader* bitmapFileHeader;
+	BITMAPINFOHEADER * bitmapInfoHeader;
+	BITMAPFILEHEADER* bitmapFileHeader;
 	RGB** rgb;
 	int linePadding;
 	char* palette;
-	long paletteSize;
+	long long paletteSize;
 public:
 	BMP(string inFileName);
 	void useFilter(Filter& filter);

@@ -5,7 +5,7 @@ class FilterGrey : public Filter
 {
 public:
 	FilterGrey();
-	void run(RGB** rgb, int width, int height);
+	RGB** run(RGB** rgb, int width, int height);
 	~FilterGrey();
 };
 

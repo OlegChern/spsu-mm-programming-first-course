@@ -5,128 +5,120 @@ using namespace std;
 
 BMP::BMP(string inFileName)
 {
-	ifstream fin(inFileName, ios::in | ios::binary);
+	FILE *fin;
+	fopen_s(&fin, inFileName.c_str(), "rb");
+	if (fin == NULL)
+	{
+		printf("Error! Incorrect name of input file");
+		exit(0);
+	}
+
 	if (!fin)
 	{
-		cout << "No such file!!";
+		cout << "No such file!!\n";
 	}
-	bitmapFileHeader = new BitmapFileHeader();
-	bitmapInfoHeader = new BitmapInfoHeader();
-	fin.read((char*)&bitmapFileHeader->Type, sizeof(bitmapFileHeader->Type));
-	fin.read((char*)&bitmapFileHeader->Size, sizeof(bitmapFileHeader->Size));
-	fin.read((char*)&bitmapFileHeader->Reserved1, sizeof(bitmapFileHeader->Reserved1));
-	fin.read((char*)&bitmapFileHeader->Reserved2, sizeof(bitmapFileHeader->Reserved2));
-	fin.read((char*)&bitmapFileHeader->Reserved2, sizeof(bitmapFileHeader->OffBits));
 
-	fin.read((char*)&bitmapInfoHeader->Size, sizeof(bitmapInfoHeader->Size));
-	fin.read((char*)&bitmapInfoHeader->Width, sizeof(bitmapInfoHeader->Width));
-	fin.read((char*)&bitmapInfoHeader->Height, sizeof(bitmapInfoHeader->Height));
-	fin.read((char*)&bitmapInfoHeader->Planes, sizeof(bitmapInfoHeader->Planes));
-	fin.read((char*)&bitmapInfoHeader->BitCount, sizeof(bitmapInfoHeader->BitCount));
-	fin.read((char*)&bitmapInfoHeader->Compression, sizeof(bitmapInfoHeader->Compression));
-	fin.read((char*)&bitmapInfoHeader->SizeImage, sizeof(bitmapInfoHeader->SizeImage));
-	fin.read((char*)&bitmapInfoHeader->XPelsPerMeter, sizeof(bitmapInfoHeader->XPelsPerMeter));
-	fin.read((char*)&bitmapInfoHeader->YPelsPerMeter, sizeof(bitmapInfoHeader->YPelsPerMeter));
-	fin.read((char*)&bitmapInfoHeader->ClrUsed, sizeof(bitmapInfoHeader->ClrUsed));
-	fin.read((char*)&bitmapInfoHeader->ClrImportant, sizeof(bitmapInfoHeader->ClrImportant));
+	//bitmapFileHeader = malloc(sizeof(BITMAPFILEHEADER));
+	//BITMAPINFOHEADER *bitmapInfoHeader = malloc(sizeof(BITMAPINFOHEADER));
+	bitmapFileHeader = new BITMAPFILEHEADER;
+	bitmapInfoHeader = new BITMAPINFOHEADER;
+	fread(bitmapFileHeader, sizeof(BITMAPFILEHEADER), 1, fin);
+	fread(bitmapInfoHeader, sizeof(BITMAPINFOHEADER), 1, fin);
 
-
-	if ((bitmapInfoHeader->BitCount != 24) && (bitmapInfoHeader->BitCount != 32) || (bitmapFileHeader->Type != 0x4D42))
+	if ((bitmapInfoHeader->biBitCount != 24) && (bitmapInfoHeader->biBitCount != 32))
 	{
-		cout << bitmapInfoHeader->BitCount << " " << bitmapFileHeader->Type << "\n";
-		cout << "Wrong format!!!";
-		//return;
+		cout << "Wrong format!!!\n";
+		exit(0);
 	}
 
-	rgb = new RGB*[bitmapInfoHeader->Height];
-	for (int i = 0; i < bitmapInfoHeader->Height; i++)
+	rgb = new RGB*[bitmapInfoHeader->biHeight];
+	for (int i = 0; i < bitmapInfoHeader->biHeight; i++)
 	{
-		rgb[i] = new RGB[bitmapInfoHeader->Width];
+		rgb[i] = new RGB[bitmapInfoHeader->biWidth];
 	}
 
-	paletteSize = bitmapFileHeader->OffBits - sizeof(BitmapFileHeader) - sizeof(BitmapInfoHeader);
-	if (paletteSize)
+	paletteSize = bitmapFileHeader->bfOffBits - (int)sizeof(BITMAPFILEHEADER) - (int)sizeof(BITMAPINFOHEADER);
+
+	if (paletteSize > 0)
 	{
 		palette = (char*)malloc(paletteSize);
-		fin.read(palette, paletteSize);
+		fread(palette, paletteSize, 1, fin);
 	}
 
-	linePadding = (4 - (bitmapInfoHeader->Width * (bitmapInfoHeader->BitCount / 8)) % 4) & 3;
+	linePadding = (4 - (bitmapInfoHeader->biWidth * (bitmapInfoHeader->biBitCount / 8)) % 4) & 3;
 	char c = 0;
-	for (int i = 0; i < bitmapInfoHeader->Height; i++)
+	for (int i = 0; i < bitmapInfoHeader->biHeight; i++)
 	{
-		for (int j = 0; j < bitmapInfoHeader->Width; j++)
+		for (int j = 0; j < bitmapInfoHeader->biWidth; j++)
 		{
-			fin.read((char*)&rgb[i][j].rgbBlue, sizeof(rgb[i][j].rgbBlue));
-			fin.read((char*)&rgb[i][j].rgbGreen, sizeof(rgb[i][j].rgbGreen));
-			fin.read((char*)&rgb[i][j].rgbRed, sizeof(rgb[i][j].rgbRed));
+			rgb[i][j].rgbBlue = (unsigned char)getc(fin);
+			rgb[i][j].rgbGreen = (unsigned char)getc(fin);
+			rgb[i][j].rgbRed = (unsigned char)getc(fin);
 
-			if (bitmapInfoHeader->BitCount == 32)
+			//printf("%d %d %d\n", rgb[i][j].rgbBlue, rgb[i][j].rgbGreen, rgb[i][j].rgbRed);
+
+			if (bitmapInfoHeader->biBitCount == 32)
 			{
-				fin.read(&c, sizeof(char));
+				getc(fin);
 			}
 		}
 		for (int k = 0; k < linePadding; k++)
 		{
-			fin.read(&c, sizeof(char));
+			getc(fin);
 		}
 	}
 }
+
 void BMP::writeBMP(string outFileName)
 {
-	ofstream fout(outFileName, ios::out | ios::binary);
-	/*fout << bitmapFileHeader->Type << bitmapFileHeader->Size << bitmapFileHeader->Reserved1 << bitmapFileHeader->Reserved2 << bitmapFileHeader->OffBits;
-	fout << bitmapInfoHeader->Size << bitmapInfoHeader->Width << bitmapInfoHeader->Height << bitmapInfoHeader->Planes << bitmapInfoHeader->BitCount <<
-	bitmapInfoHeader->Compression << bitmapInfoHeader->SizeImage << bitmapInfoHeader->XPelsPerMeter << bitmapInfoHeader->YPelsPerMeter <<
-	bitmapInfoHeader->ClrUsed << bitmapInfoHeader->ClrImportant;
-	*/
-
-	fout.write((char*)&bitmapFileHeader->Type, sizeof(bitmapFileHeader->Type));
-	fout.write((char*)&bitmapFileHeader->Size, sizeof(bitmapFileHeader->Size));
-	fout.write((char*)&bitmapFileHeader->Reserved1, sizeof(bitmapFileHeader->Reserved1));
-	fout.write((char*)&bitmapFileHeader->Reserved2, sizeof(bitmapFileHeader->Reserved2));
-	fout.write((char*)&bitmapFileHeader->Reserved2, sizeof(bitmapFileHeader->OffBits));
-
-	fout.write((char*)&bitmapInfoHeader->Size, sizeof(bitmapInfoHeader->Size));
-	fout.write((char*)&bitmapInfoHeader->Width, sizeof(bitmapInfoHeader->Width));
-	fout.write((char*)&bitmapInfoHeader->Height, sizeof(bitmapInfoHeader->Height));
-	fout.write((char*)&bitmapInfoHeader->Planes, sizeof(bitmapInfoHeader->Planes));
-	fout.write((char*)&bitmapInfoHeader->BitCount, sizeof(bitmapInfoHeader->BitCount));
-	fout.write((char*)&bitmapInfoHeader->Compression, sizeof(bitmapInfoHeader->Compression));
-	fout.write((char*)&bitmapInfoHeader->SizeImage, sizeof(bitmapInfoHeader->SizeImage));
-	fout.write((char*)&bitmapInfoHeader->XPelsPerMeter, sizeof(bitmapInfoHeader->XPelsPerMeter));
-	fout.write((char*)&bitmapInfoHeader->YPelsPerMeter, sizeof(bitmapInfoHeader->YPelsPerMeter));
-	fout.write((char*)&bitmapInfoHeader->ClrUsed, sizeof(bitmapInfoHeader->ClrUsed));
-	fout.write((char*)&bitmapInfoHeader->ClrImportant, sizeof(bitmapInfoHeader->ClrImportant));
-
-	if (paletteSize)
+	FILE *fout;
+	fopen_s(&fout, outFileName.c_str(), "wb");
+	if (fout == NULL)
 	{
-		fout.write(palette, paletteSize);
+		printf("Error! Incorrect name of output file");
+		fclose(fout);
+		exit(0);
+	}	
+
+	fwrite(bitmapFileHeader, sizeof(BITMAPFILEHEADER), 1, fout);
+	fwrite(bitmapInfoHeader, sizeof(BITMAPINFOHEADER), 1, fout);
+
+	if (paletteSize > 0)
+	{
+		fwrite(palette, paletteSize, 1, fout);
 	}
 	char c = 0;
-	for (int i = 0; i < bitmapInfoHeader->Height; i++)
+
+	//cout << bitmapInfoHeader->biHeight << " " << bitmapInfoHeader->biWidth << "\n";
+	for (int i = 0; i < bitmapInfoHeader->biHeight; i++)
 	{
-		for (int j = 0; j < bitmapInfoHeader->Width; j++)
+		for (int j = 0; j < bitmapInfoHeader->biWidth; j++)
 		{
-			fout.write((char*)&rgb[i][j].rgbBlue, sizeof(rgb[i][j].rgbBlue));
-			fout.write((char*)&rgb[i][j].rgbGreen, sizeof(rgb[i][j].rgbGreen));
-			fout.write((char*)&rgb[i][j].rgbRed, sizeof(rgb[i][j].rgbRed));
-			//fout << rgb[i][j].rgbBlue << rgb[i][j].rgbGreen << rgb[i][j].rgbRed;
-			if (bitmapInfoHeader->BitCount == 32)
+			fwrite(&rgb[i][j], sizeof(RGB), 1, fout);
+			//printf("%d %d %d\n", rgb[i][j].rgbBlue, rgb[i][j].rgbGreen, rgb[i][j].rgbRed);
+
+			if (bitmapInfoHeader->biBitCount == 32)
 			{
-				fout.write(&c, sizeof(char));
+				putc(0, fout);
 			}
 		}
 		for (int k = 0; k < linePadding; k++)
 		{
-			fout.write(&c, sizeof(char));
+			putc(0, fout);
 		}
 	}
+	fclose(fout);
 }
 
 void BMP::useFilter(Filter& filter)
 {
-	filter.run(rgb, bitmapInfoHeader->Width, bitmapInfoHeader->Height);
+	RGB** oldrgb = rgb;
+	rgb = filter.run(rgb, bitmapInfoHeader->biWidth, bitmapInfoHeader->biHeight);
+	for (int i = 0; i < bitmapInfoHeader->biHeight; i++)
+	{
+		delete[] oldrgb[i];
+	}
+	delete[] oldrgb;
 }
 
 BMP::~BMP()
