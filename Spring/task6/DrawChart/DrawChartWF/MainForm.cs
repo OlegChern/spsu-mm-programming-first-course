@@ -1,4 +1,4 @@
-﻿using Libs;
+using Libs;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -21,7 +21,7 @@ namespace DrawChartWF
         /// <summary>
         /// текущий масштаб
         /// </summary>
-        double scaleCurrInner = 1;
+        double scaleCurr = 1;
         /// <summary>
         /// шаг масштабирования
         /// </summary>
@@ -36,20 +36,20 @@ namespace DrawChartWF
         {
             set
             {
-                scaleCurrInner = Math.Max(1, value);
+                scaleCurr = Math.Max(1, value);
             }
             get
             {
-                return scaleCurrInner;
+                return scaleCurr;
             }
         }
         #endregion
 
         #region Lists
-        List<System.Windows.Point> Points = new List<System.Windows.Point>();
-        List<float> Values = new List<float>();
-        List<Chart> Charts = new List<Chart>();
-        List<Line> Lines = new List<Line>();
+        List<System.Windows.Point> points = new List<System.Windows.Point>();
+        List<float> values = new List<float>();
+        List<Chart> charts = new List<Chart>();
+        List<Line> lines = new List<Line>();
         #endregion
 
         #endregion
@@ -92,10 +92,10 @@ namespace DrawChartWF
             int dy = Height / 2;
             ClearImage();
             UpdatePoints();
-            if (Points != null)
-                DrawPoints(Points, dx, dy);
-            if (Lines != null)
-                DrawPoints(Lines, dx, dy);
+            if (points != null)
+                DrawPoints(points, dx, dy);
+            if (lines != null)
+                DrawPoints(lines, dx, dy);
         }
         private void UpdateInfoLabel()
         {
@@ -104,15 +104,15 @@ namespace DrawChartWF
         }
         private void UpdatePoints()
         {
-            if (Points != null)
-                Points.Clear();
-            if (Lines != null)
-                Lines.Clear();
+            if (points != null)
+                points.Clear();
+            if (lines != null)
+                lines.Clear();
             System.Windows.Point p = new System.Windows.Point(0, 0);
             System.Windows.Size size = new System.Windows.Size(Width, Height);
-            Lines.AddRange(cHelper.DrawAxis(p, size, ScaleCurr, ChartHelper.Direction.horizontal));
-            Lines.AddRange(cHelper.DrawAxis(p, size, ScaleCurr, ChartHelper.Direction.vertical));
-            Points = cHelper.GetPoints(Charts, Values, ScaleCurr, cmbCharts.SelectedIndex);
+            lines.AddRange(cHelper.DrawAxis(p, size, ScaleCurr, ChartHelper.Direction.horizontal));
+            lines.AddRange(cHelper.DrawAxis(p, size, ScaleCurr, ChartHelper.Direction.vertical));
+            points = cHelper.GetPoints(charts, values, ScaleCurr, cmbCharts.SelectedIndex);
         }
         #endregion
 
@@ -121,11 +121,11 @@ namespace DrawChartWF
         {
             InitializeComponent();
             for (double i = -100; i < 100; i += 0.1)
-                Values.Add((float)i);
-            Charts.Add(new SqEqChart("Парабола", false));
-            Charts.Add(new CircleChart("Окружность", true));
-            for (int i = 0; i < Charts.Count; i++)
-                cmbCharts.Items.Add(Charts[i].Name);
+                values.Add((float)i);
+            charts.Add(new SqEqChart("Парабола", false));
+            charts.Add(new CircleChart("Окружность", true));
+            for (int i = 0; i < charts.Count; i++)
+                cmbCharts.Items.Add(charts[i].Name);
             pbChart.MouseWheel += new MouseEventHandler(this.PbChartMouseWheel);
         }
         #endregion
